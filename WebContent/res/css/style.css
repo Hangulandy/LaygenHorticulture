@@ -1,0 +1,144 @@
+@charset "UTF-8";
+
+/* Setting style variables */
+:root {
+	--light-color: #ffffe0;
+	--main-dark-color: #1f386b;
+	--banner-height: 100px;
+}
+
+/* The styles for the elements */
+body {
+	background-color: #ffffe0;
+	color: var(--main-dark-color);
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 85%;
+	margin-left: 2em;
+	margin-right: 2em;
+}
+
+
+h1 {
+	font-size: 140%;
+	margin-bottom: .5em;
+}
+
+h2 {
+	font-size: 120%;
+	margin-bottom: .5em;
+}
+
+p {
+	font-weight: bold;
+}
+
+label {
+	float: left;
+	width: 7em;
+	margin-bottom: 0.5em;
+	font-weight: bold;
+}
+
+input[type="text"], input[type="email"] { /* An attribute selector */
+	width: 15em;
+	margin-left: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+span {
+	margin-left: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+br {
+	clear: both;
+}
+
+table, th, td {
+  border: 1px solid grey;
+  text-align: center;
+}
+
+table {
+  width: 100%;
+}
+
+.left {
+	text-align: left;
+}
+
+/* The styles for the classes */
+.pad_top {
+	padding-top: 0.25em;
+}
+
+.margin_left {
+	margin-left: 0.5em;
+}
+
+.banner {
+	height: var(--banner-height);
+}
+
+.errorMsg{
+	color: red;
+	font-style: italic;
+}
+
+/* The styles for specific objects */
+
+#bannerRight {
+	background-image: linear-gradient(to right, var(--main-dark-color),
+		black);
+	height: var(--banner-height);
+	line-height: var(--banner-height);
+	overflow: hidden;
+	text-align: center;
+}
+
+#bannerTitle {
+	display: inline-block;
+	font-size: 50px;
+	color: white;
+	margin: 5px;
+}
+
+.button {
+  	font: bold 11px Arial;
+  	text-decoration: none;
+  	background-color: var(--main-dark-color);
+  	color: white;
+  	padding: 2px 6px 2px 6px;
+  	border-top: 1px solid #CCCCCC;
+  	border-right: 1px solid #333333;
+  	border-bottom: 1px solid #333333;
+  	border-left: 1px solid #CCCCCC;
+  	display: inline;
+}
+
+.button:hover, .redButton:hover {
+	background-color: white;
+	color: black;
+}
+
+.redButton {
+  	font: bold 11px Arial;
+  	text-decoration: none;
+  	background-color: #cc0000;
+ 	color: white;
+  	padding: 2px 6px 2px 6px;
+  	border-top: 1px solid #CCCCCC;
+  	border-right: 1px solid #333333;
+  	border-bottom: 1px solid #333333;
+  	border-left: 1px solid #CCCCCC;
+  	display: inline;
+}
+
+.sideBySide {
+	display: inline;
+}
+
+.deleteWarning {
+	color: #D8000C;
+    background-color: #FFD2D2;	
+}

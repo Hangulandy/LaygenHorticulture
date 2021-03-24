@@ -1,9 +1,7 @@
 
 <h1>Login</h1>
 <p>Enter your login information:</p>
-<p>
-    <i class="errorMsg">${loginMessage}</i>
-</p>
+
 
 <form action="Controller" method="post">
     <input type="hidden" name="action" value="login" />
@@ -16,13 +14,5 @@
     <br>
     <input class="button" type="submit" value="Login" class="margin_left" />
 </form>
-
-
-<%
-	Object thisLock = session.getId().intern();
-	synchronized (thisLock) {
-		session.setAttribute("loginMessage", null);
-	}
-%>
 
 <hr />

@@ -29,5 +29,13 @@ if (machine != null){%>
     <input type="hidden" name="action" value="viewMachineData" />
 </form>
 
+<form class="sideBySide" action="Controller" method="post">
+    <input class="button" type="submit" value="Camera" />
+    <input type="hidden" name="action" value="viewCameraPage" />
+</form>
+
 <%} %>
+
+<p class="sideBySide">${user }</p>
+
 

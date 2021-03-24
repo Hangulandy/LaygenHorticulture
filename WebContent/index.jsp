@@ -3,6 +3,9 @@
 
 
 <!-- Must start with the login component if there is no logged in user -->
+
+<p>${message }</p>
+
 <%
 String viewComponent = (String) session.getAttribute("viewComponent");
 if ((user == null || !user.isLoggedIn()) && viewComponent == null) {
@@ -38,6 +41,9 @@ if (viewComponent.equalsIgnoreCase("machineData")) {
 <%@ include file="./res/includes/machine_data_component.jsp"%>
 <%
 }
+if (viewComponent.equalsIgnoreCase("cameraPage")){ %>
+<%@ include file="./res/includes/camera_page_component.jsp"%>
+<% } 
 } else { %>
 
 <%@ include file="./res/includes/machine_list_component.jsp"%>
@@ -52,6 +58,7 @@ if (viewComponent.equalsIgnoreCase("machineData")) {
 <%
 synchronized (lock) {
 	session.setAttribute("message", null);
+	session.setAttribute("errorMessage", null);
 	session.setAttribute("viewComponent", null);
 }
 %>

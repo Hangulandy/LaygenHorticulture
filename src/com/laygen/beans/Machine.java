@@ -2,9 +2,11 @@ package com.laygen.beans;
 
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.laygen.database.MachineDB;
@@ -12,15 +14,14 @@ import com.laygen.database.MachineDB;
 public class Machine {
 
 	private String serialNumber;
-	private Map<String, String> info; // key is the column qualifier and value is the value; i.e. key: location,
-										// value: Laygen office
-	private Map<String, String> settings; // key is the column qualifier and value is the value; i.e. key: brightness,
-											// value: 50
+	private Map<String, String> info;
+	private Map<String, String> settings;
 	private TreeSet<Component> components;
-	private List<String> imageNames;
+	private TreeMap<String, String> images;
 	private TreeSet<User> authorizedUsers;
 	private Socket socket;
 	private PrintWriter out;
+	private String image;
 
 	public Machine() {
 	}
@@ -32,9 +33,9 @@ public class Machine {
 	public void setSerialNumber(String serialNumber) {
 		this.serialNumber = serialNumber;
 	}
-	
+
 	public void refreshInfoFromDB() {
-		setInfo(MachineDB.getMachineInfoBySerialNumber(getSerialNumber()));
+		setInfo(MachineDB.getMachineCurrentInfoBySerialNumber(getSerialNumber()));
 	}
 
 	public Map<String, String> getInfo() {
@@ -43,10 +44,6 @@ public class Machine {
 
 	public void setInfo(Map<String, String> info) {
 		this.info = info;
-	}
-	
-	public void refreshSettingsFromDB() {
-		setSettings(MachineDB.getMachineSettingsBySerialNumber(getSerialNumber()));
 	}
 
 	public Map<String, String> getSettings() {
@@ -65,12 +62,12 @@ public class Machine {
 		this.components = components;
 	}
 
-	public List<String> getImageNames() {
-		return imageNames;
+	public TreeMap<String, String> getImageNames() {
+		return images;
 	}
 
-	public void setImageNames(List<String> imageNames) {
-		this.imageNames = imageNames;
+	public void setImageNames(TreeMap<String, String> images) {
+		this.images = images;
 	}
 
 	public TreeSet<User> getAuthorizedUsers() {
@@ -83,9 +80,10 @@ public class Machine {
 
 	public String updateMachineSettings(HashMap<String, String> newSettings) {
 		// TODO - perhaps this should be asynchronous in the future?
+
+		this.refreshAllFromDB();
 		String portString = this.getInfo().get("port");
-		
-		this.refreshInfoFromDB();
+
 		int port = 0;
 
 		if (portString != null) {
@@ -101,29 +99,76 @@ public class Machine {
 			out = new PrintWriter(socket.getOutputStream(), true);
 			String msg;
 			for (String key : this.getSettings().keySet()) {
-				if (this.getSettings().get(key).equalsIgnoreCase(newSettings.get(key))) {
-					// no need to send an update to the device
-				} else {
-					// update the current setting that is different
-					this.getSettings().put(key, newSettings.get(key));
-					
-					// need to send an update for just that setting to the device
-					msg = String.format("%s#%s", this.getSettings().get(key), key);
-					System.out.println(msg);
-					out.println(msg);
-				}
+				this.getSettings().put(key, newSettings.get(key));
+				msg = String.format("%s#%s", this.getSettings().get(key), key);
+				System.out.println(msg);
+				out.println(msg);
 			}
 			out.close();
 			socket.close();
 			return "Success";
 		} catch (Exception e) {
-			return "Cannot establish a communication socket with that machine";
+			return "There was a communication error with that machine. Check that it is turned on and try again.";
+		}
+	}
+
+	public String takePicture() {
+		// TODO - perhaps this should be asynchronous in the future?
+
+		String portString = this.getInfo().get("port");
+
+		int port = 0;
+
+		if (portString != null) {
+			try {
+				port = Integer.parseInt(portString);
+			} catch (Exception e) {
+				return "No valid port number to send a command to that machine";
+			}
+		}
+
+		try {
+			socket = new Socket(this.getInfo().get("ip"), port);
+			out = new PrintWriter(socket.getOutputStream(), true);
+			String msg = "1#flash";
+			System.out.println(msg);
+			out.println(msg);
+			out.close();
+			socket.close();
+			return "Success";
+		} catch (Exception e) {
+			return "There was a communication error with that machine. Check that it is turned on and try again.";
 		}
 	}
 
 	public void refreshAllFromDB() {
-		this.refreshInfoFromDB();
-		this.refreshSettingsFromDB();
+		refreshInfoFromDB();
+		refreshSettingsFromDB();
+	}
+
+	public void refreshSettingsFromDB() {
+		setSettings(MachineDB.getCurrentSettingsBySerialNumber(getSerialNumber()));
+	}
+
+	public void refreshImages() {
+		TreeMap<String, String> map = new TreeMap<String, String>(Collections.reverseOrder());
+		Map<String, String> otherMap = MachineDB.getImageNamesForMachine(this.getSerialNumber());
+		for (String key : otherMap.keySet()) {
+			map.put(key, otherMap.get(key));
+		}
+		setImageNames(map);
+	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+	
+	public void fetchImage(String imageId) {
+		this.setImage(Base64.getEncoder().encodeToString(MachineDB.fetchImageBytesById(imageId)));
 	}
 
 }

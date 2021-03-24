@@ -1,6 +1,7 @@
-<%@ page import="com.laygen.beans.Machine"%>
+<h1>Machine Settings</h1>	
 
-<p>${machineSettingsViewMessage}</p>
+
+<%@ page import="com.laygen.beans.Machine"%>
 
 <%
 boolean lightChecked = false;
@@ -33,15 +34,16 @@ if (machine != null) {
 			<td><%=lightOn%></td>
 			<td><label class="radio-inline"><input type="radio"
 					id="light_on" name="light_on" value="1" <%if (lightChecked) {%>
-					checked <%}%>>On</label> <label class="radio-inline"><input
+					checked <%}%>/>On</label> <label class="radio-inline"><input
 					type="radio" id="light_off" name="light_on" value="0"
-					<%if (!lightChecked) {%> checked <%}%>>Off</label></td>
+					<%if (!lightChecked) {%> checked <%}%>/>Off</label></td>
 		</tr>
 		<tr>
 			<td>Brightness</td>
 			<td>${machine.settings['brightness'] }</td>
 			<td><input type="number" id="brightness" name="brightness"
-				step="5" min="0" max="100" value="${machine.settings['brightness'] }"></td>
+				step="5" min="0" max="100"
+				value="${machine.settings['brightness'] }"></td>
 		</tr>
 		<tr>
 			<td>Pump On / Off</td>
@@ -74,12 +76,5 @@ if (machine != null) {
 
 
 
-<%
-}
-
-Object thisLock = session.getId().intern();
-synchronized (thisLock) {
-session.setAttribute("machineSettingsViewMessage", null);
-}
-%>
+<%}%>
 

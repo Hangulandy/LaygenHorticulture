@@ -1,15 +1,15 @@
 package com.laygen.database;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.NavigableMap;
 import java.util.TreeSet;
 
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.client.Result;
@@ -23,10 +23,10 @@ public class MessageDB {
 	static Charset enc = StandardCharsets.UTF_8;
 
 	public static TreeSet<Message> scanColumnFamily(String columnFamily){
-		return scanColumnFamilyWithRowPrefix(null, columnFamily);
+		return scanColumnFamilyWithRowPrefix(null, null, columnFamily);
 	}
 	
-	public static TreeSet<Message> scanColumnFamilyWithRowPrefix(String columnFamily, String rowPrefix) {
+	public static TreeSet<Message> scanColumnFamilyWithRowPrefix(String columnFamily, String columnQualifier, String rowPrefix) {
 		Connection conn = DBConnection.getInstance().getConnection();
 		String tableName = DBConnection.getTableName();
 		TreeSet<Message> messages = new TreeSet<Message>();
@@ -34,7 +34,13 @@ public class MessageDB {
 		try (Table table = conn.getTable(TableName.valueOf(tableName))) {
 			Scan scan = new Scan();
 			if (columnFamily != null) {
-				scan.addFamily(Bytes.toBytes(columnFamily));
+				byte[] cf = Bytes.toBytes(columnFamily);
+				if (columnQualifier != null) {
+					byte[] cq = Bytes.toBytes(columnQualifier);
+					scan.addColumn(cf, cq);
+				} else {
+					scan.addFamily(cf);
+				}
 			}
 			if (rowPrefix != null) {
 				scan.setRowPrefixFilter(Bytes.toBytes(rowPrefix));
@@ -43,7 +49,7 @@ public class MessageDB {
 			for (Result rr = scanner.next(); rr != null; rr = scanner.next()) {
 				messages.addAll(buildMessagesFromResult(rr));
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return messages;
@@ -61,10 +67,31 @@ public class MessageDB {
 			}
 			Result rr = table.get(get);
 			messages.addAll(buildMessagesFromResult(rr));
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return messages;
+	}
+	
+	public static byte[] getByteValue(String rowId, String columnFamily, String columnQualifier) {
+		
+		Connection conn = DBConnection.getInstance().getConnection();
+		String tableName = DBConnection.getTableName();
+		byte[] output = null;
+		
+		byte[] row = Bytes.toBytes(rowId);
+		byte[] cf = Bytes.toBytes(columnFamily);
+		byte[] cq = Bytes.toBytes(columnQualifier);
+
+		try (Table table = conn.getTable(TableName.valueOf(tableName))) {
+			Get get = new Get(row);
+				get.addColumn(cf, cq);
+			Result rr = table.get(get);
+			output = rr.getFamilyMap(cf).get(cq);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return output;
 	}
 
 	private static TreeSet<Message> buildMessagesFromResult(Result rr) {
@@ -112,27 +139,38 @@ public class MessageDB {
 	public static TreeSet<Message> getRowById(String rowId) {
 		return getRowMessagesByColumnFamily(rowId, null);
 	}
-
-	public static TreeSet<Message> getColumnFamilies() {
-
-		TreeSet<Message> messages = new TreeSet<Message>();
-		for (char c = 'A'; c <= 'Z'; c++) {
-			messages.addAll(getRowById(String.valueOf(c)));
-		}
-		return messages;
+	
+	public static void simplePut(byte[] row, byte[] cf, byte[] cq, byte[] value) {
+		
+		Connection conn = DBConnection.getInstance().getConnection();
+		String tableName = DBConnection.getTableName();
+		
+		try (Table table = conn.getTable(TableName.valueOf(tableName))) {
+			Put put = new Put(row);
+			put.addColumn(cf, cq, value);
+			table.put(put);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
 	}
-
-	public static HashMap<String, String> getMessageToCodeDictionary() {
-
-		HashMap<String, String> map = null;
-		TreeSet<Message> messages = MessageDB.getRowMessagesByColumnFamily("message_codes", "Z");
-		if (messages != null) {
-			map = new HashMap<String, String>();
-			for (Message message : messages) {
-				map.put(message.getValue(), message.getColumnName());
-			}
+	
+	public static boolean deleteValue(String rowId, String columnFamily, String columnQualifier) {
+		byte[] row = Bytes.toBytes(rowId);
+		byte[] cf = Bytes.toBytes(columnFamily);
+		byte[] cq = Bytes.toBytes(columnQualifier);
+		
+		Connection conn = DBConnection.getInstance().getConnection();
+		String tableName = DBConnection.getTableName();
+		
+		try (Table table = conn.getTable(TableName.valueOf(tableName))){
+			Delete del = new Delete(row);
+			del.addColumn(cf, cq);
+			table.delete(del);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
 		}
-		return map;
 	}
 
 }

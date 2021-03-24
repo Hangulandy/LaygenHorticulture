@@ -9,6 +9,7 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import com.laygen.beans.Machine;
 import com.laygen.beans.Message;
 import com.laygen.beans.User;
 
@@ -24,7 +25,7 @@ public class UserDB {
 
 			Connection conn = DBConnection.getInstance().getConnection();
 			try (Table table = conn.getTable(TableName.valueOf(DBConnection.getTableName()))) {
-				byte[] cf = Bytes.toBytes("A");
+				byte[] cf = Bytes.toBytes("C");
 				Put put = new Put(Bytes.toBytes(user.getId()));
 				put.addColumn(cf, Bytes.toBytes("email"), Bytes.toBytes(user.getEmail()));
 				put.addColumn(cf, Bytes.toBytes("name"), Bytes.toBytes(user.getName()));
@@ -34,10 +35,6 @@ public class UserDB {
 				table.put(put);
 				
 				put = new Put(Bytes.toBytes(user.getEmail()));
-				put.addColumn(cf, Bytes.toBytes("UUID"), Bytes.toBytes(user.getId()));
-				table.put(put);
-				
-				put = new Put(Bytes.toBytes(user.getUsername()));
 				put.addColumn(cf, Bytes.toBytes("UUID"), Bytes.toBytes(user.getId()));
 				table.put(put);
 
@@ -64,11 +61,14 @@ public class UserDB {
 		
 		// First, get the ID using email
 		String uuid = getUUIDByEmail(email);
+		System.out.println(uuid);
 		
 		// If a uuid comes back (i.e. email is in the db), get the user data by uuid
 		if (uuid != null) {
 			user = getCompleteUserByUUID(uuid);
 		}
+		
+		System.out.println(user);
 		
 		// if a user object came back, check password
 		if (user != null) {
@@ -87,7 +87,7 @@ public class UserDB {
 		TreeSet<Message> messages = MessageDB.getRowById(email);
 		if (messages.size() > 0) {
 			for (Message message : messages) {
-				if (message.getColumnFamily().equalsIgnoreCase("A") && message.getColumnName().equalsIgnoreCase("uuid")) {
+				if (message.getColumnFamily().equalsIgnoreCase("C") && message.getColumnName().equalsIgnoreCase("uuid")) {
 					output = message.getValue();
 					break;
 				}
@@ -106,14 +106,12 @@ public class UserDB {
 	
 	private static User getCompleteUserByUUID(String uuid) {
 		User user = null;
-		TreeSet<Message> messages = MessageDB.getRowById(uuid);
+		TreeSet<Message> messages = MessageDB.getRowMessagesByColumnFamily(uuid, "C");
 		
 		if (messages.size() > 0) {
 			user = new User();
+			user.setId(uuid);
 			for (Message message : messages) {
-				if (message.getColumnName().equalsIgnoreCase("uuid")) {
-					user.setId(message.getValue());
-				}
 				if (message.getColumnName().equalsIgnoreCase("email")) {
 					user.setEmail(message.getValue());
 				}
@@ -132,6 +130,11 @@ public class UserDB {
 			}
 		}
 		return user;
+	}
+	
+	public static TreeSet<Machine> getMachinesForUser(User user){
+		
+		return null;
 	}
 
 }

@@ -1,12 +1,6 @@
 <h1>Join our community</h1>
 <p>To become a member of the Laygen Farming community, enter your
     information below:</p>
-<p>
-    <i class="errorMsg">${user.errorMsg}</i>
-</p>
-<p>
-    <i class="errorMsg">${joinMessage}</i>
-</p>
 
 <form action="Controller" method="post">
     <input type="hidden" name="action" value="join" />
@@ -39,10 +33,3 @@
 </form>
 
 <hr/>
-
-<%
-    Object thisLock= session.getId().intern();
-    synchronized (thisLock) {
-        session.setAttribute("joinMessage", null);
-    }
-%>

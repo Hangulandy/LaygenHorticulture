@@ -1,6 +1,7 @@
 package com.laygen.beans;
 
 import java.io.Serializable;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ public class User implements Serializable, Comparable<User> {
 	private String password;
 	private String errorMsg;
 	private boolean loggedIn;
+	private TreeSet<Authorization> authorizations;
 	public final static int MAX_NAME_LEN = 40;
 	
 	// TODO - attribute for authorized machines; set of 
@@ -176,6 +178,19 @@ public class User implements Serializable, Comparable<User> {
 		System.out.println("Username on file : " + this.username);
 		System.out.println("Organization on file : " + this.organization);
 		System.out.println("Password on file : " + this.password);
+	}
+
+	public void refreshAuthorizations() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public TreeSet<Authorization> getAuthorizations() {
+		return authorizations;
+	}
+
+	public void setAuthorizations(TreeSet<Authorization> authorizations) {
+		this.authorizations = authorizations;
 	}
 
 }

@@ -7,7 +7,7 @@
 
 <form class="sideBySide" action="Controller" method="post">
     <input class="button" type="submit" value="Select Machine" />
-    <input type="hidden" name="action" value="selectMachine" />
+    <input type="hidden" name="action" value="viewMyMachines" />
 </form>
 
 <% Machine machine = (Machine) session.getAttribute("machine"); 
@@ -30,7 +30,7 @@ if (machine != null){%>
 </form>
 
 <form class="sideBySide" action="Controller" method="post">
-    <input class="button" type="submit" value="Camera" />
+    <input class="button" type="submit" value="Images" />
     <input type="hidden" name="action" value="viewCameraPage" />
 </form>
 

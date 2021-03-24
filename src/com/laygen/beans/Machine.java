@@ -99,10 +99,10 @@ public class Machine {
 			out = new PrintWriter(socket.getOutputStream(), true);
 			String msg;
 			for (String key : this.getSettings().keySet()) {
-				this.getSettings().put(key, newSettings.get(key));
-				msg = String.format("%s#%s", this.getSettings().get(key), key);
-				System.out.println(msg);
+				msg = String.format("%s#%s", newSettings.get(key), key);
 				out.println(msg);
+				this.getSettings().put(key, newSettings.get(key));
+				System.out.println(msg);
 			}
 			out.close();
 			socket.close();
@@ -166,9 +166,25 @@ public class Machine {
 	public void setImage(String image) {
 		this.image = image;
 	}
-	
+
 	public void fetchImage(String imageId) {
 		this.setImage(Base64.getEncoder().encodeToString(MachineDB.fetchImageBytesById(imageId)));
+	}
+
+	public String deleteImage(String imageId) {
+		if (imageId != null) {
+			// delete the image from the DB
+			MachineDB.deleteImage(imageId);
+			// remove the image from the TreeMap
+			this.getImageNames().remove(imageId);
+		}
+		// Set the fetched image to the first in the map no matter what imageId was passed in
+		if (this.getImageNames().size() > 0) {
+			this.fetchImage(this.getImageNames().firstKey());
+			return this.getImageNames().firstKey();			
+		} else {
+			return null;
+		}
 	}
 
 }

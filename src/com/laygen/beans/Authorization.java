@@ -1,6 +1,6 @@
 package com.laygen.beans;
 
-public class Authorization {
+public class Authorization implements Comparable<Authorization> {
 
 	private String userId;
 	private String machineSerialNumber;
@@ -28,6 +28,11 @@ public class Authorization {
 
 	public void setPrivilegeLevel(String privilegeLevel) {
 		this.privilegeLevel = privilegeLevel;
+	}
+
+	@Override
+	public int compareTo(Authorization other) {
+		return this.getMachineSerialNumber().compareTo(other.getMachineSerialNumber());
 	}
 
 }

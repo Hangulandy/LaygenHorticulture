@@ -1,4 +1,4 @@
-<h1>Machine Settings</h1>	
+<h1>Machine Settings</h1>
 
 
 <%@ page import="com.laygen.beans.Machine"%>
@@ -6,8 +6,10 @@
 <%
 boolean lightChecked = false;
 boolean pumpChecked = false;
+boolean cameraChecked = false;
 String lightOn = "Off";
 String pumpOn = "Off";
+String cameraOn = "Off";
 Machine machine = (Machine) session.getAttribute("machine");
 
 if (machine != null) {
@@ -19,10 +21,18 @@ if (machine != null) {
 		pumpChecked = true;
 		pumpOn = "On";
 	}
+	if (machine.getSettings().get("camera_on") != null
+	&& machine.getSettings().get("camera_on").equalsIgnoreCase("1")) {
+		cameraChecked = true;
+		cameraOn = "On";
+	}
 %>
+
+
 
 <!-- This will only show if machine != null because it is inside the code block following the if statement -->
 <form action="Controller" method="get">
+	<h2>Grow Settings</h2>
 	<table>
 		<tr>
 			<th>Setting</th>
@@ -34,9 +44,9 @@ if (machine != null) {
 			<td><%=lightOn%></td>
 			<td><label class="radio-inline"><input type="radio"
 					id="light_on" name="light_on" value="1" <%if (lightChecked) {%>
-					checked <%}%>/>On</label> <label class="radio-inline"><input
+					checked <%}%> />On</label> <label class="radio-inline"><input
 					type="radio" id="light_off" name="light_on" value="0"
-					<%if (!lightChecked) {%> checked <%}%>/>Off</label></td>
+					<%if (!lightChecked) {%> checked <%}%> />Off</label></td>
 		</tr>
 		<tr>
 			<td>Brightness</td>
@@ -69,6 +79,33 @@ if (machine != null) {
 				value="${machine.settings['pump_cycle']}"></td>
 		</tr>
 	</table>
+	<h2>Camera Settings</h2>
+	<table>
+		<tr>
+			<th>Setting</th>
+			<th>Value</th>
+			<th>Adjust</th>
+		</tr>
+		<tr>
+			<td>Camera On / Off</td>
+			<td><%=cameraOn%></td>
+			<td><label class="radio-inline"><input type="radio"
+					id="camera_on" name="camera_on" value="1" <%if (cameraChecked) {%>
+					checked <%}%>>On</label> <label class="radio-inline"><input
+					type="radio" id="camera_off" name="camera_on" value="0"
+					<%if (!cameraChecked) {%> checked <%}%>>Off</label></td>
+		</tr>
+		<tr>
+			<td>Camera Interval (s)</td>
+			<td>${machine.settings['camera_interval'] }</td>
+			<td><input type="number" id="camera_interval"
+				name="camera_interval" step="1" min="0" max="1000"
+				value="${machine.settings['camera_interval'] }"></td>
+		</tr>
+	</table>
+
+
+
 	<br> <input type="hidden" name="action" value="updateSettings" />
 	<input class="button" type="submit" value="Update Settings"
 		class="margin_left" />

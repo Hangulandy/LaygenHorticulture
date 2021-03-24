@@ -81,7 +81,7 @@ public class Controller extends HttpServlet {
 					// At this point, the user is in the data store
 					user.printUser();
 					if (user.isLoggedIn()) {
-						// do nothing
+						user.refreshAuthorizations();
 					} else {
 						message = "Password is incorrect.";
 					}
@@ -142,23 +142,20 @@ public class Controller extends HttpServlet {
 
 			// ACTION: view my authorizations
 			if (action.equalsIgnoreCase("viewMyMachines")) {
-
-//				user.refreshAuthorizations();
-//				if (user.getAuthorizations() == null || user.getAuthorizations().size() == 0) {
-//					message = "You have no machines to show.";
-//				} else {
-//					message = "Here are the machines you can use:";
-//				}
-//				viewComponent = "viewMyMachines";
+				user.refreshAuthorizations();
+				viewComponent = "viewMyMachines";
 			}
 
 			// ACTION: select machine
 			if (action.equalsIgnoreCase("selectMachine")) {
-				// TODO - logic to actually select machine from a list
-				String serialNumber = "0123456789";
+				String serialNumber = request.getParameter("selectedMachineId");
 				machine = new Machine();
-				machine.setSerialNumber(serialNumber);
-				machine.refreshAllFromDB();
+				if (serialNumber != null){
+					machine.setSerialNumber(serialNumber);
+					machine.refreshAllFromDB();
+				} else {
+					message = "No information to show about that machine.";
+				}
 				viewComponent = "machineInfo";
 			}
 
@@ -186,6 +183,8 @@ public class Controller extends HttpServlet {
 				newSettings.put("brightness", request.getParameter("brightness"));
 				newSettings.put("light_on", request.getParameter("light_on"));
 				newSettings.put("pump_on", request.getParameter("pump_on"));
+				newSettings.put("camera_on", request.getParameter("camera_on"));
+				newSettings.put("camera_interval", request.getParameter("camera_interval"));
 				newSettings.put("pump_duration", pumpDuration);
 				newSettings.put("pump_cycle", pumpCycle);
 
@@ -203,7 +202,7 @@ public class Controller extends HttpServlet {
 					}
 				}
 				if (image != null) {
-					machine.fetchImage(image);					
+					machine.fetchImage(image);
 				}
 				viewComponent = "cameraPage";
 			}
@@ -231,11 +230,7 @@ public class Controller extends HttpServlet {
 			// ACTION: delete image
 			if (action.equalsIgnoreCase("deleteImage")) {
 				String imageId = (String) request.getParameter("image");
-				if (imageId != null) {
-					MachineDB.deleteImage(imageId);
-				}
-				machine.setImage(null);
-				image = null;
+				image = machine.deleteImage(imageId);
 				viewComponent = "cameraPage";
 			}
 

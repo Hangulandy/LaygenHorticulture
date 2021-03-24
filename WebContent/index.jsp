@@ -41,14 +41,25 @@ if (viewComponent.equalsIgnoreCase("machineData")) {
 <%@ include file="./res/includes/machine_data_component.jsp"%>
 <%
 }
-if (viewComponent.equalsIgnoreCase("cameraPage")){ %>
+if (viewComponent.equalsIgnoreCase("cameraPage")) {
+%>
 <%@ include file="./res/includes/camera_page_component.jsp"%>
-<% } 
-} else { %>
+<%
+}
+if (viewComponent.equalsIgnoreCase("viewMyMachines")) {
+%>
+
+<%@ include file="./res/includes/machine_list_component.jsp"%>
+<%
+}
+} else {
+%>
 
 <%@ include file="./res/includes/machine_list_component.jsp"%>
 
-<% } %>
+<%
+}
+%>
 
 <%
 }

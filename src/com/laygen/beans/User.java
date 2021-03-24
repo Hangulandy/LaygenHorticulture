@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.laygen.database.AuthorizationDB;
+
 public class User implements Serializable, Comparable<User> {
 
 	private static final long serialVersionUID = 1L;
@@ -181,8 +183,7 @@ public class User implements Serializable, Comparable<User> {
 	}
 
 	public void refreshAuthorizations() {
-		// TODO Auto-generated method stub
-		
+		this.setAuthorizations(AuthorizationDB.getUserAuthorizations(this));
 	}
 
 	public TreeSet<Authorization> getAuthorizations() {

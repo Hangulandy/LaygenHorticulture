@@ -16,12 +16,13 @@ public class Machine {
 	private String serialNumber;
 	private Map<String, String> info;
 	private Map<String, String> settings;
-	private TreeSet<Component> components;
+	private TreeMap<String, Sensor> sensors;
 	private TreeMap<String, String> images;
 	private TreeSet<User> authorizedUsers;
 	private Socket socket;
 	private PrintWriter out;
 	private String image;
+	private Sensor selectedSensor;
 
 	public Machine() {
 	}
@@ -54,12 +55,12 @@ public class Machine {
 		this.settings = settings;
 	}
 
-	public TreeSet<Component> getComponents() {
-		return components;
+	public TreeMap<String, Sensor> getSensors() {
+		return sensors;
 	}
 
-	public void setComponents(TreeSet<Component> components) {
-		this.components = components;
+	public void setSensors(TreeMap<String, Sensor> sensors) {
+		this.sensors = sensors;
 	}
 
 	public TreeMap<String, String> getImageNames() {
@@ -144,6 +145,7 @@ public class Machine {
 	public void refreshAllFromDB() {
 		refreshInfoFromDB();
 		refreshSettingsFromDB();
+		refreshSensorsFromDB();
 	}
 
 	public void refreshSettingsFromDB() {
@@ -185,6 +187,23 @@ public class Machine {
 		} else {
 			return null;
 		}
+	}
+	
+	public void refreshSensorsFromDB() {
+		setSensors(MachineDB.getSensorList(this));
+	}
+
+	public Sensor getSelectedSensor() {
+		return selectedSensor;
+	}
+
+	public void setSelectedSensor(Sensor selectedSensor) {
+		this.selectedSensor = selectedSensor;
+	}
+
+	public void refreshSelectedSensorReadings() {
+		this.getSelectedSensor().refreshReadingsFromDB();
+		
 	}
 
 }

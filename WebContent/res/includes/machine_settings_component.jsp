@@ -65,17 +65,17 @@ if (machine != null) {
 					<%if (!pumpChecked) {%> checked <%}%>>Off</label></td>
 		</tr>
 		<tr>
-			<td>Pump Duration (ms)</td>
+			<td>Pump Duration (sec)</td>
 			<td>${machine.settings['pump_duration'] }</td>
 			<td><input type="number" id="pump_duration" name="pump_duration"
-				step="100" min="0" max="10000"
+				step="1" min="0" max="100000"
 				value="${machine.settings['pump_duration']}"></td>
 		</tr>
 		<tr>
-			<td>Pump Cycle (ms)</td>
+			<td>Pump Cycle (sec)</td>
 			<td>${machine.settings['pump_cycle'] }</td>
 			<td><input type="number" id="pump_cycle" name="pump_cycle"
-				step="100" min="0" max="10000"
+				step="1" min="0" max="100000"
 				value="${machine.settings['pump_cycle']}"></td>
 		</tr>
 	</table>

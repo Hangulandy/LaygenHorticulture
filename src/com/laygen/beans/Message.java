@@ -63,7 +63,7 @@ public class Message implements Comparable<Message> {
 		if (!this.getColumnName().equals(that.getColumnName())) {
 			return this.getColumnName().compareTo(that.getColumnName());
 		}
-
+		
 		return this.getValue().compareTo(that.getValue());
 	}
 	

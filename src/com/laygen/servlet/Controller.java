@@ -2,7 +2,6 @@ package com.laygen.servlet;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,10 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.laygen.beans.Sensor;
 import com.laygen.beans.Machine;
-import com.laygen.beans.Message;
 import com.laygen.beans.User;
-import com.laygen.database.MachineDB;
 import com.laygen.database.UserDB;
 
 /**
@@ -53,6 +51,7 @@ public class Controller extends HttpServlet {
 			String image = null;
 			User user = (User) session.getAttribute("user");
 			Machine machine = (Machine) session.getAttribute("machine");
+			String selectedSensor = (String) session.getAttribute("component");
 
 			// ACTION branches begin here
 
@@ -125,19 +124,17 @@ public class Controller extends HttpServlet {
 
 			// ACTION: view data
 			if (action.equalsIgnoreCase("viewMachineData")) {
-				// TODO - should this be a single sensor history view
-				TreeSet<Message> readings = null;
-				readings = MachineDB.getReadingsForMachine(machine.getSerialNumber());
-
-				if (readings == null) {
-					// Do something
-					System.out.println("'readings' is null");
-				} else {
-					// Do something else
-					System.out.println("'readings' is not null");
+				selectedSensor = (String) request.getParameter("selectedSensor");
+				if (selectedSensor == null) {
+					if (machine.getSensors() != null && machine.getSensors().size() > 0) {
+						selectedSensor = machine.getSensors().firstKey();
+					}
+				}
+				if (selectedSensor != null) {
+					machine.setSelectedSensor(machine.getSensors().get(selectedSensor));
+					machine.refreshSelectedSensorReadings();
 				}
 				viewComponent = "machineData";
-				session.setAttribute("readings", readings);
 			}
 
 			// ACTION: view my authorizations
@@ -150,7 +147,7 @@ public class Controller extends HttpServlet {
 			if (action.equalsIgnoreCase("selectMachine")) {
 				String serialNumber = request.getParameter("selectedMachineId");
 				machine = new Machine();
-				if (serialNumber != null){
+				if (serialNumber != null) {
 					machine.setSerialNumber(serialNumber);
 					machine.refreshAllFromDB();
 				} else {
@@ -168,18 +165,15 @@ public class Controller extends HttpServlet {
 				String pumpDuration = request.getParameter("pump_duration");
 
 				try {
-					int wc = Integer.parseInt(pumpCycle);
 					int wd = Integer.parseInt(pumpDuration);
-
-					if (wc < wd) {
-						pumpCycle = pumpDuration;
-					}
+					int maxWd = 60 * 60 * 24 * 50; // limit to 50 days * 24 hr * 60 min * 60 sec
+					wd = wd > maxWd ? maxWd : wd;
+					int wc = Integer.parseInt(pumpCycle);
+					wc = wc > wd ? wd : wc;
 				} catch (Exception e) {
 					// do nothing
 				}
 
-				// TODO - get a list of possible settings and do a loop
-				// put new settings in the machine object
 				newSettings.put("brightness", request.getParameter("brightness"));
 				newSettings.put("light_on", request.getParameter("light_on"));
 				newSettings.put("pump_on", request.getParameter("pump_on"));
@@ -192,7 +186,7 @@ public class Controller extends HttpServlet {
 				viewComponent = "machineSettings";
 			}
 
-			// ACTION: view camera page; also used to refresh the image list
+			// ACTION: view camera page; also used to refresh the image list and view image
 			if (action.equalsIgnoreCase("viewCameraPage")) {
 				machine.refreshImages();
 				image = (String) request.getParameter("image");
@@ -214,19 +208,6 @@ public class Controller extends HttpServlet {
 				viewComponent = "cameraPage";
 			}
 
-			// ACTION: view image
-			if (action.equalsIgnoreCase("viewImage")) {
-				String imageId = (String) request.getParameter("image");
-				System.out.println("Imageid is " + imageId);
-				if (imageId != null) {
-					machine.fetchImage(imageId);
-					image = imageId;
-				} else {
-					// TODO - not sure if anything should happen here
-				}
-				viewComponent = "cameraPage";
-			}
-
 			// ACTION: delete image
 			if (action.equalsIgnoreCase("deleteImage")) {
 				String imageId = (String) request.getParameter("image");
@@ -241,6 +222,7 @@ public class Controller extends HttpServlet {
 				session.setAttribute("machine", machine);
 				session.setAttribute("user", user);
 				session.setAttribute("selectedImageId", image);
+				session.setAttribute("selectedSensor", selectedSensor);
 			}
 		}
 

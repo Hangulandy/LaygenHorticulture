@@ -57,7 +57,7 @@
 			}
 			%>
 			<input class="button" type="submit" value="Select" /> <input
-				type="hidden" name="action" value="viewImage" />
+				type="hidden" name="action" value="viewCameraPage" />
 		</form>
 
 		<!-- div for buttons -->
@@ -82,7 +82,6 @@
 					<input type="hidden" name="image" value="<%=id%>"/>
 			</form>
 			<%} %>
-
 		</div>
 	</div>
 </div>

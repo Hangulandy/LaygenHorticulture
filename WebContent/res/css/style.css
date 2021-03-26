@@ -63,6 +63,10 @@ table {
   width: 100%;
 }
 
+canvas {
+	border: 1px solid var(--main-dark-color);
+}
+
 .left {
 	text-align: left;
 }

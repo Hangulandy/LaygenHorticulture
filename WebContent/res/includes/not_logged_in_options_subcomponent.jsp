@@ -1,8 +1,14 @@
-<form class="sideBySide" action="Controller">
-    <input type="hidden" name="action" value="redirectToJoin" />
-    <input class="button" type="submit" value="Join" />
-</form>
+<%@ page import="com.laygen.database.Dictionary"%>
 
-<form class="sideBySide" action="index.jsp">
-    <input class="button" type="submit" value="Login" />
-</form>
+<div class="left-head">
+	<br>
+	<form class="sideBySide" action="Controller">
+		<input type="hidden" name="action" value="redirectToJoin" /> <input
+			class="button-white" type="submit" value="<%=Dictionary.getInstance().get("join") %>" />
+	</form>
+
+	<form class="sideBySide" action="Controller">
+	<input type="hidden" name="action" value="home" /> 
+		<input class="button-white" type="submit" value="<%=Dictionary.getInstance().get("login") %>" />
+	</form>
+</div>

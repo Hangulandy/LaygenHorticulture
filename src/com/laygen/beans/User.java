@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 
 import com.laygen.database.AuthorizationDB;
+import com.laygen.database.Dictionary;
 
 public class User implements Serializable, Comparable<User> {
 
@@ -24,8 +25,6 @@ public class User implements Serializable, Comparable<User> {
 	private TreeSet<Authorization> authorizations;
 	public final static int MAX_NAME_LEN = 40;
 	
-	// TODO - attribute for authorized machines; set of 
-
 	public User(String email, String name, String userName, String organization) {
 		this.id = UUID.randomUUID().toString();
 		this.email = email;
@@ -169,8 +168,10 @@ public class User implements Serializable, Comparable<User> {
 
 	@Override
 	public String toString() {
-		return String.format("User %s with username %s is%slogged in.", getName(), getUsername(),
-				this.isLoggedIn() ? " " : " NOT ");
+		if (this.isLoggedIn()) {
+			return String.format("%s, %s", Dictionary.getInstance().get("hello"), getName());
+		}
+		return "Not logged in.";
 	}
 	
 	public void printUser() {

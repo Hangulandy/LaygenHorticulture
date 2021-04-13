@@ -43,9 +43,10 @@ public class Sensor implements Comparable<Sensor> {
 		this.readings = readings;
 	}
 
-	public void refreshReadingsFromDB() {
-		this.setReadings(MessageDB.scanColumnFamilyWithRowPrefix("R", this.getType(),
-				String.format("%s-%s-", this.getMachineSerialNumber(), this.getName())));
+	public void fetchReadingsFromDB(String startDate, String endDate) {
+		String startRow = String.format("%s-%s-%s", this.getMachineSerialNumber(), this.getName(), startDate);
+		String stopRow = String.format("%s-%s-%s", this.getMachineSerialNumber(), this.getName(), endDate);
+		this.setReadings(MessageDB.scanColumnFamilyWithRowPrefix("R", this.getType(), null, startRow, stopRow));
 	}
 
 	@Override

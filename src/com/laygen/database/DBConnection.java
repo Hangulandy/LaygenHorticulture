@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 
@@ -33,7 +34,11 @@ public class DBConnection {
 		return conn;
 	}
 
-	public static String getTableName() {
+	public static TableName getTableName() {
+		return TableName.valueOf(tableName);
+	}
+	
+	public static String getTableString() {
 		return tableName;
 	}
 	

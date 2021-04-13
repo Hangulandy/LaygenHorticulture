@@ -3,7 +3,6 @@ package com.laygen.database;
 import java.io.IOException;
 import java.util.TreeSet;
 
-import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Table;
@@ -18,13 +17,11 @@ public class UserDB {
 	public static String insert(User user) {
 		// output should be the message that will be passed to the view saying if the
 		// insert was successful or not and why
-		String output = "Unable to set up an account for that email address at this time.";
+		String output = "Unable to set up an account for that email address at this time. ";
 
 		if (emailAvailable(user.getEmail())) {
-			System.out.println("Email is available");
-
 			Connection conn = DBConnection.getInstance().getConnection();
-			try (Table table = conn.getTable(TableName.valueOf(DBConnection.getTableName()))) {
+			try (Table table = conn.getTable(DBConnection.getTableName())) {
 				byte[] cf = Bytes.toBytes("C");
 				Put put = new Put(Bytes.toBytes(user.getId()));
 				put.addColumn(cf, Bytes.toBytes("email"), Bytes.toBytes(user.getEmail()));
@@ -40,14 +37,12 @@ public class UserDB {
 
 				output = String.format("User with email address %s successfully inserted into database.",
 						user.getEmail());
-				System.out.println(output);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		} else {
-			System.out.println("Email is NOT available");
+			output = "Email is NOT available. " + output;
 		}
-
 		return output;
 	}
 
@@ -61,15 +56,12 @@ public class UserDB {
 		
 		// First, get the ID using email
 		String uuid = getUUIDByEmail(email);
-		System.out.println(uuid);
 		
 		// If a uuid comes back (i.e. email is in the db), get the user data by uuid
 		if (uuid != null) {
 			user = getCompleteUserByUUID(uuid);
 		}
-		
-		System.out.println(user);
-		
+			
 		// if a user object came back, check password
 		if (user != null) {
 			if (password.equalsIgnoreCase(user.getPassword())) {

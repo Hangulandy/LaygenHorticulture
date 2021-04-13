@@ -4,6 +4,8 @@ public class Authorization implements Comparable<Authorization> {
 
 	private String userId;
 	private String machineSerialNumber;
+	private String machineNickname;
+	private String ownerEmail;
 	private String privilegeLevel;
 
 	public String getUserId() {
@@ -21,6 +23,22 @@ public class Authorization implements Comparable<Authorization> {
 	public void setMachineSerialNumber(String machineSerialNumber) {
 		this.machineSerialNumber = machineSerialNumber;
 	}
+	
+	public String getMachineNickname() {
+		return machineNickname;
+	}
+	
+	public void setMachineNickname(String machineNickname) {
+		this.machineNickname = machineNickname;
+	}
+	
+	public String getOwnerEmail() {
+		return ownerEmail;
+	}
+	
+	public void setOwnerEmail(String ownerEmail) {
+		this.ownerEmail = ownerEmail;
+	}
 
 	public String getPrivilegeLevel() {
 		return privilegeLevel;
@@ -34,5 +52,4 @@ public class Authorization implements Comparable<Authorization> {
 	public int compareTo(Authorization other) {
 		return this.getMachineSerialNumber().compareTo(other.getMachineSerialNumber());
 	}
-
 }

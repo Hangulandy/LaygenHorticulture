@@ -2,19 +2,24 @@ package com.laygen.beans;
 
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import com.laygen.database.Dictionary;
 import com.laygen.database.MachineDB;
 
 public class Machine {
 
 	private String serialNumber;
 	private Map<String, String> info;
+	private Map<String, String> readings;
 	private Map<String, String> settings;
 	private TreeMap<String, Sensor> sensors;
 	private TreeMap<String, String> images;
@@ -23,6 +28,10 @@ public class Machine {
 	private PrintWriter out;
 	private String image;
 	private Sensor selectedSensor;
+	private String startDate;
+	private String endDate;
+	private String startTime;
+	private String endTime;
 
 	public Machine() {
 	}
@@ -35,7 +44,15 @@ public class Machine {
 		this.serialNumber = serialNumber;
 	}
 
+	public void refreshAllFromDB() {
+		refreshInfoFromDB();
+		refreshCurrentReadingsFromDB();
+		refreshSettingsFromDB();
+		refreshSensorsFromDB();
+	}
+
 	public void refreshInfoFromDB() {
+		setInfo(null);
 		setInfo(MachineDB.getMachineCurrentInfoBySerialNumber(getSerialNumber()));
 	}
 
@@ -45,6 +62,10 @@ public class Machine {
 
 	public void setInfo(Map<String, String> info) {
 		this.info = info;
+	}
+
+	public void refreshSettingsFromDB() {
+		setSettings(MachineDB.getCurrentSettingsBySerialNumber(getSerialNumber()));
 	}
 
 	public Map<String, String> getSettings() {
@@ -91,7 +112,7 @@ public class Machine {
 			try {
 				port = Integer.parseInt(portString);
 			} catch (Exception e) {
-				return "No valid port number to send a message to that machine";
+				return Dictionary.getInstance().get("noPort");
 			}
 		}
 
@@ -107,9 +128,9 @@ public class Machine {
 			}
 			out.close();
 			socket.close();
-			return "Success";
+			return Dictionary.getInstance().get("success");
 		} catch (Exception e) {
-			return "There was a communication error with that machine. Check that it is turned on and try again.";
+			return Dictionary.getInstance().get("commError");
 		}
 	}
 
@@ -124,32 +145,34 @@ public class Machine {
 			try {
 				port = Integer.parseInt(portString);
 			} catch (Exception e) {
-				return "No valid port number to send a command to that machine";
+				return Dictionary.getInstance().get("noPort");
 			}
 		}
 
 		try {
 			socket = new Socket(this.getInfo().get("ip"), port);
 			out = new PrintWriter(socket.getOutputStream(), true);
-			String msg = "1#flash";
+			String msg = "1#flash_on";
 			System.out.println(msg);
 			out.println(msg);
 			out.close();
 			socket.close();
-			return "Success";
+			return Dictionary.getInstance().get("success");
 		} catch (Exception e) {
-			return "There was a communication error with that machine. Check that it is turned on and try again.";
+			return Dictionary.getInstance().get("commError");
 		}
 	}
 
-	public void refreshAllFromDB() {
-		refreshInfoFromDB();
-		refreshSettingsFromDB();
-		refreshSensorsFromDB();
+	public void refreshCurrentReadingsFromDB() {
+		setSettings(MachineDB.getCurrentReadingsBySerialNumber(getSerialNumber()));
 	}
 
-	public void refreshSettingsFromDB() {
-		setSettings(MachineDB.getCurrentSettingsBySerialNumber(getSerialNumber()));
+	public Map<String, String> getReadings() {
+		return readings;
+	}
+
+	public void setReadings(Map<String, String> readings) {
+		this.readings = readings;
 	}
 
 	public void refreshImages() {
@@ -201,9 +224,79 @@ public class Machine {
 		this.selectedSensor = selectedSensor;
 	}
 
-	public void refreshSelectedSensorReadings() {
-		this.getSelectedSensor().refreshReadingsFromDB();
+	public void fetchSensorReadingsByDate(String startDate, String startTime, String endDate, String endTime) {
 		
+		this.setStartDate(startDate);
+		this.setStartTime(startTime);
+		this.setEndDate(endDate);
+		this.setEndTime(endTime);
+		
+		startDate = parseDate(String.format("%s %s", this.getStartDate(), this.getStartTime()));
+		endDate = parseDate(String.format("%s %s", this.getEndDate(), this.getEndTime()));
+		
+		if (startDate.equalsIgnoreCase("")) {
+			this.setStartDate(null);
+			this.setStartTime(null);
+		}
+		
+		if (endDate.equalsIgnoreCase("")) {
+			this.setEndDate(null);
+			this.setEndTime(null);
+		}
+		
+		this.getSelectedSensor().fetchReadingsFromDB(startDate, endDate);	
+	}
+
+	public String updateNickname(String nickname) {
+		String output = null;
+		this.getInfo().put("nickname", nickname);
+		output = MachineDB.putNickname(this);
+		return output;
+	}
+
+	public String getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+	
+	private String parseDate(String string) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss");
+		
+		try {
+			Date date = df.parse(string);
+			String dateString = sf.format(date);
+			return dateString;
+		} catch (ParseException e) {
+			return "";
+		}
+	}
+
+	public String getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+
+	public String getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
 	}
 
 }

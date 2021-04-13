@@ -10,9 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.laygen.beans.Sensor;
 import com.laygen.beans.Machine;
 import com.laygen.beans.User;
+import com.laygen.database.Dictionary;
+import com.laygen.database.MessageDB;
 import com.laygen.database.UserDB;
 
 /**
@@ -35,213 +36,375 @@ public class Controller extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
+		
 		String action = request.getParameter("action");
 		action = action == null ? "home" : action;
+		
+		String lang = request.getParameter("lang");
+		lang = lang == null ? "ko" : lang;
 
 		String url = "/index.jsp";
 		HttpSession session = request.getSession();
+		
+		Dictionary dict = Dictionary.getInstance();
 
 		final Object lock = session.getId().intern();
 
 		synchronized (lock) {
-
-			String message = null;
-			String viewComponent = null;
-			String image = null;
-			User user = (User) session.getAttribute("user");
-			Machine machine = (Machine) session.getAttribute("machine");
-			String selectedSensor = (String) session.getAttribute("component");
+			
+			session.setAttribute("dict", dict);
+			session.setAttribute("popup", null);
+			
+			// this will set some of the attributes to null because we don't want them
+			// persisting outside of a the view scope
+			if (action.equalsIgnoreCase("selectLanguage")) {
+				selectLanguage(request, session);
+			} else {
+				initializeSessionAttributes(session);
+			}
 
 			// ACTION branches begin here
-
-			// ACTION: home
 			if (action.equalsIgnoreCase("home")) {
-				// will just execute defaults which lead to home page
-				viewComponent = null;
+				redirectHome(session);
 			}
 
-			// ACTION: logout
+			if (action.equalsIgnoreCase("backupDB")) {
+				backupDB(session);
+			}
+
 			if (action.equalsIgnoreCase("logout")) {
-				session.invalidate();
-				// TODO - do we want to put a message on the home screen also?
+				logout(session);
 			}
 
-			// ACTION: login
 			if (action.equalsIgnoreCase("login")) {
-				String email = request.getParameter("email");
-				String password = request.getParameter("password");
-
-				user = UserDB.login(email, password);
-
-				if (user == null) {
-					message = "Could not find that user in the database. Check your credentials and try again, or join our community.";
-				} else {
-					// At this point, the user is in the data store
-					user.printUser();
-					if (user.isLoggedIn()) {
-						user.refreshAuthorizations();
-					} else {
-						message = "Password is incorrect.";
-					}
-				}
-				viewComponent = null;
+				login(request, session);
 			}
 
-			// ACTION: redirect to join
 			if (action.equalsIgnoreCase("redirectToJoin")) {
-				viewComponent = "join";
+				redirectToJoin(session);
 			}
 
-			// ACTION: join
 			if (action.equalsIgnoreCase("join")) {
-				user = User.buildUserFromRequest(request);
-				message = user.getErrorMsg().equalsIgnoreCase("") ? UserDB.insert(user) : user.getErrorMsg();
-				viewComponent = "join";
+				join(request, session);
 			}
 
-			// ACTION: view machine info
-			if (action.equalsIgnoreCase("viewMachineInfo")) {
-				machine.refreshInfoFromDB();
-				if (machine.getInfo() == null) {
-					message = "No info was returned for that machine.";
-				} else {
-					message = "Here is the information for machine " + machine.getSerialNumber();
-				}
-				viewComponent = "machineInfo";
-			}
-
-			// ACTION: view settings
 			if (action.equalsIgnoreCase("viewMachineSettings")) {
-				machine.refreshSettingsFromDB();
-				if (machine.getSettings() == null) {
-					message = "No settings were returned for that machine.";
-				} else {
-					message = "Here are the settings for machine " + machine.getSerialNumber();
-				}
-				viewComponent = "machineSettings";
+				viewMachineSettings(session);
 			}
 
-			// ACTION: view data
 			if (action.equalsIgnoreCase("viewMachineData")) {
-				selectedSensor = (String) request.getParameter("selectedSensor");
-				if (selectedSensor == null) {
-					if (machine.getSensors() != null && machine.getSensors().size() > 0) {
-						selectedSensor = machine.getSensors().firstKey();
-					}
-				}
-				if (selectedSensor != null) {
-					machine.setSelectedSensor(machine.getSensors().get(selectedSensor));
-					machine.refreshSelectedSensorReadings();
-				}
-				viewComponent = "machineData";
+				viewMachineData(request, session);
 			}
 
-			// ACTION: view my authorizations
 			if (action.equalsIgnoreCase("viewMyMachines")) {
-				user.refreshAuthorizations();
-				viewComponent = "viewMyMachines";
+				viewMyMachines(session);
 			}
 
-			// ACTION: select machine
 			if (action.equalsIgnoreCase("selectMachine")) {
-				String serialNumber = request.getParameter("selectedMachineId");
-				machine = new Machine();
-				if (serialNumber != null) {
-					machine.setSerialNumber(serialNumber);
-					machine.refreshAllFromDB();
-				} else {
-					message = "No information to show about that machine.";
-				}
-				viewComponent = "machineInfo";
+				selectMachine(request, session);
 			}
 
-			// ACTION: update settings
+			if (action.equalsIgnoreCase("viewMachineInfo")) {
+				viewMachineInfo(session);
+			}
+
+			if (action.equalsIgnoreCase("updateMachineInfo")) {
+				updateMachineInfo(request, session);
+			}
+
 			if (action.equalsIgnoreCase("updateSettings")) {
-
-				HashMap<String, String> newSettings = new HashMap<String, String>();
-
-				String pumpCycle = request.getParameter("pump_cycle");
-				String pumpDuration = request.getParameter("pump_duration");
-
-				try {
-					int wd = Integer.parseInt(pumpDuration);
-					int maxWd = 60 * 60 * 24 * 50; // limit to 50 days * 24 hr * 60 min * 60 sec
-					wd = wd > maxWd ? maxWd : wd;
-					int wc = Integer.parseInt(pumpCycle);
-					wc = wc > wd ? wd : wc;
-				} catch (Exception e) {
-					// do nothing
-				}
-
-				newSettings.put("brightness", request.getParameter("brightness"));
-				newSettings.put("light_on", request.getParameter("light_on"));
-				newSettings.put("pump_on", request.getParameter("pump_on"));
-				newSettings.put("camera_on", request.getParameter("camera_on"));
-				newSettings.put("camera_interval", request.getParameter("camera_interval"));
-				newSettings.put("pump_duration", pumpDuration);
-				newSettings.put("pump_cycle", pumpCycle);
-
-				message = machine.updateMachineSettings(newSettings);
-				viewComponent = "machineSettings";
+				updateSettings(request, session);
 			}
 
-			// ACTION: view camera page; also used to refresh the image list and view image
 			if (action.equalsIgnoreCase("viewCameraPage")) {
-				machine.refreshImages();
-				image = (String) request.getParameter("image");
-				if (image == null) {
-					if (machine.getImageNames() != null && machine.getImageNames().size() > 0) {
-						image = machine.getImageNames().firstKey();
-					}
-				}
-				if (image != null) {
-					machine.fetchImage(image);
-				}
-				viewComponent = "cameraPage";
+				viewCameraPage(request, session);
 			}
 
-			// ACTION: take a picture
 			if (action.equalsIgnoreCase("takePicture")) {
-				message = machine.takePicture() + ". Be sure to refresh the list in a few seconds.";
-				request.setAttribute("action", null);
-				viewComponent = "cameraPage";
+				takePicture(session);
 			}
 
-			// ACTION: delete image
 			if (action.equalsIgnoreCase("deleteImage")) {
-				String imageId = (String) request.getParameter("image");
-				image = machine.deleteImage(imageId);
-				viewComponent = "cameraPage";
+				deleteImageFromMachine(request, session);
 			}
 
-			// finally, set session attributes to use in the SPA
-			if (!action.equalsIgnoreCase("logout")) {
-				session.setAttribute("message", message);
-				session.setAttribute("viewComponent", viewComponent);
-				session.setAttribute("machine", machine);
-				session.setAttribute("user", user);
-				session.setAttribute("selectedImageId", image);
-				session.setAttribute("selectedSensor", selectedSensor);
+		}
+		
+		getServletContext().getRequestDispatcher(url).forward(request, response);
+	}
+
+	private void initializeSessionAttributes(HttpSession session) {
+		session.setAttribute("message", null);
+		session.setAttribute("viewComponent", null);
+		session.setAttribute("selectedImage", null);
+	}
+
+	private void redirectHome(HttpSession session) {
+		session.setAttribute("viewComponent", null);
+	}
+	
+	private void selectLanguage(HttpServletRequest request, HttpSession session) {
+		String lang = request.getParameter("selectedLanguage"); 
+		
+		if (lang != null) {
+			Dictionary.setLanguage(lang);			
+		} else {
+			Dictionary.setLanguage("ko");
+		}
+	}
+
+	private void backupDB(HttpSession session) {
+		String message = MessageDB.backupDB();
+		session.setAttribute("message", message);
+		redirectHome(session);
+	}
+
+	private void logout(HttpSession session) {
+		session.invalidate();
+	}
+
+	private void login(HttpServletRequest request, HttpSession session) {
+		String email = request.getParameter("email");
+		String password = request.getParameter("password");
+		User user = UserDB.login(email, password);
+		String message = null;
+
+		if (user == null) {
+			message = Dictionary.getInstance().get("userNotFound");
+		} else {
+			// At this point, the user is in the data store
+			user.printUser();
+			if (user.isLoggedIn()) {
+				user.refreshAuthorizations();
+			} else {
+				message = Dictionary.getInstance().get("wrongPassword");
 			}
 		}
+		session.setAttribute("user", user);
+		session.setAttribute("message", message);
+		session.setAttribute("viewComponent", null);
+	}
 
-//		TreeSet<Message> messages = null;
-//
-//		messages = MessageDB.getAllMessages();
-//		
-//		session.setAttribute("messages", messages);
-//
-//		if (messages == null) {
-//			// Do something
-//			System.out.println("'messages' is null");
-//		} else {
-//			// Do something else
-//			System.out.println("'messages' is not null");
-//			url = "/display_all_messages.jsp";
-//		}
+	private void redirectToJoin(HttpSession session) {
+		session.setAttribute("viewComponent", "join");
+	}
 
-		getServletContext().getRequestDispatcher(url).forward(request, response);
+	private void join(HttpServletRequest request, HttpSession session) {
+		User user = User.buildUserFromRequest(request);
+		String message = user.getErrorMsg().equalsIgnoreCase("") ? UserDB.insert(user) : user.getErrorMsg();
+
+		session.setAttribute("user", user);
+		session.setAttribute("message", message);
+		session.setAttribute("viewComponent", "join");
+	}
+
+	private void viewMachineSettings(HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = null;
+
+		if (machine != null && machine.getSerialNumber() != null) {
+			machine.refreshSettingsFromDB();
+			if (machine.getSettings() == null) {
+				message = Dictionary.getInstance().get("noSettings");
+			}
+		} else {
+			viewMyMachines(session);
+		}
+
+		session.setAttribute("message", message);
+		session.setAttribute("viewComponent", "machineSettings");
+	}
+
+	private void viewMachineData(HttpServletRequest request, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String selectedSensor = (String) request.getParameter("selectedSensor");
+		String startDate = (String) request.getParameter("startDate");
+		String startTime = (String) request.getParameter("startTime");
+		String endDate = (String) request.getParameter("endDate");
+		String endTime = (String) request.getParameter("endTime");
+		
+
+		if (machine != null) {
+			if (selectedSensor == null) {
+				if (machine.getSensors() != null && machine.getSensors().size() > 0) {
+					selectedSensor = machine.getSensors().firstKey();
+				} else {
+					session.setAttribute("message", Dictionary.getInstance().get("noSensors"));
+				}
+			}
+			if (selectedSensor != null) {
+				machine.setSelectedSensor(machine.getSensors().get(selectedSensor));
+				machine.fetchSensorReadingsByDate(startDate, startTime, endDate, endTime);
+			}
+		} else {
+			// redirect to select machine
+			viewMyMachines(session);
+		}
+
+		session.setAttribute("selectedSensor", selectedSensor);
+		session.setAttribute("viewComponent", "machineData");
+	}
+
+	private void viewMyMachines(HttpSession session) {
+		User user = (User) session.getAttribute("user");
+
+		if (user != null && user.getId() != null) {
+			user.refreshAuthorizations();
+
+			session.setAttribute("message", Dictionary.getInstance().get("selectMachinePrompt"));
+			session.setAttribute("machine", null);
+			session.setAttribute("viewComponent", "viewMyMachines");
+		} else {
+			session.setAttribute("user", null);
+			redirectHome(session);
+		}
+	}
+
+	private void selectMachine(HttpServletRequest request, HttpSession session) {
+		String serialNumber = request.getParameter("selectedMachineId");
+		Machine machine = null;
+		String message = null;
+
+		if (serialNumber != null) {
+			machine = new Machine();
+			machine.setSerialNumber(serialNumber);
+			machine.refreshAllFromDB();
+		} else {
+			viewMyMachines(session);
+		}
+
+		if (machine.getInfo() == null) {
+			viewMyMachines(session);
+		} else {
+			session.setAttribute("machine", machine);
+			session.setAttribute("message", message);
+			session.setAttribute("viewComponent", "machineInfo");
+		}
+	}
+
+	private void viewMachineInfo(HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		if (machine != null && machine.getSerialNumber() != null && machine.getInfo() != null) {
+			session.setAttribute("viewComponent", "machineInfo");
+		} else {
+			viewMyMachines(session);
+		}
+	}
+
+	private void updateMachineInfo(HttpServletRequest request, HttpSession session) {
+		User user = (User) session.getAttribute("user");
+
+		if (user != null && user.isLoggedIn()) {
+
+			Machine machine = (Machine) session.getAttribute("machine");
+			String nickname = request.getParameter("nickname");
+			String message = null;
+
+			if (machine != null && machine.getSerialNumber() != null && nickname != null) {
+				message = machine.updateNickname(nickname);
+				session.setAttribute("message", message);
+				viewMachineInfo(session);
+			} else {
+				viewMyMachines(session);
+			}
+			user.refreshAuthorizations();
+
+		} else {
+			session.setAttribute("user", null);
+			redirectHome(session);
+		}
+	}
+
+	private void updateSettings(HttpServletRequest request, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+
+		if (machine != null && machine.getSerialNumber() != null) {
+			HashMap<String, String> newSettings = new HashMap<String, String>();
+
+			String pumpCycle = request.getParameter("pump_cycle");
+			String pumpDuration = request.getParameter("pump_duration");
+
+			int duration = 0;
+			int cycle = 0;
+			try {
+				duration = Integer.parseInt(pumpDuration);
+				cycle = Integer.parseInt(pumpCycle);
+			} catch (Exception e) {
+				// do nothing
+			}
+
+			int max = 60 * 60 * 24 * 50; // limit to 50 days * 24 hr * 60 min * 60 sec
+			duration = duration > max ? max : duration;
+			pumpCycle = cycle > duration ? pumpCycle : pumpDuration;
+
+			newSettings.put("brightness", request.getParameter("brightness"));
+			newSettings.put("light_on", request.getParameter("light_on"));
+			newSettings.put("heater_on", request.getParameter("heater_on"));
+			newSettings.put("fan_on", request.getParameter("fan_on"));
+			newSettings.put("uvc_on", request.getParameter("uvc_on"));
+			newSettings.put("pump_on", request.getParameter("pump_on"));
+			newSettings.put("camera_on", request.getParameter("camera_on"));
+			newSettings.put("camera_interval", request.getParameter("camera_interval"));
+			newSettings.put("pump_duration", pumpDuration);
+			newSettings.put("pump_cycle", pumpCycle);
+
+			session.setAttribute("message", machine.updateMachineSettings(newSettings));
+			session.setAttribute("viewComponent", "machineSettings");
+		} else {
+			viewMyMachines(session);
+		}
+	}
+
+	private void viewCameraPage(HttpServletRequest request, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+
+		if (machine != null && machine.getSerialNumber() != null) {
+			machine.refreshImages();
+			String image = (String) request.getParameter("image");
+
+			if (image == null) {
+				if (machine.getImageNames() != null && machine.getImageNames().size() > 0) {
+					image = machine.getImageNames().firstKey();
+				}
+			}
+			if (image != null) {
+				machine.fetchImage(image);
+			}
+
+			session.setAttribute("selectedImageId", image);
+			session.setAttribute("viewComponent", "cameraPage");
+		} else {
+			viewMyMachines(session);
+		}
+	}
+
+	private void takePicture(HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = null;
+
+		if (machine != null) {
+			message = machine.takePicture();
+		} else {
+			message = Dictionary.getInstance().get("machineNull");
+		}
+
+		if (message.equalsIgnoreCase("success")) {
+			message = message + " " + Dictionary.getInstance().get("refreshPrompt");
+		}
+
+		session.setAttribute("message", message);
+		// session.setAttribute("popup", message);
+		session.setAttribute("viewComponent", "cameraPage");
+	}
+
+	private void deleteImageFromMachine(HttpServletRequest request, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String imageId = (String) request.getParameter("image");
+
+		if (machine != null && imageId != null) {
+			session.setAttribute("selectedImageId", machine.deleteImage(imageId));
+		}
+		session.setAttribute("viewComponent", "cameraPage");
 	}
 
 	/**

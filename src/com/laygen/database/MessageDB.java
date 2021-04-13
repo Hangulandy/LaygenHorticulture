@@ -2,10 +2,13 @@ package com.laygen.database;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.NavigableMap;
 import java.util.TreeSet;
 
 import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
@@ -22,17 +25,28 @@ public class MessageDB {
 
 	static Charset enc = StandardCharsets.UTF_8;
 
-	public static TreeSet<Message> scanColumnFamily(String columnFamily){
+	public static TreeSet<Message> scanColumnFamily(String columnFamily) {
 		return scanColumnFamilyWithRowPrefix(null, null, columnFamily);
 	}
 	
-	public static TreeSet<Message> scanColumnFamilyWithRowPrefix(String columnFamily, String columnQualifier, String rowPrefix) {
-		Connection conn = DBConnection.getInstance().getConnection();
-		String tableName = DBConnection.getTableName();
-		TreeSet<Message> messages = new TreeSet<Message>();
+	public static TreeSet<Message> scanColumnFamilyWithRowPrefix(String columnFamily, String columnQualifier,
+			String rowPrefix){
+		return scanColumnFamilyWithRowPrefix(columnFamily, columnQualifier, rowPrefix, null, null);
+	}
 
-		try (Table table = conn.getTable(TableName.valueOf(tableName))) {
+	public static TreeSet<Message> scanColumnFamilyWithRowPrefix(String columnFamily, String columnQualifier,
+			String rowPrefix, String startRow, String stopRow) {
+		Connection conn = DBConnection.getInstance().getConnection();
+		TreeSet<Message> messages = new TreeSet<Message>();
+		
+		try (Table table = conn.getTable(DBConnection.getTableName())) {
 			Scan scan = new Scan();
+			if (startRow != null) {
+				scan.setStartRow(Bytes.toBytes(startRow));				
+			}
+			if (stopRow != null) {
+				scan.setStopRow(Bytes.toBytes(stopRow));				
+			}
 			if (columnFamily != null) {
 				byte[] cf = Bytes.toBytes(columnFamily);
 				if (columnQualifier != null) {
@@ -57,10 +71,9 @@ public class MessageDB {
 
 	public static TreeSet<Message> getRowMessagesByColumnFamily(String rowId, String columnFamily) {
 		Connection conn = DBConnection.getInstance().getConnection();
-		String tableName = DBConnection.getTableName();
 		TreeSet<Message> messages = new TreeSet<Message>();
 
-		try (Table table = conn.getTable(TableName.valueOf(tableName))) {
+		try (Table table = conn.getTable(DBConnection.getTableName())) {
 			Get get = new Get(Bytes.toBytes(rowId));
 			if (columnFamily != null) {
 				get.addFamily(Bytes.toBytes(columnFamily));
@@ -72,20 +85,19 @@ public class MessageDB {
 		}
 		return messages;
 	}
-	
+
 	public static byte[] getByteValue(String rowId, String columnFamily, String columnQualifier) {
-		
+
 		Connection conn = DBConnection.getInstance().getConnection();
-		String tableName = DBConnection.getTableName();
 		byte[] output = null;
-		
+
 		byte[] row = Bytes.toBytes(rowId);
 		byte[] cf = Bytes.toBytes(columnFamily);
 		byte[] cq = Bytes.toBytes(columnQualifier);
 
-		try (Table table = conn.getTable(TableName.valueOf(tableName))) {
+		try (Table table = conn.getTable(DBConnection.getTableName())) {
 			Get get = new Get(row);
-				get.addColumn(cf, cq);
+			get.addColumn(cf, cq);
 			Result rr = table.get(get);
 			output = rr.getFamilyMap(cf).get(cq);
 		} catch (Exception e) {
@@ -94,7 +106,7 @@ public class MessageDB {
 		return output;
 	}
 
-	private static TreeSet<Message> buildMessagesFromResult(Result rr) {
+	public static TreeSet<Message> buildMessagesFromResult(Result rr) {
 
 		TreeSet<Message> messages = new TreeSet<Message>();
 
@@ -122,7 +134,7 @@ public class MessageDB {
 
 		for (byte[] key : map.keySet()) {
 			String columnName = Bytes.toString(key);
-			String value = Bytes.toString(map.get(key));
+			String value = new String(map.get(key), enc);
 
 			Message message = new Message();
 			message.setColumnFamily(columnFamily);
@@ -130,7 +142,6 @@ public class MessageDB {
 			message.setColumnName(columnName);
 			message.setValue(value);
 
-			// System.out.println(message.toString());
 			messages.add(message);
 		}
 		return messages;
@@ -139,30 +150,40 @@ public class MessageDB {
 	public static TreeSet<Message> getRowById(String rowId) {
 		return getRowMessagesByColumnFamily(rowId, null);
 	}
-	
-	public static void simplePut(byte[] row, byte[] cf, byte[] cq, byte[] value) {
-		
+
+	public static boolean simplePut(String row, String cf, String cq, String value) {
+
+		byte[] rb = Bytes.toBytes(row);
+		byte[] cfb = Bytes.toBytes(cf);
+		byte[] cqb = Bytes.toBytes(cq);
+		byte[] vb = value.getBytes(enc);
+
+		return simplePut(rb, cfb, cqb, vb);
+	}
+
+	public static boolean simplePut(byte[] row, byte[] cf, byte[] cq, byte[] value) {
+		boolean success = false;
 		Connection conn = DBConnection.getInstance().getConnection();
-		String tableName = DBConnection.getTableName();
-		
-		try (Table table = conn.getTable(TableName.valueOf(tableName))) {
+
+		try (Table table = conn.getTable(DBConnection.getTableName())) {
 			Put put = new Put(row);
 			put.addColumn(cf, cq, value);
 			table.put(put);
+			success = true;
 		} catch (Exception e) {
 			e.printStackTrace();
-		}	
+		}
+		return success;
 	}
-	
+
 	public static boolean deleteValue(String rowId, String columnFamily, String columnQualifier) {
 		byte[] row = Bytes.toBytes(rowId);
 		byte[] cf = Bytes.toBytes(columnFamily);
 		byte[] cq = Bytes.toBytes(columnQualifier);
-		
+
 		Connection conn = DBConnection.getInstance().getConnection();
-		String tableName = DBConnection.getTableName();
-		
-		try (Table table = conn.getTable(TableName.valueOf(tableName))){
+
+		try (Table table = conn.getTable(DBConnection.getTableName())) {
 			Delete del = new Delete(row);
 			del.addColumn(cf, cq);
 			table.delete(del);
@@ -171,6 +192,30 @@ public class MessageDB {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	public static String backupDB() {
+		String message = null;
+		
+		Connection conn = DBConnection.getInstance().getConnection();
+		
+		try (Admin admin = conn.getAdmin()) {
+			
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+			LocalDateTime now = LocalDateTime.now();
+			String dateString = dtf.format(now);
+			
+			String tableString = DBConnection.getTableString();
+			TableName tableName = DBConnection.getTableName();
+			String snapshotName = String.format("%s-snapshot-%s", tableString, dateString);
+			admin.snapshot(snapshotName, tableName);
+			
+			message = "Success!";
+		} catch (Exception e) {
+			e.printStackTrace();
+			message = "Failed to create snapshot";
+		}
+		return message;
 	}
 
 }

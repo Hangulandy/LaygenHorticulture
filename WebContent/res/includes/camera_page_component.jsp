@@ -1,87 +1,79 @@
-<%@ page import="com.laygen.beans.Machine"%>
+<%@ page
+	import="com.laygen.beans.Machine, com.laygen.database.Dictionary"%>
 
-
-<h1>Camera</h1>
-<!-- div to hold subcomponents -->
-<form class="sideBySide" action="Controller" method="post">
-	<input class="button" type="submit" value="Take a Picture" /> <input
-		type="hidden" name="action" value="takePicture" />
-</form>
-<form class="sideBySide" action="Controller" method="post">
-	<input class="button" type="submit" value="Refresh" /> <input
-		type="hidden" name="action" value="viewCameraPage" />
-</form>
-<ul>
-
-	<%
-	Machine machine = (Machine) session.getAttribute("machine");
-		if (machine != null && machine.getImageNames() != null) {
-			for (String key : machine.getImageNames().keySet()) {
-	%>
-	<li><%=key%> : <%=machine.getImageNames().get(key)%></li>
-	<%
-	}
-		}
-	%>
-
-</ul>
+<%
+Machine machine = (Machine) session.getAttribute("machine");
+%>
 
 <div>
-	<!-- Image list div -->
+	<h1><%=Dictionary.getInstance().get("cameraHeading")%></h1>
+</div>
+<hr>
+<br>
+
+<div id="image-selector" class="selector">
 	<div>
-		<!-- label block -->
-		<label>Images for this machine:</label>
 		<form class="sideBySide" action="Controller" method="post">
+			<input class="button" type="submit"
+				value="<%=Dictionary.getInstance().get("capture")%>" /> <input
+				type="hidden" name="action" value="takePicture" />
+		</form>
+		<form class="sideBySide" action="Controller" method="post">
+			<input class="button" type="submit"
+				value="<%=Dictionary.getInstance().get("refresh")%>" /> <input
+				type="hidden" name="action" value="viewCameraPage" />
+		</form>
+	</div>
+
+
+	<!-- Image list div -->
+	<!-- label block -->
+	<h3><%=Dictionary.getInstance().get("selectAnImageLabel")%>:
+	</h3>
+	<form class="sideBySide" action="Controller" method="post">
+		<%
+		String id = (String) session.getAttribute("selectedImageId");
+		if (machine != null && machine.getImageNames() != null) {
+		%>
+		<!-- list box -->
+		<select name="image" size="10">
 			<%
-			String id = (String) session.getAttribute("selectedImageId");
-				if (machine != null && machine.getImageNames() != null) {
+			for (String key : machine.getImageNames().keySet()) {
 			%>
-			<p>Selected Image ID is <%=id%></p>
-			<!-- list box -->
-			<select name="image">
-				<%
-				for (String key : machine.getImageNames().keySet()) {
-				%>
-				<option value="<%=key%>"
-					<%if (id != null && id.equalsIgnoreCase(key)) {%>
-					selected="selected" <%}%>><%=machine.getImageNames().get(key)%></option>
-				<%
-				}
-				%>
-			</select>
-			<%
-			} else {
-			%>
-			<p>No images to display</p>
+			<option value="<%=key%>"
+				<%if (id != null && id.equalsIgnoreCase(key)) {%>
+				selected="selected" <%}%>><%=machine.getImageNames().get(key)%></option>
 			<%
 			}
 			%>
-			<input class="button" type="submit" value="Select" /> <input
-				type="hidden" name="action" value="viewCameraPage" />
-		</form>
+		</select>
+		<%
+		} else {
+		%>
+		<p>No images to display</p>
+		<%
+		}
+		%>
+		<br class="not-mobile"> <input class="button" type="submit"
+			value="<%=Dictionary.getInstance().get("select")%>" /> <input
+			type="hidden" name="action" value="viewCameraPage" />
+	</form>
 
-		<!-- div for buttons -->
-		<div>
-			<!-- View (select) button -->
-			<!-- Refresh list button -->
-		</div>
-	</div>
-	<!-- Image view div -->
-	<div>
-		<!-- label block -->
-		<!-- image viewer? -->
-		<img src="data:image/jpg;base64,${machine.image }" height="480"
-			width="640" />
-		<!-- div for buttons -->
-		<div>
-			<!-- delete image button will only show if there is still a selected image id session variable -->
-			<% if ( id != null){%>
-			<form>
-				<input class="button" type="submit" value="Delete" /> <input
-					type="hidden" name="action" value="deleteImage" />
-					<input type="hidden" name="image" value="<%=id%>"/>
-			</form>
-			<%} %>
-		</div>
-	</div>
+</div>
+
+<div class="img-container">
+	<img class="display-img" src="data:image/jpg;base64,${machine.image }" />
+	<!-- delete image button will only show if there is still a selected image id session variable -->
+	<%
+	if (id != null) {
+	%>
+	<form>
+		<input class="button-red" type="submit"
+			value="<%=Dictionary.getInstance().get("delete")%>" /> <input
+			type="hidden" name="action" value="deleteImage" /> <input
+			type="hidden" name="image" value="<%=id%>" />
+	</form>
+	<%
+	}
+	%>
 </div>

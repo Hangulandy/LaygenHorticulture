@@ -224,6 +224,7 @@ public class Controller extends HttpServlet {
 		
 
 		if (machine != null) {
+			machine.refreshCurrentReadingsFromDB();
 			if (selectedSensor == null) {
 				if (machine.getSensors() != null && machine.getSensors().size() > 0) {
 					selectedSensor = machine.getSensors().firstKey();

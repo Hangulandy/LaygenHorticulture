@@ -33,11 +33,12 @@
 				%>
 				<option value="<%=key%>"
 					<%String value = "0";
-if (machine.getReadings() != null && machine.getReadings().get(key) != null) {
-	value = machine.getReadings().get(key);
-}%>
+				if (machine.getReadings() != null && machine.getReadings().get(key) != null) {
+					value = machine.getReadings().get(key);
+				}%>
 					<%if (machine.getSelectedSensor() != null && machine.getSelectedSensor().getName().equalsIgnoreCase(key)) {%>
-					selected="selected" <%}%>><%=key%> :
+					selected="selected" <%}%>>
+					<%=key%> :
 					<%=value%></option>
 				<%
 				}
@@ -166,7 +167,7 @@ if (machine.getReadings() != null && machine.getReadings().get(key) != null) {
 	</script>
 	<br>
 	<form class="sideBySide" action="DownloadSpreadsheetServlet">
-		<input class="button" type="submit" value="Download" />
+		<input class="button" type="submit" value="<%=Dictionary.getInstance().get("downloadButtonLabel")%>" />
 	</form>
 	<%
 	} else {

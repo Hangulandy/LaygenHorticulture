@@ -11,7 +11,7 @@ if (userHere.getAuthorizations() != null && userHere.getAuthorizations().size() 
 </h1>
 <table>
 	<tr>
-		<th>SN</th>
+		<th><%=Dictionary.getInstance().get("serialNumberLabel")%></th>
 		<th><%=Dictionary.getInstance().get("nickname")%></th>
 		<th class="not-mobile"><%=Dictionary.getInstance().get("ownerEmail")%></th>
 		<th><%=Dictionary.getInstance().get("select")%></th>

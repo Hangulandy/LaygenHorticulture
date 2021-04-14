@@ -266,41 +266,41 @@
 		<en>Camera Settings</en>
 		<ko>카메라 설정</ko>
 	</string>
-	<string >
-		<en></en>
-		<ko></ko>
+	<string id="downloadButtonLabel">
+		<en>Download</en>
+		<ko>다운로드</ko>
 	</string>
-	<string>
-		<en></en>
-		<ko></ko>
+	<string id="machineInfoHeading">
+		<en>Machine Information</en>
+		<ko>기계 정보</ko>
 	</string>
-	<string>
-		<en></en>
-		<ko></ko>
+	<string id="serialNumberLabel">
+		<en>Serial Number</en>
+		<ko>기계 번호</ko>
 	</string>
-	<string >
-		<en></en>
-		<ko></ko>
+	<string id="modelLabel">
+		<en>Model</en>
+		<ko>모델</ko>
 	</string>
-	<string>
-		<en></en>
-		<ko></ko>
+	<string id="primaryUseLabel">
+		<en>Primary Use</en>
+		<ko>주요 용도</ko>
 	</string>
-	<string>
-		<en></en>
-		<ko></ko>
+	<string id="ipAddressLabel">
+		<en>IP Address</en>
+		<ko>IP 주소</ko>
 	</string>
-	<string >
-		<en></en>
-		<ko></ko>
+	<string id="portLabel">
+		<en>Port</en>
+		<ko>포트</ko>
 	</string>
-	<string>
-		<en></en>
-		<ko></ko>
+	<string id="editButtonLabel">
+		<en>Edit</en>
+		<ko>변경</ko>
 	</string>
-	<string>
-		<en></en>
-		<ko></ko>
+	<string id="saveButtonLabel">
+		<en>Save</en>
+		<ko>저장</ko>
 	</string>
 
 </strings>

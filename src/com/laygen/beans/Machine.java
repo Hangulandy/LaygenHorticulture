@@ -164,7 +164,7 @@ public class Machine {
 	}
 
 	public void refreshCurrentReadingsFromDB() {
-		setSettings(MachineDB.getCurrentReadingsBySerialNumber(getSerialNumber()));
+		setReadings(MachineDB.getCurrentReadingsBySerialNumber(getSerialNumber()));
 	}
 
 	public Map<String, String> getReadings() {

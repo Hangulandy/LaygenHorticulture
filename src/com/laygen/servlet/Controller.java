@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.laygen.beans.Authorization;
 import com.laygen.beans.Machine;
 import com.laygen.beans.User;
 import com.laygen.database.Dictionary;
@@ -172,17 +173,15 @@ public class Controller extends HttpServlet {
 		if (user == null) {
 			message = Dictionary.getInstance().get("userNotFound");
 		} else {
-			// At this point, the user is in the data store
-			user.printUser();
 			if (user.isLoggedIn()) {
-				user.refreshAuthorizations();
+				session.setAttribute("user", user);
+				viewMyMachines(session);
 			} else {
 				message = Dictionary.getInstance().get("wrongPassword");
+				session.setAttribute("message", message);
+				session.setAttribute("viewComponent", null);
 			}
 		}
-		session.setAttribute("user", user);
-		session.setAttribute("message", message);
-		session.setAttribute("viewComponent", null);
 	}
 
 	private void redirectToJoin(HttpSession session) {
@@ -250,10 +249,14 @@ public class Controller extends HttpServlet {
 
 		if (user != null && user.getId() != null) {
 			user.refreshAuthorizations();
-
+			
+//			for (Authorization auth : user.getAuthorizations()) {
+//				System.out.println(auth);
+//			}
+			session.setAttribute("user", user);
 			session.setAttribute("message", Dictionary.getInstance().get("selectMachinePrompt"));
 			session.setAttribute("machine", null);
-			session.setAttribute("viewComponent", "viewMyMachines");
+			session.setAttribute("viewComponent", null);
 		} else {
 			session.setAttribute("user", null);
 			redirectHome(session);

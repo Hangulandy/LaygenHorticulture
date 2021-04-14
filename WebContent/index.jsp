@@ -8,12 +8,14 @@
 	<%
 	String viewComponent = (String) session.getAttribute("viewComponent");
 	if ((user == null || !user.isLoggedIn())) {
-		if (viewComponent == null) { // include login
 	%>
 	<div class="under-header-not-logged-in"></div>
-	<%@ include file="./res/includes/login_component.jsp"%>
-	<%} else { // include join %>
+	<%
+	if (viewComponent != null && viewComponent.equalsIgnoreCase("join")) { // include join
+	%>
 	<%@ include file="./res/includes/join_component.jsp"%>
+	<%} else { // include login %>
+	<%@ include file="./res/includes/login_component.jsp"%>
 	<%}%>
 	<%
 	} else {// place side-bar and then list all the logged in options
@@ -63,11 +65,6 @@
 		if (viewComponent.equalsIgnoreCase("cameraPage")) {
 		%>
 		<%@ include file="./res/includes/camera_page_component.jsp"%>
-		<%
-		}
-		if (viewComponent.equalsIgnoreCase("viewMyMachines")) {
-		%>
-		<%@ include file="./res/includes/machine_list_component.jsp"%>
 		<%
 		}
 		%>

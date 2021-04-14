@@ -1,6 +1,6 @@
 
 <%@ include file="/res/includes/popup.jsp"%>
-
+<div class="under-footer"></div>
 <div class="row">
 	<div class="footer">
 		<%@ include file="/res/includes/language_selector.jsp"%>

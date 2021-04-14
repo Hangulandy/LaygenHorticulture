@@ -23,19 +23,19 @@ public class Authorization implements Comparable<Authorization> {
 	public void setMachineSerialNumber(String machineSerialNumber) {
 		this.machineSerialNumber = machineSerialNumber;
 	}
-	
+
 	public String getMachineNickname() {
 		return machineNickname;
 	}
-	
+
 	public void setMachineNickname(String machineNickname) {
 		this.machineNickname = machineNickname;
 	}
-	
+
 	public String getOwnerEmail() {
 		return ownerEmail;
 	}
-	
+
 	public void setOwnerEmail(String ownerEmail) {
 		this.ownerEmail = ownerEmail;
 	}
@@ -51,5 +51,9 @@ public class Authorization implements Comparable<Authorization> {
 	@Override
 	public int compareTo(Authorization other) {
 		return this.getMachineSerialNumber().compareTo(other.getMachineSerialNumber());
+	}
+
+	public String toString() {
+		return String.format("Authorization for %s on machine %s", this.getUserId(), this.getMachineSerialNumber());
 	}
 }

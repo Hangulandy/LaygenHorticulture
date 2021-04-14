@@ -237,11 +237,12 @@ tr:nth-child(odd) {
 
 .under-header {
 	height: var(--header-height);
+	line-height: var(--header-height);
 	width: 100%;
 }
 
 .under-header-not-logged-in {
-		height: var(--header-height);
+	height: var(--header-height);
 	width: 100%;
 }
 
@@ -305,6 +306,7 @@ tr:nth-child(odd) {
 	.not-mobile {
 	display: none;
 	}
+	
 	.selector {
 		size: 1;
 		margin: 0px;

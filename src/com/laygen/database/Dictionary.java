@@ -59,13 +59,13 @@ public class Dictionary {
 				}
 			}
 
-			for (String key : dictionary.keySet()) {
-				System.out.print(String.format("%s : \n", key));
-				HashMap<String, String> map = dictionary.get(key);
-				for (String key2 : map.keySet()) {
-					System.out.print(String.format("\t%s : %s \n", key2, map.get(key2)));
-				}
-			}
+//			for (String key : dictionary.keySet()) {
+//				System.out.print(String.format("%s : \n", key));
+//				HashMap<String, String> map = dictionary.get(key);
+//				for (String key2 : map.keySet()) {
+//					System.out.print(String.format("\t%s : %s \n", key2, map.get(key2)));
+//				}
+//			}
 
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();

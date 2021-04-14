@@ -103,20 +103,22 @@ if (machine.getReadings() != null && machine.getReadings().get(key) != null) {
 	List<Map<Object, Object>> list = new ArrayList<Map<Object, Object>>();
 	%>
 	<%
-	SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-	formatter.setTimeZone(TimeZone.getTimeZone("JST"));
+	SimpleDateFormat parser = new SimpleDateFormat("yyyyMMddHHmmss");
+	parser.setTimeZone(TimeZone.getTimeZone("JST"));
+	SimpleDateFormat formatter = new SimpleDateFormat("MM-dd HH:mm");
 	float val;
 	for (Message reading : machine.getSelectedSensor().getReadings()) {
 		map = new HashMap<Object, Object>();
 
 		try {
-			Date date = formatter.parse(reading.getTime());
-			map.put("label", date);
+			Date date = parser.parse(reading.getTime());
+			String output = formatter.format(date);
+			map.put("date", output);
 			val = Float.parseFloat(reading.getValue());
 		} catch (Exception e) {
 			val = 0;
 		}
-		map.put("data", val);
+		map.put("value", val);
 		list.add(map);
 	}
 
@@ -130,14 +132,11 @@ if (machine.getReadings() != null && machine.getReadings().get(key) != null) {
 		;
 
 		var labels = dataPoints.map(function(e) {
-			return e.label;
+			return e.date;
 		});
 		var data = dataPoints.map(function(e) {
-			return e.data;
+			return e.value;
 		});
-
-		console.log(labels);
-		console.log(Date.parse("Dec 04, 1995, 00:12:00 PM"));
 
 		var ctx = canvas.getContext('2d');
 		var config = {
@@ -165,6 +164,7 @@ if (machine.getReadings() != null && machine.getReadings().get(key) != null) {
 
 		var chart = new Chart(ctx, config);
 	</script>
+	<br>
 	<form class="sideBySide" action="DownloadSpreadsheetServlet">
 		<input class="button" type="submit" value="Download" />
 	</form>

@@ -48,7 +48,7 @@ a.footer-link:visited {
 }
 
 h1 {
-	margin: var(--standard-pad);
+	margin: var(--standard-pad) 0px;
 }
 
 h3 {

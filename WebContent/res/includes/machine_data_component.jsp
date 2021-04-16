@@ -1,6 +1,7 @@
 <%@ page import="com.laygen.beans.Machine"%>
 <%@ page import="com.laygen.beans.Sensor"%>
 <%@ page import="com.laygen.beans.Message"%>
+<%@ page import="com.laygen.database.Dictionary"%>
 <%@ page import="com.google.gson.Gson"%>
 <%@ page import="com.google.gson.JsonObject"%>
 <%@ page import="java.util.ArrayList"%>
@@ -16,6 +17,8 @@
 <div id="data-selector" class="selector">
 	<%
 	Machine machine = (Machine) session.getAttribute("machine");
+	Dictionary dict1 = (Dictionary) session.getAttribute("dict");
+	String lang1 = (String) session.getAttribute("lang");
 	%>
 	<!-- label block -->
 	<h3>${dict.get('chooseSensorPrompt', lang)}:
@@ -37,8 +40,8 @@
 				}%>
 					<%if (machine.getSelectedSensor() != null && machine.getSelectedSensor().getName().equalsIgnoreCase(key)) {%>
 					selected="selected" <%}%>>
-					<%=key%> :
-					<%=value%></option>
+					<%=dict1.get(key, lang1) %> :
+					<%=value %> <%=machine.getSensors().get(key).getUnits() %></option>
 				<%
 				}
 				%>
@@ -55,8 +58,17 @@
 			<%
 			String startDate = "2021-01-01";
 			String startTime = "00:00";
-			String endDate = "2029-12-31";
+			
+			Date currentTime = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+			String endDate = sdf.format(currentTime);			
+
 			String endTime = "23:59";
+			
+			if (machine.getSettings().get("plant_date") != null){
+				startDate = machine.getSettings().get("plant_date");
+			}
 			if (machine.getStartDate() != null) {
 				startDate = machine.getStartDate();
 			}
@@ -128,9 +140,7 @@
 	<canvas id="canvas" class="display-chart"></canvas>
 
 	<script>
-		var dataPoints =
-	<%out.print(dataPoints);%>
-		;
+		var dataPoints = <%out.print(dataPoints);%>;
 
 		var labels = dataPoints.map(function(e) {
 			return e.date;
@@ -157,7 +167,7 @@
 				},
 				title : {
 					display : true,
-					text : "<%=machine.getSelectedSensor().getType()%> on sensor <%=machine.getSelectedSensor().getName()%>",
+					text : "${machine.selectedSensor.type} on sensor <%=dict1.get(machine.getSelectedSensor().getName(), lang1) %>",
 				},
 				responsive : true,
 			}

@@ -125,11 +125,11 @@ public class Machine {
 				msg = String.format("%s#%s", newSettings.get(key), key);
 				out.println(msg);
 				this.getSettings().put(key, newSettings.get(key));
-				System.out.println(msg);
+				// System.out.println(msg);
 			}
-			
+
 			// out.println(generateTimeCommand());
-			
+
 			out.close();
 			socket.close();
 			return Dictionary.getInstance().get("success");
@@ -137,29 +137,30 @@ public class Machine {
 			return Dictionary.getInstance().get("commError");
 		}
 	}
-	
-	public String takePicture() {
-		refreshTime();
-		return sendCommandToMachine("1#flash_on");
+
+	public String takePicture(String lang) {
+		// refreshTime();
+		return sendCommandToMachine("1#flash_on", lang);
 	}
-	
+
 	public String generateTimeCommand() {
 		Date currentTime = new Date();
-		
+
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		String timeString = sdf.format(currentTime);
 		String msg = String.format("%s#time", timeString);
-		
+
 		return msg;
 	}
-	
-	public String refreshTime() {
-		return sendCommandToMachine(generateTimeCommand());
+
+	public String refreshTime(String lang) {
+		return sendCommandToMachine(generateTimeCommand(), lang);
 	}
 
-	public String sendCommandToMachine(String msg) {
+	public String sendCommandToMachine(String msg, String lang) {
 		// TODO - perhaps this should be asynchronous in the future?
+		System.out.println(String.format("Attemptint to send message to machine %s : %s", this.getSerialNumber(), msg));
 
 		String portString = this.getInfo().get("port");
 
@@ -184,6 +185,28 @@ public class Machine {
 		} catch (Exception e) {
 			return Dictionary.getInstance().get("commError");
 		}
+	}
+
+	public String sendOpenValveMessage(String lang) {
+		String result = null;
+		// check for current value of water level
+		this.refreshCurrentReadingsFromDB();
+		if (this.getReadings().get("water_level1") != null) {
+			String waterLevel = this.getReadings().get("water_level1");
+			try {
+				int wl = Integer.parseInt(waterLevel);
+				if (wl <= 4) {
+					result = this.sendCommandToMachine("1#water_in_valve_on", lang);
+				} else {
+					result = Dictionary.getInstance().get("waterLevelHighMessage", lang);
+				}
+			} catch (Exception e) {
+				result = Dictionary.getInstance().get("invalidValueMessage", lang);
+			}
+		} else {
+			result = Dictionary.getInstance().get("invalidValueMessage", lang);
+		}
+		return result;
 	}
 
 	public void refreshCurrentReadingsFromDB() {
@@ -226,17 +249,24 @@ public class Machine {
 			// remove the image from the TreeMap
 			this.getImageNames().remove(imageId);
 		}
-		// Set the fetched image to the first in the map no matter what imageId was passed in
+		// Set the fetched image to the first in the map no matter what imageId was
+		// passed in
 		if (this.getImageNames().size() > 0) {
 			this.fetchImage(this.getImageNames().firstKey());
-			return this.getImageNames().firstKey();			
+			return this.getImageNames().firstKey();
 		} else {
 			return null;
 		}
 	}
-	
+
 	public void refreshSensorsFromDB() {
 		setSensors(MachineDB.getSensorList(this));
+		
+		Sensor sensor = null;
+		for (String key : this.getSensors().keySet()) {
+			sensor = this.getSensors().get(key);
+			sensor.fetchUnitsFromDB();
+		}
 	}
 
 	public Sensor getSelectedSensor() {
@@ -248,26 +278,26 @@ public class Machine {
 	}
 
 	public void fetchSensorReadingsByDate(String startDate, String startTime, String endDate, String endTime) {
-		
+
 		this.setStartDate(startDate);
 		this.setStartTime(startTime);
 		this.setEndDate(endDate);
 		this.setEndTime(endTime);
-		
+
 		startDate = parseDate(String.format("%s %s", this.getStartDate(), this.getStartTime()));
 		endDate = parseDate(String.format("%s %s", this.getEndDate(), this.getEndTime()));
-		
+
 		if (startDate.equalsIgnoreCase("")) {
 			this.setStartDate(null);
 			this.setStartTime(null);
 		}
-		
+
 		if (endDate.equalsIgnoreCase("")) {
 			this.setEndDate(null);
 			this.setEndTime(null);
 		}
-		
-		this.getSelectedSensor().fetchReadingsFromDB(startDate, endDate);	
+
+		this.getSelectedSensor().fetchReadingsFromDB(startDate, endDate);
 	}
 
 	public String updateNickname(String nickname) {
@@ -292,11 +322,11 @@ public class Machine {
 	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
-	
+
 	private String parseDate(String string) {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss");
-		
+
 		try {
 			Date date = df.parse(string);
 			String dateString = sf.format(date);

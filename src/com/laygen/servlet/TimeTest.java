@@ -9,7 +9,7 @@ public class TimeTest {
 	public static void main(String[] args) {
 		Date currentTime = new Date();
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		String timeString = sdf.format(currentTime);
 		

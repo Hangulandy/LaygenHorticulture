@@ -2,7 +2,7 @@
 	import="com.laygen.beans.Machine"%>
 
 <div class="left-head">
-	<p>${user }</p>
+	<p>${user.getUserMsg('lang') }</p>
 
 	<form class="sideBySide" action="Controller" method="post">
 		<input class="button-white" type="submit"

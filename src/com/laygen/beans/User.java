@@ -162,16 +162,15 @@ public class User implements Serializable, Comparable<User> {
 	}
 
 	@Override
-	public int compareTo(User o) {
-		return this.getEmail().compareTo(o.getEmail());
+	public int compareTo(User other) {
+		return this.getEmail().compareTo(other.getEmail());
 	}
-
-	@Override
-	public String toString() {
+	
+	public String getUserMsg(String lang) {
 		if (this.isLoggedIn()) {
-			return String.format("%s, %s", Dictionary.getInstance().get("hello"), getName());
+			return String.format("%s, %s", Dictionary.getInstance().get("hello", lang), getName());
 		}
-		return "Not logged in.";
+		return Dictionary.getInstance().get("notLoggedIn", lang);
 	}
 	
 	public void printUser() {

@@ -20,6 +20,7 @@
 <body>
 	<%
 	Dictionary dict = (Dictionary) session.getAttribute("dict");
+	String lang = (String) session.getAttribute("lang");
 	%>
 	<%
 	if (dict == null) {

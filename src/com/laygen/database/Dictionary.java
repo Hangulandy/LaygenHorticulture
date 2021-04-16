@@ -29,14 +29,14 @@ public class Dictionary {
 	public static HashMap<String, HashMap<String, String>> getDictionary() {
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
-		String filePath = "./../eclipse-workspace/HorticultureApp/WebContent/res/xml/string.xml";
+		
+		String fileName = "/usr/share/HorticultureApp/string.xml";
 
 		HashMap<String, HashMap<String, String>> dictionary = new HashMap<String, HashMap<String, String>>();
 
 		try {
 			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(filePath);
+			Document doc = builder.parse(fileName);
 			NodeList nodes = doc.getElementsByTagName("string");
 
 			for (int i = 0; i < nodes.getLength(); i++) {
@@ -85,8 +85,9 @@ public class Dictionary {
 		while (entries == null) {
 			refreshDictionary();
 		}
-		language = (language == null) || language.equalsIgnoreCase("") ? "ko" : language;
-		return entries.get(string).get(language);
+		language = ((language == null) || language.equalsIgnoreCase("")) ? "ko" : language;
+		String result = entries.get(string).get(language);
+		return result != null ? result : get(string);
 	}
 
 	public String get(String string) {

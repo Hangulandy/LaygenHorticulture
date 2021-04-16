@@ -165,15 +165,16 @@ public class Controller extends HttpServlet {
 		String password = request.getParameter("password");
 		User user = UserDB.login(email, password);
 		String message = null;
+		String lang = (String)session.getAttribute("lang");
 
 		if (user == null) {
-			message = Dictionary.getInstance().get("userNotFound");
+			message = Dictionary.getInstance().get("userNotFound", lang);
 		} else {
 			if (user.isLoggedIn()) {
 				session.setAttribute("user", user);
 				viewMyMachines(session);
 			} else {
-				message = Dictionary.getInstance().get("wrongPassword");
+				message = Dictionary.getInstance().get("wrongPassword", lang);
 				session.setAttribute("message", message);
 				session.setAttribute("viewComponent", null);
 			}
@@ -200,12 +201,11 @@ public class Controller extends HttpServlet {
 		if (machine != null && machine.getSerialNumber() != null) {
 			machine.refreshSettingsFromDB();
 			if (machine.getSettings() == null) {
-				message = Dictionary.getInstance().get("noSettings");
+				message = Dictionary.getInstance().get("noSettings", (String) session.getAttribute("lang"));
 			}
 		} else {
 			viewMyMachines(session);
 		}
-
 		session.setAttribute("message", message);
 		session.setAttribute("viewComponent", "machineSettings");
 	}
@@ -224,7 +224,7 @@ public class Controller extends HttpServlet {
 				if (machine.getSensors() != null && machine.getSensors().size() > 0) {
 					selectedSensor = machine.getSensors().firstKey();
 				} else {
-					session.setAttribute("message", Dictionary.getInstance().get("noSensors"));
+					session.setAttribute("message", Dictionary.getInstance().get("noSensors", (String)session.getAttribute("lang")));
 				}
 			}
 			if (selectedSensor != null) {
@@ -250,7 +250,7 @@ public class Controller extends HttpServlet {
 //				System.out.println(auth);
 //			}
 			session.setAttribute("user", user);
-			session.setAttribute("message", Dictionary.getInstance().get("selectMachinePrompt"));
+			session.setAttribute("message", Dictionary.getInstance().get("selectMachinePrompt", (String) session.getAttribute("lang")));
 			session.setAttribute("machine", null);
 			session.setAttribute("viewComponent", null);
 		} else {
@@ -313,6 +313,16 @@ public class Controller extends HttpServlet {
 			redirectHome(session);
 		}
 	}
+	
+
+	private void openWaterValve(HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = (String) session.getAttribute("message");
+
+		message = message + machine.sendOpenValveMessage((String)session.getAttribute("lang"));
+		session.setAttribute("message", message);
+		session.setAttribute("viewComponent", "machineSettings");
+	}
 
 	private void updateSettings(HttpServletRequest request, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
@@ -320,32 +330,46 @@ public class Controller extends HttpServlet {
 		if (machine != null && machine.getSerialNumber() != null) {
 			HashMap<String, String> newSettings = new HashMap<String, String>();
 
-			String pumpCycle = request.getParameter("pump_cycle");
-			String pumpDuration = request.getParameter("pump_duration");
+			String waterCyclePeriodHours = request.getParameter("water_cycle_period_hours");
+			String waterCyclePeriodMinutes = request.getParameter("water_cycle_period_minutes");
+
+			String waterCycleDuration = request.getParameter("water_cycle_duration");
 
 			int duration = 0;
-			int cycle = 0;
+			int hours = 0;
+			int minutes = 0;
+			int total = 0;
 			try {
-				duration = Integer.parseInt(pumpDuration);
-				cycle = Integer.parseInt(pumpCycle);
+				duration = Integer.parseInt(waterCycleDuration);
+				hours = Integer.parseInt(waterCyclePeriodHours);
+				minutes = Integer.parseInt(waterCyclePeriodMinutes);
+				total = ((hours * 60) + minutes) * 60;
 			} catch (Exception e) {
 				// do nothing
 			}
 
 			int max = 60 * 60 * 24 * 50; // limit to 50 days * 24 hr * 60 min * 60 sec
 			duration = duration > max ? max : duration;
-			pumpCycle = cycle > duration ? pumpCycle : pumpDuration;
+			total = total > duration ? total : duration;
 
+			newSettings.put("plant_date", request.getParameter("plant_date"));
 			newSettings.put("brightness", request.getParameter("brightness"));
 			newSettings.put("light_on", request.getParameter("light_on"));
 			newSettings.put("heater_on", request.getParameter("heater_on"));
 			newSettings.put("fan_on", request.getParameter("fan_on"));
 			newSettings.put("uvc_on", request.getParameter("uvc_on"));
-			newSettings.put("pump_on", request.getParameter("pump_on"));
+			newSettings.put("water_cycle_on", request.getParameter("water_cycle_on"));
 			newSettings.put("camera_on", request.getParameter("camera_on"));
 			newSettings.put("camera_interval", request.getParameter("camera_interval"));
-			newSettings.put("pump_duration", pumpDuration);
-			newSettings.put("pump_cycle", pumpCycle);
+			newSettings.put("water_cycle_duration", String.valueOf(duration));
+			newSettings.put("water_cycle_period", String.valueOf(total));
+			
+			String water_in_valve_on = request.getParameter("water_in_valve_on");
+			if (water_in_valve_on != null && water_in_valve_on.equalsIgnoreCase("1")) {
+				openWaterValve(session);
+			} else {
+				newSettings.put("water_in_valve_on", water_in_valve_on);
+			}
 
 			session.setAttribute("message", machine.updateMachineSettings(newSettings));
 			session.setAttribute("viewComponent", "machineSettings");
@@ -380,15 +404,16 @@ public class Controller extends HttpServlet {
 	private void takePicture(HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String message = null;
+		String lang = (String) session.getAttribute("lang");
 
 		if (machine != null) {
-			message = machine.takePicture();
+			message = machine.takePicture((String)session.getAttribute("lang"));
 		} else {
-			message = Dictionary.getInstance().get("machineNull");
+			message = Dictionary.getInstance().get("machineNull", lang);
 		}
 
 		if (message.equalsIgnoreCase("success")) {
-			message = message + " " + Dictionary.getInstance().get("refreshPrompt");
+			message = message + " " + Dictionary.getInstance().get("refreshPrompt", lang);
 		}
 
 		session.setAttribute("message", message);

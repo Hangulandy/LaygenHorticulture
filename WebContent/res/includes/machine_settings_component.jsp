@@ -1,22 +1,27 @@
-<%@ page
-	import="com.laygen.beans.Machine"%>
+<%@ page import="com.laygen.beans.Machine"%>
 
 <%
+boolean waterOnChecked = false;
 boolean lightChecked = false;
 boolean heaterChecked = false;
 boolean fanChecked = false;
 boolean uvcChecked = false;
-boolean pumpChecked = false;
+boolean waterCycleOnChecked = false;
 boolean cameraChecked = false;
+String waterOn = "Off";
 String lightOn = "Off";
 String heaterOn = "Off";
 String fanOn = "Off";
 String uvcOn = "Off";
-String pumpOn = "Off";
+String waterCycleOn = "Off";
 String cameraOn = "Off";
 Machine machine = (Machine) session.getAttribute("machine");
 
 if (machine != null) {
+	if (machine.getSettings().get("water_on") != null && machine.getSettings().get("water_in_valve_on").equalsIgnoreCase("1")) {
+		waterOnChecked = true;
+		waterOn = "On";
+	}
 	if (machine.getSettings().get("light_on") != null && machine.getSettings().get("light_on").equalsIgnoreCase("1")) {
 		lightChecked = true;
 		lightOn = "On";
@@ -33,9 +38,9 @@ if (machine != null) {
 		uvcChecked = true;
 		uvcOn = "On";
 	}
-	if (machine.getSettings().get("pump_on") != null && machine.getSettings().get("pump_on").equalsIgnoreCase("1")) {
-		pumpChecked = true;
-		pumpOn = "On";
+	if (machine.getSettings().get("water_cycle_on") != null && machine.getSettings().get("water_cycle_on").equalsIgnoreCase("1")) {
+		waterCycleOnChecked = true;
+		waterCycleOn = "On";
 	}
 	if (machine.getSettings().get("camera_on") != null
 	&& machine.getSettings().get("camera_on").equalsIgnoreCase("1")) {
@@ -49,6 +54,7 @@ if (machine != null) {
 <!-- This will only show if machine != null because it is inside the code block following the if statement -->
 <h1>${dict.get('machineSettingsHeading', lang)}</h1>
 <hr>
+
 <form action="Controller" method="get">
 	<div class="small-space"></div>
 	<h2>${dict.get('growSettingsHeading', lang)}</h2>
@@ -58,12 +64,31 @@ if (machine != null) {
 			<th>${dict.get('valueLabel', lang)}</th>
 			<th>${dict.get('adjustLabel', lang)}</th>
 		</tr>
+
+		<tr>
+			<td class="left">${dict.get('plantDateLabel', lang)}</td>
+			<td></td>
+			<td><input type="date" id="plant_date" name="plant_date"
+				value="${machine.settings.get('plant_date')}" min="2021-01-01" max="2030-12-31"
+				pattern="\d{4}-\d{2}-\d{2}" required />
+			</td>
+		</tr>
+		<tr>
+			<td class="left">${dict.get('waterOnToggleLabel', lang)}</td>
+			<td><%=waterOn%></td>
+			<td><label class="radio-label"><input type="radio"
+					id="water_in_valve_on" name="water_in_valve_on" value="1"
+					<%if (waterOnChecked) {%> checked <%}%> /> On</label> <label
+				class="radio-label"><input type="radio"
+					id="water_in_valve_off" name="water_in_valve_on" value="0"
+					<%if (!waterOnChecked) {%> checked <%}%> /> Off</label></td>
+		</tr>
 		<tr>
 			<td class="left">${dict.get('lightToggleLabel', lang)}</td>
 			<td><%=lightOn%></td>
 			<td><label class="radio-label"><input type="radio"
 					id="light_on" name="light_on" value="1" <%if (lightChecked) {%>
-					checked <%}%> /> On</label>   <label class="radio-label"><input
+					checked <%}%> /> On</label> <label class="radio-label"><input
 					type="radio" id="light_off" name="light_on" value="0"
 					<%if (!lightChecked) {%> checked <%}%> /> Off</label></td>
 		</tr>
@@ -87,6 +112,7 @@ if (machine != null) {
 					id="fan_off" name="fan_on" value="0" <%if (!fanChecked) {%> checked
 					<%}%> /> Off</label></td>
 		</tr>
+
 		<!-- 
 			<tr>
 				<td class="left">${dict.get('uvcToggleLabel', lang)}</td>
@@ -105,27 +131,38 @@ if (machine != null) {
 				value="${machine.settings['brightness'] }"></td>
 		</tr>
 		<tr>
-			<td class="left">${dict.get('pumpToggleLabel', lang)}</td>
-			<td><%=pumpOn%></td>
+			<td class="left">${dict.get('waterCycleOnToggleLabel', lang)}</td>
+			<td><%=waterCycleOn%></td>
 			<td><label class="radio-label"><input type="radio"
-					id="pump_on" name="pump_on" value="1" <%if (pumpChecked) {%>
-					checked <%}%>> On</label> <label class="radio-label"><input
-					type="radio" id="pump_off" name="pump_on" value="0"
-					<%if (!pumpChecked) {%> checked <%}%>> Off</label></td>
+					id="water_cycle_on" name="water_cycle_on" value="1"
+					<%if (waterCycleOnChecked) {%> checked <%}%>> On</label> <label
+				class="radio-label"><input type="radio" id="water_cycle_off"
+					name="water_cycle_on" value="0" <%if (!waterCycleOnChecked) {%>
+					checked <%}%>> Off</label></td>
 		</tr>
 		<tr>
-			<td class="left">${dict.get('pumpDurationLabel', lang)}</td>
-			<td>${machine.settings['pump_duration'] }</td>
-			<td><input type="number" id="pump_duration" name="pump_duration"
-				step="1" min="0" max="1000000"
-				value="${machine.settings['pump_duration']}"></td>
+			<td class="left">${dict.get('waterCycleDurationLabel', lang)}</td>
+			<td>${machine.settings['water_cycle_duration'] }</td>
+			<td><input type="number" id="water_cycle_duration"
+				name="water_cycle_duration" step="1" min="0" max="3600"
+				value="${machine.settings['water_cycle_duration']}"></td>
 		</tr>
+
+		<%
+		int period = Integer.parseInt(machine.getSettings().get("water_cycle_period"));
+		int minutes = period / 60;
+		int hours = minutes / 60;
+		minutes %= 60;
+		%>
+
 		<tr>
-			<td class="left">${dict.get('pumpCycleLabel', lang)}</td>
-			<td>${machine.settings['pump_cycle'] }</td>
-			<td><input type="number" id="pump_cycle" name="pump_cycle"
-				step="1" min="0" max="1000000"
-				value="${machine.settings['pump_cycle']}"></td>
+			<td class="left">${dict.get('waterCyclePeriodLabel', lang)}</td>
+			<td><%=hours%> h: <%=minutes%> m</td>
+			<td><input type="number" id="water_cycle_period_hours"
+				name="water_cycle_period_hours" step="1" min="0" max="100"
+				value="<%=hours%>"> h <input type="number"
+				id="water_cycle_perdiod_minutes" name="water_cycle_period_minutes"
+				step="1" min="0" max="59" value="<%=minutes%>"> m</td>
 		</tr>
 	</table>
 	<h2>${dict.get('cameraSettingsHeading', lang)}</h2>
@@ -155,8 +192,7 @@ if (machine != null) {
 
 	<input type="hidden" name="action" value="updateSettings" /> <input
 		class="button-red" type="submit"
-		value="${dict.get('updateButtonLabel', lang)}"
-		class="margin_left" />
+		value="${dict.get('updateButtonLabel', lang)}" class="margin_left" />
 </form>
 <%}%>
 

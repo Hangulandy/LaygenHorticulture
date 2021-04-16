@@ -9,6 +9,7 @@ public class Sensor implements Comparable<Sensor> {
 	private String machineSerialNumber;
 	private String name;
 	private String type;
+	private String units;
 	private TreeSet<Message> readings;
 
 	public String getMachineSerialNumber() {
@@ -55,5 +56,24 @@ public class Sensor implements Comparable<Sensor> {
 			return this.getMachineSerialNumber().compareTo(that.getMachineSerialNumber());
 		}
 		return this.getName().compareTo(that.getName());
+	}
+
+	public String getUnits() {
+		return units;
+	}
+
+	public void setUnits(String units) {
+		this.units = units;
+	}
+
+	public void fetchUnitsFromDB() {
+		TreeSet<Message> messages = MessageDB.getRowById(this.getType());
+		this.setUnits("None");
+		for (Message message : messages) {
+			if (message.getColumnName().equalsIgnoreCase("units")) {
+				this.setUnits(message.getValue());
+				break;
+			}
+		}
 	}
 }

@@ -2,7 +2,7 @@
 	--light-color: white;
 	--light-text: white;
 	--dark-text: black;
-	--visited-text: grey;
+	--visited-text: rgb(211, 215, 207);
 	--table-light-color: #ebf0f9;
 	--main-dark-color: #1f386b; 
 	--banner-height: 100px; 
@@ -16,7 +16,7 @@
 	--standard-pad: 10px; 
 	--left-head-width: 300px; 
 	--right-head-width: 350px; 
-	--content-width: calc(100vw - calc(var(--left-head-width) + calc(2 * var(--standard-pad))));
+	--content-width: calc(100vw - calc(var(--left-head-width) + calc(4 * var(--standard-pad))));
 	--selector-width: 250px; 
 	--selector-height: 300px; 
 	--mobile-selector-height: 200px; 
@@ -31,20 +31,32 @@
 	margin: 0px;
 }
 
-a:link {
-	color: var(--light-text);
-}
-
-a:visited {
-	color: var(--visited-text);
-}
-
-a.machine-link:link {
+a.shortcut:link {
 	color: var(--dark-text);
 }
 
+a.shortcut:visited {
+	color: var(--dark-text);
+}
+
+a.footer-link:link{
+	color: var(--light-color);
+}
+
+a.footer-link:visited {
+	color: var(--visited-text);
+}
+
+h1 {
+	margin: var(--standard-pad);
+}
+
 h3 {
-	margin-top: var(--standard-pad);
+	margin: var(--standard-pad) 0px;
+}
+
+label {
+	padding: var(--standard-pad);
 }
 
 p {
@@ -112,7 +124,7 @@ tr:nth-child(odd) {
   	width: 80px;
   	background-color: var(--main-dark-color);
   	color: var(--light-text);
-  	padding: 2px 6px 2px 6px;
+  	padding: 2px 0px;
   	border-top: 1px solid #CCCCCC;
   	border-right: 1px solid #333333;
   	border-bottom: 1px solid #333333;
@@ -148,6 +160,7 @@ tr:nth-child(odd) {
 }
 
 .display-chart {
+	margin-top: var(--standard-margin);
 	border: 1px solid var(--dark-text);
 	width: 100%;
 	height: auto;
@@ -186,18 +199,17 @@ tr:nth-child(odd) {
 }
 
 .img-container {
-	margin-top: var(--standard-pad);
 	float: left;
-	width: calc(calc(var(--content-width) - calc(2 * var(--standard-border))) - calc(var(--selector-width) + calc(1 * var(--standard-pad))));
+	width: calc(calc(var(--content-width) - calc(2 * var(--standard-border))) - calc(var(--selector-width) + calc(4 * var(--standard-pad))));
 }
 
 .left {
-	padding-left: calc(var(--standard-pad) * 3);
+	padding-left: calc(var(--standard-pad) * 2);
 	text-align: left;
 }
 
 .left-head, .right-head {
-	padding-top: var(--standard-pad);
+	margin-bottom: var(--standard-pad);
 	float: left;
 	color: var(--light-text);
 	text-align: left;
@@ -210,6 +222,10 @@ tr:nth-child(odd) {
 
 .margin-top {
 	margin-top: var(--standard-pad);
+}
+
+.mobile-only {
+	display: none;
 }
 
 .right-head {
@@ -229,6 +245,11 @@ tr:nth-child(odd) {
 
 .sideBySide {
 	display: inline;
+}
+
+.small-space {
+	height: var(--standard-pad);
+	width: 100%;
 }
 
 .under-footer {
@@ -294,7 +315,7 @@ tr:nth-child(odd) {
 	}
 	
 	.img-container {
-		padding: var(--standard-pad) 0px;
+		margin-top: calc(3 * var(--standard-pad));
 		width: 100%;
 		clear: both;
 	}
@@ -304,7 +325,7 @@ tr:nth-child(odd) {
 	}
 	
 	.not-mobile {
-	display: none;
+		display: none;
 	}
 	
 	.selector {

@@ -1,9 +1,7 @@
 
 <%@ include file="./res/includes/header_component.jsp"%>
 
-
 <!-- Must start with the login component if there is no logged in user -->
-
 <div class="view-area">
 	<%
 	String viewComponent = (String) session.getAttribute("viewComponent");
@@ -23,12 +21,12 @@
 	<div class="under-header"></div>
 
 	<div class="side-bar block">
-		<h3><%=Dictionary.getInstance().get("quickViewHeading")%>:
-		</h3>
+	<h3>${dict.get('quickViewHeading', lang)} :</h3>
+
 		<%
 		for (Authorization auth : user.getAuthorizations()) {
 		%>
-		<a class=""
+		<a class="shortcut"
 			href="Controller?selectedMachineId=<%=auth.getMachineSerialNumber()%>&action=selectMachine"><%=auth.getMachineNickname()%></a>
 		<br>
 		<%}%>
@@ -59,7 +57,7 @@
 		}
 		if (viewComponent.equalsIgnoreCase("machineData")) {
 		%>
-		<%@ include file="./res/includes/machine_data_component2.jsp"%>
+		<%@ include file="./res/includes/machine_data_component.jsp"%>
 		<%
 		}
 		if (viewComponent.equalsIgnoreCase("cameraPage")) {

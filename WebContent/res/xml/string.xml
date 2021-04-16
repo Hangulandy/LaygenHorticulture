@@ -18,8 +18,10 @@
 		<ko>선택된 기계는 등록된 센서가 없습니다. </ko>
 	</string>
 	<string id="userNotFound">
-		<en>Could not find that user in the database. Check your credentials and try again, or join our community. </en>
-		<ko>입력한 계정을 찾을 수 없습니다. 이메일, 암호를 확인하고 다시 시도하십시오. 회원이 아니시면 회원 가입을 하십시오. </ko>
+		<en>Could not find that user in the database. Check your credentials
+			and try again, or join our community. </en>
+		<ko>입력한 계정을 찾을 수 없습니다. 이메일, 암호를 확인하고 다시 시도하십시오. 회원이 아니시면 회원 가입을 하십시오.
+		</ko>
 	</string>
 	<string id="wrongPassword">
 		<en>Password is incorrect. </en>
@@ -50,7 +52,8 @@
 		<ko>적용되었습니다. </ko>
 	</string>
 	<string id="commError">
-		<en>There was a communication error with that machine. Check that it is turned on and try again. </en>
+		<en>There was a communication error with that machine. Check that it
+			is turned on and try again. </en>
 		<ko>선택된 기계와 통신이 실패하였습니다. 기계를 켰는지 확인하고 다시 시도해 주십시오. </ko>
 	</string>
 	<string id="nickname">
@@ -111,7 +114,8 @@
 	</string>
 	<string id="joinPrompt">
 		<en>To become a member of the Laygen Farming community, enter your
-		information below:</en>
+			information below:
+		</en>
 		<ko>회원 가입을 하려면 다음 정보를 입력해주셔야 합니다: </ko>
 	</string>
 	<string id="join">
@@ -222,7 +226,7 @@
 		<en>Brightness</en>
 		<ko>밝기</ko>
 	</string>
-	<string id="growSettingsHeader">
+	<string id="growSettingsHeading">
 		<en>Grow Settings</en>
 		<ko>재배 설정</ko>
 	</string>
@@ -302,5 +306,24 @@
 		<en>Save</en>
 		<ko>저장</ko>
 	</string>
-
+	<string id="fromLabel">
+		<en>Start</en>
+		<ko>시작</ko>
+	</string>
+	<string id="toLabel">
+		<en>End</en>
+		<ko>종료</ko>
+	</string>
+	<string id="">
+		<en></en>
+		<ko></ko>
+	</string>
+	<string id="">
+		<en></en>
+		<ko></ko>
+	</string>
+	<string id="">
+		<en></en>
+		<ko></ko>
+	</string>
 </strings>

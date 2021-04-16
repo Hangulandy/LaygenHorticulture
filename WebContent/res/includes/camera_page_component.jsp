@@ -1,26 +1,26 @@
 <%@ page
-	import="com.laygen.beans.Machine, com.laygen.database.Dictionary"%>
+	import="com.laygen.beans.Machine"%>
 
 <%
 Machine machine = (Machine) session.getAttribute("machine");
 %>
 
 <div>
-	<h1><%=Dictionary.getInstance().get("cameraHeading")%></h1>
+	<h1>${dict.get('cameraHeading', lang)}</h1>
 </div>
 <hr>
-<br>
+<div class="small-space"></div>
 
 <div id="image-selector" class="selector">
 	<div>
 		<form class="sideBySide" action="Controller" method="post">
 			<input class="button" type="submit"
-				value="<%=Dictionary.getInstance().get("capture")%>" /> <input
+				value="${dict.get('capture', lang)}" /> <input
 				type="hidden" name="action" value="takePicture" />
 		</form>
 		<form class="sideBySide" action="Controller" method="post">
 			<input class="button" type="submit"
-				value="<%=Dictionary.getInstance().get("refresh")%>" /> <input
+				value="${dict.get('refresh', lang)}" /> <input
 				type="hidden" name="action" value="viewCameraPage" />
 		</form>
 	</div>
@@ -28,7 +28,7 @@ Machine machine = (Machine) session.getAttribute("machine");
 
 	<!-- Image list div -->
 	<!-- label block -->
-	<h3><%=Dictionary.getInstance().get("selectAnImageLabel")%>:
+	<h3>${dict.get('selectAnImageLabel', lang)}:
 	</h3>
 	<form class="sideBySide" action="Controller" method="post">
 		<%
@@ -55,7 +55,7 @@ Machine machine = (Machine) session.getAttribute("machine");
 		}
 		%>
 		<br class="not-mobile"> <input class="button" type="submit"
-			value="<%=Dictionary.getInstance().get("select")%>" /> <input
+			value="${dict.get('select', lang)}" /> <input
 			type="hidden" name="action" value="viewCameraPage" />
 	</form>
 
@@ -67,9 +67,10 @@ Machine machine = (Machine) session.getAttribute("machine");
 	<%
 	if (id != null) {
 	%>
+	<div class="small-space"></div>
 	<form>
 		<input class="button-red" type="submit"
-			value="<%=Dictionary.getInstance().get("delete")%>" /> <input
+			value="${dict.get('delete', lang)}" /> <input
 			type="hidden" name="action" value="deleteImage" /> <input
 			type="hidden" name="image" value="<%=id%>" />
 	</form>

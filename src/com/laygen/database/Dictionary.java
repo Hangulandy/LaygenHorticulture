@@ -17,7 +17,6 @@ public class Dictionary {
 
 	private static Dictionary instance = new Dictionary();
 	private static HashMap<String, HashMap<String, String>> entries = null;
-	private static String lang;
 
 	private Dictionary() {
 		refreshDictionary();
@@ -86,16 +85,12 @@ public class Dictionary {
 		while (entries == null) {
 			refreshDictionary();
 		}
-		lang = language == null ? "ko" : language;
-		return entries.get(string).get(lang);
+		language = (language == null) || language.equalsIgnoreCase("") ? "ko" : language;
+		return entries.get(string).get(language);
 	}
 
 	public String get(String string) {
-		return get(string, lang);
-	}
-	
-	public static void setLanguage(String lang) {
-		Dictionary.lang = lang;
+		return get(string, null);
 	}
 
 }

@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -126,6 +127,9 @@ public class Machine {
 				this.getSettings().put(key, newSettings.get(key));
 				System.out.println(msg);
 			}
+			
+			// out.println(generateTimeCommand());
+			
 			out.close();
 			socket.close();
 			return Dictionary.getInstance().get("success");
@@ -133,8 +137,28 @@ public class Machine {
 			return Dictionary.getInstance().get("commError");
 		}
 	}
-
+	
 	public String takePicture() {
+		refreshTime();
+		return sendCommandToMachine("1#flash_on");
+	}
+	
+	public String generateTimeCommand() {
+		Date currentTime = new Date();
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+		String timeString = sdf.format(currentTime);
+		String msg = String.format("%s#time", timeString);
+		
+		return msg;
+	}
+	
+	public String refreshTime() {
+		return sendCommandToMachine(generateTimeCommand());
+	}
+
+	public String sendCommandToMachine(String msg) {
 		// TODO - perhaps this should be asynchronous in the future?
 
 		String portString = this.getInfo().get("port");
@@ -152,8 +176,7 @@ public class Machine {
 		try {
 			socket = new Socket(this.getInfo().get("ip"), port);
 			out = new PrintWriter(socket.getOutputStream(), true);
-			String msg = "1#flash_on";
-			System.out.println(msg);
+			System.out.println(String.format("Sending message to machine %s : %s", this.getSerialNumber(), msg));
 			out.println(msg);
 			out.close();
 			socket.close();

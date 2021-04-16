@@ -1,31 +1,43 @@
 
-<%@ page import="com.laygen.beans.Machine, com.laygen.database.Dictionary"%>
+<%@ page
+	import="com.laygen.beans.Machine"%>
 
-<h1><%=Dictionary.getInstance().get("machineInfoHeading")%></h1>
+<h1>${dict.get('machineInfoHeading', lang)}</h1>
 <hr>
-<br>
+<div class="small-space"></div>
 <form class="sideBySide" action="Controller" method="post">
-	<p><%=Dictionary.getInstance().get("serialNumberLabel")%> : ${machine.serialNumber}</p>
-	<p><%=Dictionary.getInstance().get("modelLabel")%> : ${machine.info['model_name'] }</p>
-	<p><%=Dictionary.getInstance().get("primaryUseLabel")%> : ${machine.info['primary_use'] }</p>
-	<p><%=Dictionary.getInstance().get("ownerEmail")%> : ${machine.info['owner_email'] }</p>
-	<p>
-		<%=Dictionary.getInstance().get("nickname")%> : <input id="nickname" type="text" name="nickname"
-			value="${machine.info['nickname'] }" required />
-		<button id="editButton" class="button-red" type="button"
-			onclick="toggleNicknameGlyph()"><%=Dictionary.getInstance().get("editButtonLabel")%></button>
+	<p>${dict.get('serialNumberLabel', lang)}
+		: ${machine.serialNumber}
 	</p>
-	<p><%=Dictionary.getInstance().get("ipAddressLabel")%> : ${machine.info['ip'] }</p>
-	<p><%=Dictionary.getInstance().get("portLabel")%> : ${machine.info['port'] }</p>
-
+	<p>${dict.get('modelLabel', lang)}
+		: ${machine.info['model_name'] }
+	</p>
+	<p>${dict.get('primaryUseLabel', lang)}
+		: ${machine.info['primary_use'] }
+	</p>
+	<p>${dict.get('ownerEmail', lang)}
+		: ${machine.info['owner_email'] }
+	</p>
+	<p>
+		${dict.get('nickname', lang)}
+		: <input id="nickname" type="text" name="nickname"
+			value="${machine.info['nickname'] }" required />
+		<button id="editButton" class="button-red" type="button" onclick="toggleNicknameGlyph()">${dict.get('editButtonLabel', lang)}</button>
+	</p>
+	<p>${dict.get('ipAddressLabel', lang)}
+		: ${machine.info['ip'] }
+	</p>
+	<p>${dict.get('portLabel', lang)}
+		: ${machine.info['port'] }
+	</p>
+<div class="small-space"></div>
 	<input id="saveButton" class="button-red margin-top" type="submit"
-		value="<%=Dictionary.getInstance().get("saveButtonLabel")%>" /> <input type="hidden" name="action"
-		value="updateMachineInfo" /> <input type="hidden"
-		name="selectedMachineId" value="${machine.serialNumber}" />
+		value="${dict.get('saveButtonLabel', lang)}" /> <input
+		type="hidden" name="action" value="updateMachineInfo" /> <input
+		type="hidden" name="selectedMachineId" value="${machine.serialNumber}" />
 </form>
-<br>
 <form class="sideBySide margin-top" action="Controller" method="post">
-	<input class="button" type="submit" value="<%=Dictionary.getInstance().get("refresh")%>" /> <input
+	<input class="button" type="submit" value="${dict.get('refresh', lang)}" /> <input
 		type="hidden" name="action" value="selectMachine" /> <input
 		type="hidden" name="selectedMachineId" value="${machine.serialNumber}" />
 </form>

@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.laygen.beans.Authorization;
 import com.laygen.beans.Machine;
 import com.laygen.beans.User;
 import com.laygen.database.Dictionary;
@@ -37,25 +36,22 @@ public class Controller extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
+
 		String action = request.getParameter("action");
 		action = action == null ? "home" : action;
-		
-		String lang = request.getParameter("lang");
-		lang = lang == null ? "ko" : lang;
 
 		String url = "/index.jsp";
 		HttpSession session = request.getSession();
-		
+
 		Dictionary dict = Dictionary.getInstance();
 
 		final Object lock = session.getId().intern();
 
 		synchronized (lock) {
-			
+
 			session.setAttribute("dict", dict);
 			session.setAttribute("popup", null);
-			
+
 			// this will set some of the attributes to null because we don't want them
 			// persisting outside of a the view scope
 			if (action.equalsIgnoreCase("selectLanguage")) {
@@ -130,7 +126,7 @@ public class Controller extends HttpServlet {
 			}
 
 		}
-		
+
 		getServletContext().getRequestDispatcher(url).forward(request, response);
 	}
 
@@ -143,14 +139,14 @@ public class Controller extends HttpServlet {
 	private void redirectHome(HttpSession session) {
 		session.setAttribute("viewComponent", null);
 	}
-	
+
 	private void selectLanguage(HttpServletRequest request, HttpSession session) {
-		String lang = request.getParameter("selectedLanguage"); 
-		
+		String lang = request.getParameter("selectedLanguage");
+
 		if (lang != null) {
-			Dictionary.setLanguage(lang);			
+			session.setAttribute("lang", lang);
 		} else {
-			Dictionary.setLanguage("ko");
+			session.setAttribute("lang", "ko");
 		}
 	}
 
@@ -221,7 +217,6 @@ public class Controller extends HttpServlet {
 		String startTime = (String) request.getParameter("startTime");
 		String endDate = (String) request.getParameter("endDate");
 		String endTime = (String) request.getParameter("endTime");
-		
 
 		if (machine != null) {
 			machine.refreshCurrentReadingsFromDB();
@@ -250,7 +245,7 @@ public class Controller extends HttpServlet {
 
 		if (user != null && user.getId() != null) {
 			user.refreshAuthorizations();
-			
+
 //			for (Authorization auth : user.getAuthorizations()) {
 //				System.out.println(auth);
 //			}

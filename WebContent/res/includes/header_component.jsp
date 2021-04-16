@@ -18,23 +18,31 @@
 <title>Horticulture by Laygen</title>
 </head>
 <body>
+	<%
+	Dictionary dict = (Dictionary) session.getAttribute("dict");
+	%>
+	<%
+	if (dict == null) {
+		session.setAttribute("dict", Dictionary.getInstance());
+	}
+	%>
 	<div class="header">
 		<div class="banner">
-			<p><%=Dictionary.getInstance().get("bannerText")%></p>
+			<p>${dict.get('bannerText', lang)}</p>
 		</div>
 		<!-- option bar -->
 		<%
-			User user = (User) session.getAttribute("user");
-			final Object lock = session.getId().intern();
-			if (user == null || !user.isLoggedIn()) {
-			%>
+		User user = (User) session.getAttribute("user");
+		final Object lock = session.getId().intern();
+		if (user == null || !user.isLoggedIn()) {
+		%>
 		<%@ include
 			file="/res/includes/not_logged_in_options_subcomponent.jsp"%>
 		<%
-			} else {
-			%>
+		} else {
+		%>
 		<%@ include file="/res/includes/logged_in_options_subcomponent.jsp"%>
 		<%
-			}
-			%>
+		}
+		%>
 	</div>

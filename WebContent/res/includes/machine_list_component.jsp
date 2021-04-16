@@ -1,20 +1,20 @@
 <!-- This will be the component that lists machines a user is authorized to view -->
 
 <%@ page
-	import="com.laygen.beans.Authorization, com.laygen.beans.User, com.laygen.database.Dictionary, java.util.TreeSet"%>
+	import="com.laygen.beans.Authorization, com.laygen.beans.User, java.util.TreeSet"%>
 
 
 <%
 User userHere = (User) session.getAttribute("user");
 if (userHere.getAuthorizations() != null && userHere.getAuthorizations().size() > 0) {%>
-<h1><%=Dictionary.getInstance().get("machineListHeading")%>:
+<h1>${dict.get('machineListHeading', lang)}:
 </h1>
 <table>
 	<tr>
-		<th><%=Dictionary.getInstance().get("serialNumberLabel")%></th>
-		<th><%=Dictionary.getInstance().get("nickname")%></th>
-		<th class="not-mobile"><%=Dictionary.getInstance().get("ownerEmail")%></th>
-		<th><%=Dictionary.getInstance().get("select")%></th>
+		<th>${dict.get('serialNumberLabel', lang)}</th>
+		<th>${dict.get('nickname', lang)}</th>
+		<th class="not-mobile">${dict.get('ownerEmail', lang)}</th>
+		<th>${dict.get('select', lang)}</th>
 	</tr>
 
 	<%
@@ -26,7 +26,7 @@ if (userHere.getAuthorizations() != null && userHere.getAuthorizations().size() 
 		<td class="not-mobile"><%=auth.getOwnerEmail()%></td>
 		<td><form class="sideBySide" action="Controller" method="post">
 				<input class="button" type="submit"
-					value="<%=Dictionary.getInstance().get("select")%>" /> <input
+					value="${dict.get('select', lang)}" /> <input
 					type="hidden" name="action" value="selectMachine" /> <input
 					type="hidden" name="selectedMachineId"
 					value="<%=auth.getMachineSerialNumber()%>" />

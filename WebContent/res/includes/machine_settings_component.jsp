@@ -5,6 +5,7 @@ boolean waterOnChecked = false;
 boolean lightChecked = false;
 boolean heaterChecked = false;
 boolean fanChecked = false;
+boolean fanAutoChecked = false;
 boolean uvcChecked = false;
 boolean waterCycleOnChecked = false;
 boolean cameraChecked = false;
@@ -12,6 +13,7 @@ String waterOn = "Off";
 String lightOn = "Off";
 String heaterOn = "Off";
 String fanOn = "Off";
+String fanAuto = "Cont";
 String uvcOn = "Off";
 String waterCycleOn = "Off";
 String cameraOn = "Off";
@@ -33,6 +35,10 @@ if (machine != null) {
 	if (machine.getSettings().get("fan_on") != null && machine.getSettings().get("fan_on").equalsIgnoreCase("1")) {
 		fanChecked = true;
 		fanOn = "On";
+	}
+	if (machine.getSettings().get("fan_auto") != null && machine.getSettings().get("fan_auto").equalsIgnoreCase("1")) {
+		fanAutoChecked = true;
+		fanAuto = "Auto";
 	}
 	if (machine.getSettings().get("uvc_on") != null && machine.getSettings().get("uvc_on").equalsIgnoreCase("1")) {
 		uvcChecked = true;
@@ -69,9 +75,9 @@ if (machine != null) {
 			<td class="left">${dict.get('plantDateLabel', lang)}</td>
 			<td></td>
 			<td><input type="date" id="plant_date" name="plant_date"
-				value="${machine.settings.get('plant_date')}" min="2021-01-01" max="2030-12-31"
-				pattern="\d{4}-\d{2}-\d{2}" required />
-			</td>
+				value="${machine.settings.get('plant_date')}" min="2021-01-01"
+				max="2030-12-31" pattern="\d{4}-\d{2}-\d{2}"
+				placeholder="yyyy-mm-dd" required /></td>
 		</tr>
 		<tr>
 			<td class="left">${dict.get('waterOnToggleLabel', lang)}</td>
@@ -113,6 +119,22 @@ if (machine != null) {
 					<%}%> /> Off</label></td>
 		</tr>
 
+		<tr>
+			<td class="left">${dict.get('fanAutoToggleLabel', lang)}</td>
+			<td><%=fanAuto%></td>
+			<td><label class="radio-label"><input type="radio"
+					id="fan_auto" name="fan_auto" value="1" <%if (fanAutoChecked) {%> checked
+					<%}%> /> Auto</label> <label class="radio-label"><input type="radio"
+					id="fan_cont" name="fan_auto" value="0" <%if (!fanAutoChecked) {%> checked
+					<%}%> /> Cont</label></td>
+		</tr>
+		<tr>
+			<td class="left">${dict.get('fanHumidityLabel', lang)}</td>
+			<td>${machine.settings['fan_humidity'] }</td>
+			<td><input type="number" id="fan_humidity" name="fan_humidity"
+				step="1" min="0" max="100"
+				value="${machine.settings['fan_humidity'] }"></td>
+		</tr>
 		<!-- 
 			<tr>
 				<td class="left">${dict.get('uvcToggleLabel', lang)}</td>
@@ -173,20 +195,20 @@ if (machine != null) {
 			<th>${dict.get('adjustLabel', lang)}</th>
 		</tr>
 		<tr>
-			<td class="left">${dict.get('cameraToggleLabel', lang)}</td>
+			<td class="left">${dict.get('cameraCycleToggleLabel', lang)}</td>
 			<td><%=cameraOn%></td>
 			<td><label class="radio-label"><input type="radio"
-					id="camera_on" name="camera_on" value="1" <%if (cameraChecked) {%>
+					id="camera_cycle_on" name="camera_cycle_on" value="1" <%if (cameraChecked) {%>
 					checked <%}%>> On</label> <label class="radio-label"><input
-					type="radio" id="camera_off" name="camera_on" value="0"
+					type="radio" id="camera_cycle_off" name="camera_cycle_on" value="0"
 					<%if (!cameraChecked) {%> checked <%}%>> Off</label></td>
 		</tr>
 		<tr>
-			<td class="left">${dict.get('cameraIntervalLabel', lang)}</td>
-			<td>${machine.settings['camera_interval'] }</td>
-			<td><input type="number" id="camera_interval"
-				name="camera_interval" step="1" min="0" max="1000000"
-				value="${machine.settings['camera_interval'] }"></td>
+			<td class="left">${dict.get('cameraCyclePeriodLabel', lang)}</td>
+			<td>${machine.settings['camera_cycle_period'] }</td>
+			<td><input type="number" id="camera_cycle_period"
+				name="camera_cycle_period" step="1" min="0" max="1000000"
+				value="${machine.settings['camera_cycle_period'] }"></td>
 		</tr>
 	</table>
 

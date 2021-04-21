@@ -121,11 +121,13 @@ public class Machine {
 			socket = new Socket(this.getInfo().get("ip"), port);
 			out = new PrintWriter(socket.getOutputStream(), true);
 			String msg;
-			for (String key : this.getSettings().keySet()) {
+			System.out.println();
+			System.out.println("Messages sent to Machine: ");
+			for (String key : newSettings.keySet()) {
 				msg = String.format("%s#%s", newSettings.get(key), key);
 				out.println(msg);
 				this.getSettings().put(key, newSettings.get(key));
-				// System.out.println(msg);
+				System.out.println(msg);
 			}
 
 			// out.println(generateTimeCommand());
@@ -261,11 +263,12 @@ public class Machine {
 
 	public void refreshSensorsFromDB() {
 		setSensors(MachineDB.getSensorList(this));
-		
+
 		Sensor sensor = null;
 		for (String key : this.getSensors().keySet()) {
 			sensor = this.getSensors().get(key);
 			sensor.fetchUnitsFromDB();
+			sensor.setReadings(null);
 		}
 	}
 
@@ -277,27 +280,21 @@ public class Machine {
 		this.selectedSensor = selectedSensor;
 	}
 
-	public void fetchSensorReadingsByDate(String startDate, String startTime, String endDate, String endTime) {
+	public void fetchSensorReadingsByDate(String startDate, String startTime, String endDate, String endTime,
+			Sensor sensor) {
 
 		this.setStartDate(startDate);
 		this.setStartTime(startTime);
 		this.setEndDate(endDate);
 		this.setEndTime(endTime);
 
-		startDate = parseDate(String.format("%s %s", this.getStartDate(), this.getStartTime()));
-		endDate = parseDate(String.format("%s %s", this.getEndDate(), this.getEndTime()));
-
-		if (startDate.equalsIgnoreCase("")) {
-			this.setStartDate(null);
-			this.setStartTime(null);
+		if (this.startDate == null || this.startTime == null || this.endDate == null || this.endTime == null) {
+			// Do nothing
+		} else {
+			startDate = parseDate(String.format("%s %s", this.getStartDate(), this.getStartTime()));
+			endDate = parseDate(String.format("%s %s", this.getEndDate(), this.getEndTime()));
+			sensor.fetchReadingsFromDB(startDate, endDate);			
 		}
-
-		if (endDate.equalsIgnoreCase("")) {
-			this.setEndDate(null);
-			this.setEndTime(null);
-		}
-
-		this.getSelectedSensor().fetchReadingsFromDB(startDate, endDate);
 	}
 
 	public String updateNickname(String nickname) {

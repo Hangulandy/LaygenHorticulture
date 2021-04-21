@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.laygen.beans.Machine;
+import com.laygen.beans.Sensor;
 import com.laygen.beans.User;
 import com.laygen.database.Dictionary;
 import com.laygen.database.MessageDB;
@@ -227,9 +228,18 @@ public class Controller extends HttpServlet {
 					session.setAttribute("message", Dictionary.getInstance().get("noSensors", (String)session.getAttribute("lang")));
 				}
 			}
-			if (selectedSensor != null) {
-				machine.setSelectedSensor(machine.getSensors().get(selectedSensor));
-				machine.fetchSensorReadingsByDate(startDate, startTime, endDate, endTime);
+//			if (selectedSensor != null) {
+//				machine.setSelectedSensor(machine.getSensors().get(selectedSensor));
+//				machine.fetchSensorReadingsByDate(startDate, startTime, endDate, endTime, machine.getSelectedSensor());
+//			}
+			if (machine.getSensors() != null) {
+				Sensor sensor = null;
+				for (String key : machine.getSensors().keySet()) {
+					sensor  = machine.getSensors().get(key);
+					if (sensor != null) {
+						machine.fetchSensorReadingsByDate(startDate, startTime, endDate, endTime, sensor);						
+					}
+				}
 			}
 		} else {
 			// redirect to select machine
@@ -351,18 +361,20 @@ public class Controller extends HttpServlet {
 			int max = 60 * 60 * 24 * 50; // limit to 50 days * 24 hr * 60 min * 60 sec
 			duration = duration > max ? max : duration;
 			total = total > duration ? total : duration;
-
+			
 			newSettings.put("plant_date", request.getParameter("plant_date"));
 			newSettings.put("brightness", request.getParameter("brightness"));
 			newSettings.put("light_on", request.getParameter("light_on"));
-			newSettings.put("heater_on", request.getParameter("heater_on"));
+			// newSettings.put("heater_on", request.getParameter("heater_on"));
 			newSettings.put("fan_on", request.getParameter("fan_on"));
-			newSettings.put("uvc_on", request.getParameter("uvc_on"));
+			newSettings.put("fan_auto", request.getParameter("fan_auto"));
+			newSettings.put("fan_humidity", request.getParameter("fan_humidity"));
+			// newSettings.put("uvc_on", request.getParameter("uvc_on"));
 			newSettings.put("water_cycle_on", request.getParameter("water_cycle_on"));
-			newSettings.put("camera_on", request.getParameter("camera_on"));
-			newSettings.put("camera_interval", request.getParameter("camera_interval"));
 			newSettings.put("water_cycle_duration", String.valueOf(duration));
 			newSettings.put("water_cycle_period", String.valueOf(total));
+			newSettings.put("camera_cycle_on", request.getParameter("camera_cycle_on"));
+			newSettings.put("camera_cycle_period", request.getParameter("camera_cycle_period"));
 			
 			String water_in_valve_on = request.getParameter("water_in_valve_on");
 			if (water_in_valve_on != null && water_in_valve_on.equalsIgnoreCase("1")) {

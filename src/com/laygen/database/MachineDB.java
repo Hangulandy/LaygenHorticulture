@@ -81,6 +81,23 @@ public class MachineDB {
 		}
 		return sensors;
 	}
+	
+
+	public static TreeMap<String, String> getLightColors(Machine machine) {
+		TreeMap<String, String> lightColors = null;
+
+		if (machine.getInfo() != null && machine.getInfo().get("model_name") != null) {
+			TreeSet<Message> messages = MessageDB
+					.getRowMessagesByColumnFamily(machine.getInfo().get("model_name") + "-L", "C");
+			if (messages.size() > 0) {
+				lightColors = new TreeMap<String, String>();
+				for (Message message : messages) {
+					lightColors.put(message.getColumnName(), message.getValue());
+				}
+			}
+		}
+		return lightColors;
+	}
 
 	public static String putNickname(Machine machine) {
 		String output = null;

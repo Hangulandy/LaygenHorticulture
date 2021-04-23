@@ -1,7 +1,9 @@
 package com.laygen.servlet;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -338,7 +340,7 @@ public class Controller extends HttpServlet {
 		Machine machine = (Machine) session.getAttribute("machine");
 
 		if (machine != null && machine.getSerialNumber() != null) {
-			HashMap<String, String> newSettings = new HashMap<String, String>();
+			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
 
 			String waterCyclePeriodHours = request.getParameter("water_cycle_period_hours");
 			String waterCyclePeriodMinutes = request.getParameter("water_cycle_period_minutes");
@@ -365,6 +367,7 @@ public class Controller extends HttpServlet {
 			newSettings.put("plant_date", request.getParameter("plant_date"));
 			newSettings.put("brightness", request.getParameter("brightness"));
 			newSettings.put("light_on", request.getParameter("light_on"));
+			newSettings.put("light_color", request.getParameter("light_color"));
 			// newSettings.put("heater_on", request.getParameter("heater_on"));
 			newSettings.put("fan_on", request.getParameter("fan_on"));
 			newSettings.put("fan_auto", request.getParameter("fan_auto"));

@@ -22,6 +22,7 @@ public class Machine {
 	private Map<String, String> info;
 	private Map<String, String> readings;
 	private Map<String, String> settings;
+	private TreeMap<String, String> lightColors;
 	private TreeMap<String, Sensor> sensors;
 	private TreeMap<String, String> images;
 	private TreeSet<User> authorizedUsers;
@@ -49,6 +50,7 @@ public class Machine {
 		refreshInfoFromDB();
 		refreshCurrentReadingsFromDB();
 		refreshSettingsFromDB();
+		refreshLightColorsFromDB();
 		refreshSensorsFromDB();
 	}
 
@@ -101,7 +103,7 @@ public class Machine {
 		this.authorizedUsers = authorizedUsers;
 	}
 
-	public String updateMachineSettings(HashMap<String, String> newSettings) {
+	public String updateMachineSettings(TreeMap<String, String> newSettings) {
 		// TODO - perhaps this should be asynchronous in the future?
 
 		this.refreshAllFromDB();
@@ -162,7 +164,7 @@ public class Machine {
 
 	public String sendCommandToMachine(String msg, String lang) {
 		// TODO - perhaps this should be asynchronous in the future?
-		System.out.println(String.format("Attemptint to send message to machine %s : %s", this.getSerialNumber(), msg));
+		System.out.println(String.format("Attempting to send message to machine %s : %s", this.getSerialNumber(), msg));
 
 		String portString = this.getInfo().get("port");
 
@@ -261,6 +263,10 @@ public class Machine {
 		}
 	}
 
+	private void refreshLightColorsFromDB() {
+		setLightColors(MachineDB.getLightColors(this));
+	}
+
 	public void refreshSensorsFromDB() {
 		setSensors(MachineDB.getSensorList(this));
 
@@ -293,7 +299,7 @@ public class Machine {
 		} else {
 			startDate = parseDate(String.format("%s %s", this.getStartDate(), this.getStartTime()));
 			endDate = parseDate(String.format("%s %s", this.getEndDate(), this.getEndTime()));
-			sensor.fetchReadingsFromDB(startDate, endDate);			
+			sensor.fetchReadingsFromDB(startDate, endDate);
 		}
 	}
 
@@ -347,6 +353,14 @@ public class Machine {
 
 	public void setEndTime(String endTime) {
 		this.endTime = endTime;
+	}
+
+	public TreeMap<String, String> getLightColors() {
+		return lightColors;
+	}
+
+	public void setLightColors(TreeMap<String, String> lightColors) {
+		this.lightColors = lightColors;
 	}
 
 }

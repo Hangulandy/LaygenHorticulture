@@ -6,41 +6,6 @@
 <hr>
 
 <div class="info-page-tile">
-	<h3>General</h3>
-	<div class="small-space"></div>
-	<form class="sideBySide" action="Controller" method="post">
-		<p>${dict.get('serialNumberLabel', lang)}:${machine.serialNumber}
-		</p>
-		<p>${dict.get('modelLabel', lang)}:${machine.info['model_name'] }
-		</p>
-		<p>${dict.get('primaryUseLabel', lang)}:
-			${machine.info['primary_use'] }</p>
-		<p>${dict.get('ownerEmail', lang)}:${machine.info['owner_email'] }
-		</p>
-		<p>
-			${dict.get('nickname', lang)} : <input id="nickname" type="text"
-				name="nickname" value="${machine.info['nickname'] }" required />
-			<button id="editButton" class="button-red" type="button"
-				onclick="toggleNicknameGlyph()">${dict.get('editButtonLabel', lang)}</button>
-		</p>
-		<p>${dict.get('ipAddressLabel', lang)}:${machine.info['ip'] }</p>
-		<p>${dict.get('portLabel', lang)}:${machine.info['port'] }</p>
-		<div class="small-space"></div>
-		<input id="saveButton" class="button-red margin-top" type="submit"
-			value="${dict.get('saveButtonLabel', lang)}" /> <input type="hidden"
-			name="action" value="updateMachineInfo" /> <input type="hidden"
-			name="selectedMachineId" value="${machine.serialNumber}" />
-	</form>
-	<form class="sideBySide margin-top" action="Controller" method="post">
-		<input class="button" type="submit"
-			value="${dict.get('refresh', lang)}" /> <input type="hidden"
-			name="action" value="selectMachine" /> <input type="hidden"
-			name="selectedMachineId" value="${machine.serialNumber}" />
-	</form>
-</div>
-
-
-<div class="info-page-tile">
 	<h3>Current Sensor Data</h3>
 	<div class="small-space"></div>
 
@@ -73,6 +38,40 @@ String lang1 = (String) session.getAttribute("lang");
 }
 %>
 	<br>
+</div>
+
+<div class="info-page-tile">
+	<h3>General</h3>
+	<div class="small-space"></div>
+	<form class="sideBySide" action="Controller" method="post">
+		<p>${dict.get('serialNumberLabel', lang)}:${machine.serialNumber}
+		</p>
+		<p>${dict.get('modelLabel', lang)}:${machine.info['model_name'] }
+		</p>
+		<p>${dict.get('primaryUseLabel', lang)}:
+			${machine.info['primary_use'] }</p>
+		<p>${dict.get('ownerEmail', lang)}:${machine.info['owner_email'] }
+		</p>
+		<p>
+			${dict.get('nickname', lang)} : <input id="nickname" type="text"
+				name="nickname" value="${machine.info['nickname'] }" required />
+			<button id="editButton" class="button-red" type="button"
+				onclick="toggleNicknameGlyph()">${dict.get('editButtonLabel', lang)}</button>
+		</p>
+		<p>${dict.get('ipAddressLabel', lang)}:${machine.info['ip'] }</p>
+		<p>${dict.get('portLabel', lang)}:${machine.info['port'] }</p>
+		<div class="small-space"></div>
+		<input id="saveButton" class="button-red margin-top" type="submit"
+			value="${dict.get('saveButtonLabel', lang)}" /> <input type="hidden"
+			name="action" value="updateMachineInfo" /> <input type="hidden"
+			name="selectedMachineId" value="${machine.serialNumber}" />
+	</form>
+	<form class="sideBySide margin-top" action="Controller" method="post">
+		<input class="button" type="submit"
+			value="${dict.get('refresh', lang)}" /> <input type="hidden"
+			name="action" value="selectMachine" /> <input type="hidden"
+			name="selectedMachineId" value="${machine.serialNumber}" />
+	</form>
 </div>
 
 <script>

@@ -15,8 +15,9 @@
 	--header-height: calc(var(--banner-height) + var(--head-height)); 
 	--head-foot-color: grey; 
 	--standard-pad: 10px; 
-	--left-head-width: 300px; 
-	--right-head-width: 350px; 
+	--left-head-width: 250px; 
+	--right-head-width: 350px;
+	--chart-container-width: 325px;
 	--content-width: calc(100vw - calc(var(--left-head-width) + calc(4 * var(--standard-pad))));
 	--selector-width: 250px; 
 	--selector-height: 300px; 
@@ -54,6 +55,10 @@ h1 {
 
 h3 {
 	margin: var(--standard-pad) 0px;
+}
+
+input[type=text] {
+	width: 150px;
 }
 
 label {
@@ -148,10 +153,22 @@ tr:nth-child(odd) {
 	color: var(--main-dark-color);
 }
 
+.button-container {
+	text-align: left;
+	margin: auto;
+	display: inline-block;
+}
+
 .chart-container {
+	margin-top: var(--standard-pad);
 	margin-right: var(--standard-pad);
 	float: left;
-	width: 480px; 
+	width: var(--chart-container-width); 
+}
+
+.chart-container-large {
+	width: 100%;
+	margin: var(--standard-pad);
 }
 
 .content {
@@ -173,7 +190,6 @@ tr:nth-child(odd) {
 }
 
 .display-chart {
-	margin-top: var(--standard-margin);
 	border: 1px solid var(--dark-text);
 	width: 100%;
 	height: auto;
@@ -319,6 +335,10 @@ tr:nth-child(odd) {
 	
 	.box {
 		line-height: 50px;
+	}
+	
+	.chart-container {
+		width: 100%;
 	}
 
 	.content {

@@ -24,8 +24,9 @@ String lang1 = (String) session.getAttribute("lang");
 	Sensor sensor = null;
 	for (String key : machine.getSensors().keySet()) {
 		sensor = machine.getSensors().get(key);
-		value = sensor != null ? machine.getReadings().get(sensor.getName()) : "0";%>
-		<p><%=dict1.get(key, lang1)%> : <%=value %><%=sensor.getUnits() %></p>
+		value = sensor != null ? machine.getReadings().get(sensor.getName()) : "0";
+		value = value != null ? value : "0"; %>
+		<p><%=dict1.get(key, lang1)%> : <%=value %> <%=sensor.getUnits() %></p>
 		<%
 	}
 	%>
@@ -44,13 +45,13 @@ String lang1 = (String) session.getAttribute("lang");
 	<h3>General</h3>
 	<div class="small-space"></div>
 	<form class="sideBySide" action="Controller" method="post">
-		<p>${dict.get('serialNumberLabel', lang)}:${machine.serialNumber}
+		<p>${dict.get('serialNumberLabel', lang)} : ${machine.serialNumber}
 		</p>
-		<p>${dict.get('modelLabel', lang)}:${machine.info['model_name'] }
+		<p>${dict.get('modelLabel', lang)} : ${machine.info['model_name'] }
 		</p>
-		<p>${dict.get('primaryUseLabel', lang)}:
+		<p>${dict.get('primaryUseLabel', lang)} : 
 			${machine.info['primary_use'] }</p>
-		<p>${dict.get('ownerEmail', lang)}:${machine.info['owner_email'] }
+		<p>${dict.get('ownerEmail', lang)} : ${machine.info['owner_email'] }
 		</p>
 		<p>
 			${dict.get('nickname', lang)} : <input id="nickname" type="text"
@@ -58,8 +59,8 @@ String lang1 = (String) session.getAttribute("lang");
 			<button id="editButton" class="button-red" type="button"
 				onclick="toggleNicknameGlyph()">${dict.get('editButtonLabel', lang)}</button>
 		</p>
-		<p>${dict.get('ipAddressLabel', lang)}:${machine.info['ip'] }</p>
-		<p>${dict.get('portLabel', lang)}:${machine.info['port'] }</p>
+		<p>${dict.get('ipAddressLabel', lang)} : ${machine.info['ip'] }</p>
+		<p>${dict.get('portLabel', lang)} : ${machine.info['port'] }</p>
 		<div class="small-space"></div>
 		<input id="saveButton" class="button-red margin-top" type="submit"
 			value="${dict.get('saveButtonLabel', lang)}" /> <input type="hidden"

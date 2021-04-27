@@ -161,9 +161,9 @@ if (machine != null) {
 					for (String key : machine.getLightColors().keySet()) {
 					%>
 					<label class="radio-label"><input type="radio"
-						name="light_color" value="<%=key %>"
-						<% String checkedLightColor = machine.getSettings().get("light_color");
-					if (checkedLightColor != null && checkedLightColor.equalsIgnoreCase(key)) {%>
+						name="light_color" value="<%=key%>"
+						<%String checkedLightColor = machine.getSettings().get("light_color");
+if (checkedLightColor != null && checkedLightColor.equalsIgnoreCase(key)) {%>
 						checked <%}%>> <%=machine.getLightColors().get(key)%></label>
 					<div class="small-space"></div>
 					<%
@@ -191,10 +191,16 @@ if (machine != null) {
 		</tr>
 
 		<%
-		int period = Integer.parseInt(machine.getSettings().get("water_cycle_period"));
-		int minutes = period / 60;
-		int hours = minutes / 60;
-		minutes %= 60;
+		int minutes = 0;
+		int hours = 0;
+		try {
+			int period = Integer.parseInt(machine.getSettings().get("water_cycle_period"));
+			minutes = period / 60;
+			hours = minutes / 60;
+			minutes %= 60;
+		} catch (Exception e) {
+			// do nothing
+		}
 		%>
 
 		<tr>

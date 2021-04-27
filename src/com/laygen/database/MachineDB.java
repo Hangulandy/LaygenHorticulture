@@ -33,7 +33,8 @@ public class MachineDB {
 		if (messages != null) {
 			map = new HashMap<String, String>();
 			for (Message message : messages) {
-				map.put(message.getColumnName(), message.getValue());
+				String value = message.getValue().equalsIgnoreCase("") ? "0" : message.getValue();
+				map.put(message.getColumnName(), value);
 			}
 		}
 		return map;

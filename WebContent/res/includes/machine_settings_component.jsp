@@ -1,4 +1,5 @@
 <%@ page import="com.laygen.beans.Machine"%>
+<%@ page import="com.laygen.database.Dictionary"%>
 
 <%
 boolean waterOnChecked = false;
@@ -61,16 +62,23 @@ if (machine != null) {
 <h1>${dict.get('machineSettingsHeading', lang)}</h1>
 <hr>
 
+
+
+<!-- This is the section for Grow Settings -->
+<div class="small-space"></div>
+<h2>${dict.get('growSettingsHeading', lang)}</h2>
 <form action="Controller" method="get">
-	<div class="small-space"></div>
-	<h2>${dict.get('growSettingsHeading', lang)}</h2>
 	<table>
+		<colgroup span="3">
+			<col class="col-left"></col>
+			<col class="col-mid"></col>
+			<col class="col-right"></col>
+		</colgroup>
 		<tr>
 			<th class="left">${dict.get('itemLabel', lang)}</th>
 			<th>${dict.get('valueLabel', lang)}</th>
 			<th>${dict.get('adjustLabel', lang)}</th>
 		</tr>
-
 		<tr>
 			<td class="left">${dict.get('plantDateLabel', lang)}</td>
 			<td></td>
@@ -79,15 +87,99 @@ if (machine != null) {
 				max="2030-12-31" pattern="\d{4}-\d{2}-\d{2}"
 				placeholder="yyyy-mm-dd" required /></td>
 		</tr>
+	</table>
+	<input type="hidden" name="action" value="updateGrowSettings" /> <input
+		class="button-red" type="submit"
+		value="${dict.get('updateButtonLabel', lang)}" class="margin_left" />
+</form>
+
+
+
+<!-- This is the section for Water Settings -->
+<div class="small-space"></div>
+<h2>${dict.get('waterSettingsHeading', lang)}</h2>
+<form action="Controller" method="get">
+	<%
+	int minutes = 0;
+	int hours = 0;
+	try {
+		int period = Integer.parseInt(machine.getSettings().get("water_cycle_period"));
+		minutes = period / 60;
+		hours = minutes / 60;
+		minutes %= 60;
+	} catch (Exception e) {
+		// do nothing
+	}
+	%>
+	<table>
+		<colgroup span="3">
+			<col class="col-left"></col>
+			<col class="col-mid"></col>
+			<col class="col-right"></col>
+		</colgroup>
+		<tr>
+			<th class="left">${dict.get('itemLabel', lang)}</th>
+			<th>${dict.get('valueLabel', lang)}</th>
+			<th>${dict.get('adjustLabel', lang)}</th>
+		</tr>
 		<tr>
 			<td class="left">${dict.get('waterOnToggleLabel', lang)}</td>
 			<td><%=waterOn%></td>
 			<td><label class="radio-label"><input type="radio"
 					id="water_in_valve_on" name="water_in_valve_on" value="1"
-					<%if (waterOnChecked) {%> checked <%}%> /> On</label> <label
+					<%if (waterOnChecked) {%> checked <%}%> /> On</label><label
 				class="radio-label"><input type="radio"
 					id="water_in_valve_off" name="water_in_valve_on" value="0"
 					<%if (!waterOnChecked) {%> checked <%}%> /> Off</label></td>
+		</tr>
+		<tr>
+			<td class="left">${dict.get('waterCycleOnToggleLabel', lang)}</td>
+			<td><%=waterCycleOn%></td>
+			<td><label class="radio-label"><input type="radio"
+					id="water_cycle_on" name="water_cycle_on" value="1"
+					<%if (waterCycleOnChecked) {%> checked <%}%>> On</label><label
+				class="radio-label"><input type="radio" id="water_cycle_off"
+					name="water_cycle_on" value="0" <%if (!waterCycleOnChecked) {%>
+					checked <%}%>> Off</label></td>
+		</tr>
+		<tr>
+			<td class="left">${dict.get('waterCycleDurationLabel', lang)}</td>
+			<td>${machine.settings['water_cycle_duration'] }</td>
+			<td><input type="number" id="water_cycle_duration"
+				name="water_cycle_duration" step="1" min="0" max="3600"
+				value="${machine.settings['water_cycle_duration']}"></td>
+		</tr>
+		<tr>
+			<td class="left">${dict.get('waterCyclePeriodLabel', lang)}</td>
+			<td><%=hours%> h: <%=minutes%> m</td>
+			<td><input type="number" id="water_cycle_period_hours"
+				name="water_cycle_period_hours" step="1" min="0" max="100"
+				value="<%=hours%>"> h <input type="number"
+				id="water_cycle_perdiod_minutes" name="water_cycle_period_minutes"
+				step="1" min="0" max="59" value="<%=minutes%>"> m</td>
+		</tr>
+	</table>
+	<input type="hidden" name="action" value="updateWaterSettings" /> <input
+		class="button-red" type="submit"
+		value="${dict.get('updateButtonLabel', lang)}" class="margin_left" />
+</form>
+
+
+
+<!-- This is the section for Light Settings -->
+<div class="small-space"></div>
+<h2>${dict.get('lightSettingsHeading', lang)}</h2>
+<form action="Controller" method="get">
+	<table>
+		<colgroup span="3">
+			<col class="col-left"></col>
+			<col class="col-mid"></col>
+			<col class="col-right"></col>
+		</colgroup>
+		<tr>
+			<th class="left">${dict.get('itemLabel', lang)}</th>
+			<th>${dict.get('valueLabel', lang)}</th>
+			<th>${dict.get('adjustLabel', lang)}</th>
 		</tr>
 		<tr>
 			<td class="left">${dict.get('lightToggleLabel', lang)}</td>
@@ -98,7 +190,127 @@ if (machine != null) {
 					type="radio" id="light_off" name="light_on" value="0"
 					<%if (!lightChecked) {%> checked <%}%> /> Off</label></td>
 		</tr>
+		<tr>
+			<td class="left">${dict.get('brightnessLabel', lang)}</td>
+			<td>${machine.settings['brightness'] }</td>
+			<td><input type="number" id="brightness" name="brightness"
+				step="1" min="0" max="100"
+				value="${machine.settings['brightness'] }"><br
+				class="mobile-only"> <br class="mobile-only"> <input
+				type="range" min="0" max="100"
+				value="${machine.settings['brightness']}" id="brightnessSlider"></td>
+		</tr>
+		<tr>
+			<td class="left">${dict.get('lightColorLabel', lang)}</td>
+			<td>${dict.get(machine.settings['light_color'], lang) }</td>
+			<td>
+				<div class="button-container">
+					<%String lang1 = (String) session.getAttribute("lang");
+				for (String key : machine.getLightColors().keySet()) {
+				%>
+					<label class="radio-label"><input type="radio"
+						id="<%=key %>" name="light_color" onclick="checkColor(this)"
+						value="<%=key%>"
+						<%String checkedLightColor = machine.getSettings().get("light_color");%>
+						<%if (checkedLightColor != null && checkedLightColor.equalsIgnoreCase(key)) {%>
+						checked <%}%>> <%=Dictionary.getInstance().get(key, lang1)%></label>
+					<div class="small-space"></div>
+					<%
+				}
+				%>
+				</div>
+			</td>
+		</tr>
+		<!-- 
+			<tr>
+				<td class="left">${dict.get('uvcToggleLabel', lang)}</td>
+				<td><%=uvcOn%></td>
+				<td><label class="radio-label"><input type="radio"
+						id="uvc_on" name="uvc_on" value="1" <%if (uvcChecked) {%>
+						checked <%}%> />On</label> <label class="radio-label"><input
+						type="radio" id="uvc_off" name="uvc_on" value="0"
+						<%if (!uvcChecked) {%> checked <%}%> />Off</label></td>
+			</tr>  -->
+	</table>
+	<input type="hidden" name="action" value="updateLightSettings" /> <input
+		class="button-red" type="submit"
+		value="${dict.get('updateButtonLabel', lang)}" class="margin_left" />
+</form>
 
+<div id="custom-color-adjuster">
+	<div class="small-space"></div>
+	<h2>${dict.get('customColorAdjusterHeading', lang)} : <span id="customLightColorName"></span></h2>
+	<form class="custom-color-adjuster">
+		<table>
+			<colgroup span="3">
+				<col class="col-left"></col>
+				<col class="col-mid"></col>
+				<col class="col-right"></col>
+			</colgroup>
+			<tr>
+				<th class="left">${dict.get('itemLabel', lang)}</th>
+				<th>${dict.get('valueLabel', lang)}</th>
+				<th>${dict.get('adjustLabel', lang)}</th>
+			</tr>
+			<tr>
+				<td>${dict.get('red', lang)}</td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>${dict.get('green', lang)}</td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>${dict.get('blue', lang)}</td>
+				<td></td>
+				<td></td>
+			</tr>
+		</table>
+	</form>
+</div>
+
+<script>
+		var a = document.getElementById("brightnessSlider");
+		var b = document.getElementById("brightness");
+		
+		a.oninput = function(){
+			b.value =  this.value;
+		}
+		
+		b.oninput = function(){
+			a.value = this.value;
+		}
+		
+		function checkColor(button){
+			var block = document.getElementById("custom-color-adjuster");
+			if (button.id.includes("custom")){
+				block.style.display = "block";
+				document.getElementById("customLightColorName").textContent = button.id;
+			} else {
+				block.style.display = "none";
+			}
+		}
+		</script>
+
+
+<!-- This is the section for Air Settings -->
+<div class="small-space"></div>
+<h2>${dict.get('airSettingsHeading', lang)}</h2>
+<form action="Controller" method="get">
+
+	<table>
+		<colgroup span="3">
+			<col class="col-left"></col>
+			<col class="col-mid"></col>
+			<col class="col-right"></col>
+		</colgroup>
+		<tr>
+			<th class="left">${dict.get('itemLabel', lang)}</th>
+			<th>${dict.get('valueLabel', lang)}</th>
+			<th>${dict.get('adjustLabel', lang)}</th>
+		</tr>
 		<!-- 
 			<tr>
 				<td class="left">${dict.get('heaterToggleLabel', lang)}</td>
@@ -124,7 +336,7 @@ if (machine != null) {
 			<td><%=fanAuto%></td>
 			<td><label class="radio-label"><input type="radio"
 					id="fan_auto" name="fan_auto" value="1" <%if (fanAutoChecked) {%>
-					checked <%}%> /> Auto</label> <label class="radio-label"><input
+					checked <%}%> /> Auto</label><label class="radio-label"><input
 					type="radio" id="fan_cont" name="fan_auto" value="0"
 					<%if (!fanAutoChecked) {%> checked <%}%> /> Cont</label></td>
 		</tr>
@@ -133,88 +345,42 @@ if (machine != null) {
 			<td>${machine.settings['fan_humidity'] }</td>
 			<td><input type="number" id="fan_humidity" name="fan_humidity"
 				step="1" min="0" max="100"
-				value="${machine.settings['fan_humidity'] }"></td>
-		</tr>
-		<!-- 
-			<tr>
-				<td class="left">${dict.get('uvcToggleLabel', lang)}</td>
-				<td><%=uvcOn%></td>
-				<td><label class="radio-label"><input type="radio"
-						id="uvc_on" name="uvc_on" value="1" <%if (uvcChecked) {%>
-						checked <%}%> />On</label> <label class="radio-label"><input
-						type="radio" id="uvc_off" name="uvc_on" value="0"
-						<%if (!uvcChecked) {%> checked <%}%> />Off</label></td>
-			</tr>  -->
-		<tr>
-			<td class="left">${dict.get('brightnessLabel', lang)}</td>
-			<td>${machine.settings['brightness'] }</td>
-			<td><input type="number" id="brightness" name="brightness"
-				step="1" min="0" max="100"
-				value="${machine.settings['brightness'] }"></td>
-		</tr>
-		<tr>
-			<td class="left">${dict.get('lightColorLabel', lang)}</td>
-			<td>${machine.settings['light_color'] }</td>
-			<td>
-				<div class="button-container">
-					<%
-					for (String key : machine.getLightColors().keySet()) {
-					%>
-					<label class="radio-label"><input type="radio"
-						name="light_color" value="<%=key%>"
-						<%String checkedLightColor = machine.getSettings().get("light_color");
-if (checkedLightColor != null && checkedLightColor.equalsIgnoreCase(key)) {%>
-						checked <%}%>> <%=machine.getLightColors().get(key)%></label>
-					<div class="small-space"></div>
-					<%
-					}
-					%>
-				</div>
-			</td>
-		</tr>
-		<tr>
-			<td class="left">${dict.get('waterCycleOnToggleLabel', lang)}</td>
-			<td><%=waterCycleOn%></td>
-			<td><label class="radio-label"><input type="radio"
-					id="water_cycle_on" name="water_cycle_on" value="1"
-					<%if (waterCycleOnChecked) {%> checked <%}%>> On</label> <label
-				class="radio-label"><input type="radio" id="water_cycle_off"
-					name="water_cycle_on" value="0" <%if (!waterCycleOnChecked) {%>
-					checked <%}%>> Off</label></td>
-		</tr>
-		<tr>
-			<td class="left">${dict.get('waterCycleDurationLabel', lang)}</td>
-			<td>${machine.settings['water_cycle_duration'] }</td>
-			<td><input type="number" id="water_cycle_duration"
-				name="water_cycle_duration" step="1" min="0" max="3600"
-				value="${machine.settings['water_cycle_duration']}"></td>
-		</tr>
-
-		<%
-		int minutes = 0;
-		int hours = 0;
-		try {
-			int period = Integer.parseInt(machine.getSettings().get("water_cycle_period"));
-			minutes = period / 60;
-			hours = minutes / 60;
-			minutes %= 60;
-		} catch (Exception e) {
-			// do nothing
-		}
-		%>
-
-		<tr>
-			<td class="left">${dict.get('waterCyclePeriodLabel', lang)}</td>
-			<td><%=hours%> h: <%=minutes%> m</td>
-			<td><input type="number" id="water_cycle_period_hours"
-				name="water_cycle_period_hours" step="1" min="0" max="100"
-				value="<%=hours%>"> h <input type="number"
-				id="water_cycle_perdiod_minutes" name="water_cycle_period_minutes"
-				step="1" min="0" max="59" value="<%=minutes%>"> m</td>
+				value="${machine.settings['fan_humidity'] }"><br
+				class="mobile-only"> <br class="mobile-only"> <input
+				type="range" min="0" max="100"
+				value="${machine.settings['fan_humidity']}" id="humiditySlider"></td>
 		</tr>
 	</table>
-	<h2>${dict.get('cameraSettingsHeading', lang)}</h2>
+	<input type="hidden" name="action" value="updateAirSettings" /> <input
+		class="button-red" type="submit"
+		value="${dict.get('updateButtonLabel', lang)}" class="margin_left" />
+</form>
+
+<script>
+	var a = document.getElementById("humiditySlider");
+	var b = document.getElementById("fan_humidity");
+
+	a.oninput = function() {
+		b.value = this.value;
+	}
+
+	b.oninput = function() {
+		a.value = this.value;
+	}
+</script>
+
+
+
+<!-- This is the section for Camera Settings -->
+<div class="small-space"></div>
+<h2>${dict.get('cameraSettingsHeading', lang)}</h2>
+<form action="Controller" method="get">
 	<table>
+		<colgroup span="3">
+			<col class="col-left"></col>
+			<col class="col-mid"></col>
+			<col class="col-right"></col>
+		</colgroup>
 		<tr>
 			<th class="left">${dict.get('itemLabel', lang)}</th>
 			<th>${dict.get('valueLabel', lang)}</th>
@@ -230,18 +396,36 @@ if (checkedLightColor != null && checkedLightColor.equalsIgnoreCase(key)) {%>
 					id="camera_cycle_off" name="camera_cycle_on" value="0"
 					<%if (!cameraCycleChecked) {%> checked <%}%>> Off</label></td>
 		</tr>
+
+		<%
+		minutes = 0;
+		hours = 0;
+		try {
+			int period = Integer.parseInt(machine.getSettings().get("camera_cycle_period"));
+			minutes = period / 60;
+			hours = minutes / 60;
+			minutes %= 60;
+		} catch (Exception e) {
+			// do nothing
+		}
+		%>
+
 		<tr>
 			<td class="left">${dict.get('cameraCyclePeriodLabel', lang)}</td>
-			<td>${machine.settings['camera_cycle_period'] }</td>
-			<td><input type="number" id="camera_cycle_period"
-				name="camera_cycle_period" step="1" min="0" max="1000000"
-				value="${machine.settings['camera_cycle_period'] }"></td>
+			<td><%=hours%> h: <%=minutes%> m</td>
+
+			<td><input type="number" id="camera_cycle_period_hours"
+				name="camera_cycle_period_hours" step="1" min="0" max="100"
+				value="<%=hours%>"> h <input type="number"
+				id="camera_cycle_perdiod_minutes" name="camera_cycle_period_minutes"
+				step="1" min="0" max="59" value="<%=minutes%>"> m</td>
 		</tr>
 	</table>
-
-	<input type="hidden" name="action" value="updateSettings" /> <input
+	<input type="hidden" name="action" value="updateCameraSettings" /> <input
 		class="button-red" type="submit"
 		value="${dict.get('updateButtonLabel', lang)}" class="margin_left" />
 </form>
-<%}%>
 
+<%
+}
+%>

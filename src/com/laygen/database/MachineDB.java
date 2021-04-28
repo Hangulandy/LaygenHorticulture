@@ -99,6 +99,22 @@ public class MachineDB {
 		}
 		return lightColors;
 	}
+	
+	public static TreeMap<String, String> getCustomLightColors(Machine machine){
+		TreeMap<String, String> lightColors = null;
+
+		if (machine.getSerialNumber() != null) {
+			TreeSet<Message> messages = MessageDB
+					.getRowMessagesByColumnFamily(machine.getSerialNumber() + "-L", "C");
+			if (messages.size() > 0) {
+				lightColors = new TreeMap<String, String>();
+				for (Message message : messages) {
+					lightColors.put(message.getColumnName(), message.getValue());
+				}
+			}
+		}
+		return lightColors;
+	}
 
 	public static String putNickname(Machine machine) {
 		String output = null;

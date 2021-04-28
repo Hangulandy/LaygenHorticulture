@@ -25,8 +25,6 @@ public class Machine {
 	private TreeMap<String, Sensor> sensors;
 	private TreeMap<String, String> images;
 	private TreeSet<User> authorizedUsers;
-	private Socket socket;
-	private PrintWriter out;
 	private String image;
 	private Sensor selectedSensor;
 	private String startDate;
@@ -102,43 +100,35 @@ public class Machine {
 		this.authorizedUsers = authorizedUsers;
 	}
 
-	public String updateMachineSettings(TreeMap<String, String> newSettings) {
-		// TODO - perhaps this should be asynchronous in the future?
+	public String updateMachineSettings(TreeMap<String, String> newSettings, String lang) {
+		String message = "";
 
-		this.refreshAllFromDB();
-		String portString = this.getInfo().get("port");
-
-		int port = 0;
-
-		if (portString != null) {
-			try {
-				port = Integer.parseInt(portString);
-			} catch (Exception e) {
-				return Dictionary.getInstance().get("noPort");
-			}
-		}
-
+		// get port as integer
 		try {
-			socket = new Socket(this.getInfo().get("ip"), port);
-			out = new PrintWriter(socket.getOutputStream(), true);
-			String msg;
-			System.out.println();
-			System.out.println("Messages sent to Machine: ");
-			for (String key : newSettings.keySet()) {
-				msg = String.format("%s#%s", newSettings.get(key), key);
-				out.println(msg);
-				this.getSettings().put(key, newSettings.get(key));
-				System.out.println(msg);
+			int port = Integer.parseInt(this.getInfo().get("port"));
+
+			// establish socket
+			try (Socket socket = new Socket(this.getInfo().get("ip"), port)) {
+
+				// establish printwriter
+				try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+					String msg;
+					System.out.println();
+					System.out.println("Messages sent to Machine: ");
+					for (String key : newSettings.keySet()) {
+						msg = String.format("%s#%s", newSettings.get(key), key);
+						out.println(msg);
+						this.getSettings().put(key, newSettings.get(key));
+						System.out.println(msg);
+					}
+					System.out.println();
+					message = message + Dictionary.getInstance().get("success");
+				}
 			}
-
-			// out.println(generateTimeCommand());
-
-			out.close();
-			socket.close();
-			return Dictionary.getInstance().get("success");
 		} catch (Exception e) {
-			return Dictionary.getInstance().get("commError");
+			message = message + Dictionary.getInstance().get("commError");
 		}
+		return message;
 	}
 
 	public String takePicture(String lang) {
@@ -162,31 +152,25 @@ public class Machine {
 	}
 
 	public String sendCommandToMachine(String msg, String lang) {
-		// TODO - perhaps this should be asynchronous in the future?
 		System.out.println(String.format("Attempting to send message to machine %s : %s", this.getSerialNumber(), msg));
 
-		String portString = this.getInfo().get("port");
-
-		int port = 0;
-
-		if (portString != null) {
-			try {
-				port = Integer.parseInt(portString);
-			} catch (Exception e) {
-				return Dictionary.getInstance().get("noPort");
-			}
-		}
-
+		// get port as integer
 		try {
-			socket = new Socket(this.getInfo().get("ip"), port);
-			out = new PrintWriter(socket.getOutputStream(), true);
-			System.out.println(String.format("Sending message to machine %s : %s", this.getSerialNumber(), msg));
-			out.println(msg);
-			out.close();
-			socket.close();
-			return Dictionary.getInstance().get("success");
+			int port = Integer.parseInt(this.getInfo().get("port"));
+
+			// establish socket
+			try (Socket socket = new Socket(this.getInfo().get("ip"), port)) {
+
+				// establish printwriter
+				try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+					System.out
+							.println(String.format("Sending message to machine %s : %s", this.getSerialNumber(), msg));
+					out.println(msg);
+				}
+				return Dictionary.getInstance().get("success", lang);
+			}
 		} catch (Exception e) {
-			return Dictionary.getInstance().get("commError");
+			return Dictionary.getInstance().get("commError", lang);
 		}
 	}
 
@@ -234,7 +218,11 @@ public class Machine {
 	}
 
 	public String getImage() {
-		return image;
+		if (this.getImageNames().size() > 0) {
+			return image;
+		} else {
+			return null;
+		}
 	}
 
 	public void setImage(String image) {
@@ -263,7 +251,12 @@ public class Machine {
 	}
 
 	private void refreshLightColorsFromDB() {
-		setLightColors(MachineDB.getLightColors(this));
+		TreeMap<String, String> colors = MachineDB.getLightColors(this);
+		TreeMap<String, String> newColors = MachineDB.getCustomLightColors(this);
+		if (newColors != null) {
+			colors.putAll(newColors);			
+		}
+		setLightColors(colors);
 	}
 
 	public void refreshSensorsFromDB() {
@@ -360,6 +353,34 @@ public class Machine {
 
 	public void setLightColors(TreeMap<String, String> lightColors) {
 		this.lightColors = lightColors;
+	}
+
+	public String[] setWaterInValve(String value, String lang) {
+
+		String[] output = new String[2];
+		output[0] = "0";
+		output[1] = ""; // when no message is necessary
+
+		if (value.equalsIgnoreCase("0")) {
+			// initialized values are ok
+		} else  {
+			// value = "1"; make sure water level is ok to open it
+			int waterLevel = 0;
+
+			try {
+				waterLevel = Integer.parseInt(this.getReadings().get("water_level1"));
+				if (waterLevel < 4) {
+					output[0] = "1"; // message is still ok, but need to change value
+				} else {
+					// value is still ok, but need to change message
+					output[1] = Dictionary.getInstance().get("waterLevelHighMessage", lang); 					
+				}
+			} catch (Exception e) {
+				// number was invalid, so we need to return that message
+				output[1] = Dictionary.getInstance().get("invalidValueMessage", lang); 
+			}
+		}
+		return output;
 	}
 
 }

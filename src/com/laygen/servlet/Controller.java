@@ -399,6 +399,9 @@ public class Controller extends HttpServlet {
 			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
 
 			String lightColorString = request.getParameter("light_color");
+			if (lightColorString == null) {
+				lightColorString = machine.getLightColors().firstKey();
+			}
 			String lightColorName = lightColorString.split("-")[0];
 
 			newSettings.put("brightness", request.getParameter("brightness"));

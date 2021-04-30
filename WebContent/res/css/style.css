@@ -148,7 +148,7 @@ form.custom-color-adjuster {
   	border-right: 1px solid #333333;
   	border-bottom: 1px solid #333333;
   	border-left: 1px solid #CCCCCC;
-  	display: inline;
+  	display: inline-block;
 }
 
 .button:hover, .button-red:hover, .button-white:hover {
@@ -332,6 +332,10 @@ form.custom-color-adjuster {
 
 #data-selector {
 	clear:both;
+}
+
+#settingsRefreshButton {
+	vertical-align: middle;
 }
 
 @media ( max-width : 991px) {

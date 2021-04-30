@@ -61,7 +61,7 @@ if (machine != null) {
 <!-- This will only show if machine != null because it is inside the code block following the if statement -->
 <h1 class="sideBySide">${dict.get('machineSettingsHeading', lang)}</h1>
 <form class="sideBySide" action="Controller" method="post">
-	<input class="button" type="submit"
+	<input id="settingsRefreshButton" class="button" type="submit"
 		value="${dict.get('refresh', lang)}" /> <input type="hidden"
 		name="action" value="viewMachineSettings" />
 </form>

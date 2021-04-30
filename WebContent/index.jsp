@@ -21,15 +21,19 @@
 	<div class="under-header"></div>
 
 	<div class="side-bar block">
-	<h3>${dict.get('quickViewHeading', lang)} :</h3>
+		<h3>${dict.get('quickViewHeading', lang)}:</h3>
 
 		<%
-		for (Authorization auth : user.getAuthorizations()) {
+		if (user.getAuthorizations() != null) {
+			for (Authorization auth : user.getAuthorizations()) {
 		%>
 		<a class="shortcut"
 			href="Controller?selectedMachineId=<%=auth.getMachineSerialNumber()%>&action=selectMachine"><%=auth.getMachineNickname()%></a>
 		<br>
-		<%}%>
+		<%
+		}
+		}
+		%>
 	</div>
 	<!-- end of side-bar div -->
 

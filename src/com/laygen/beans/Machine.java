@@ -8,7 +8,6 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -46,8 +45,7 @@ public class Machine {
 	public void refreshAllFromDB() {
 		refreshInfoFromDB();
 		refreshCurrentReadingsFromDB();
-		refreshSettingsFromDB();
-		refreshLightColorsFromDB();
+		refreshSettingsFromDB(); // includes refresh light colors
 		refreshSensorsFromDB();
 	}
 
@@ -66,6 +64,7 @@ public class Machine {
 
 	public void refreshSettingsFromDB() {
 		setSettings(MachineDB.getCurrentSettingsBySerialNumber(getSerialNumber()));
+		this.refreshLightColorsFromDB();
 	}
 
 	public Map<String, String> getSettings() {
@@ -101,73 +100,38 @@ public class Machine {
 	}
 
 	public String updateMachineSettings(TreeMap<String, String> newSettings, String lang) {
-		String message = "";
-
-		// get port as integer
 		try {
 			int port = Integer.parseInt(this.getInfo().get("port"));
-
-			// establish socket
 			try (Socket socket = new Socket(this.getInfo().get("ip"), port)) {
-
-				// establish printwriter
 				try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
 					String msg;
-					System.out.println();
-					System.out.println("Messages sent to Machine: ");
 					for (String key : newSettings.keySet()) {
 						msg = String.format("%s#%s", newSettings.get(key), key);
 						out.println(msg);
 						this.getSettings().put(key, newSettings.get(key));
-						System.out.println(msg);
 					}
-					System.out.println();
-					message = message + Dictionary.getInstance().get("success");
+					return Dictionary.getInstance().get("success", lang)
+							+ Dictionary.getInstance().get("refreshPrompt", lang);
 				}
 			}
 		} catch (Exception e) {
-			message = message + Dictionary.getInstance().get("commError");
+			return Dictionary.getInstance().get("commError");
 		}
-		return message;
 	}
 
 	public String takePicture(String lang) {
-		// refreshTime();
 		return sendCommandToMachine("1#flash_on", lang);
 	}
 
-	public String generateTimeCommand() {
-		Date currentTime = new Date();
-
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-		String timeString = sdf.format(currentTime);
-		String msg = String.format("%s#time", timeString);
-
-		return msg;
-	}
-
-	public String refreshTime(String lang) {
-		return sendCommandToMachine(generateTimeCommand(), lang);
-	}
-
 	public String sendCommandToMachine(String msg, String lang) {
-		System.out.println(String.format("Attempting to send message to machine %s : %s", this.getSerialNumber(), msg));
-
-		// get port as integer
 		try {
 			int port = Integer.parseInt(this.getInfo().get("port"));
-
-			// establish socket
 			try (Socket socket = new Socket(this.getInfo().get("ip"), port)) {
-
-				// establish printwriter
 				try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
-					System.out
-							.println(String.format("Sending message to machine %s : %s", this.getSerialNumber(), msg));
 					out.println(msg);
 				}
-				return Dictionary.getInstance().get("success", lang);
+				return Dictionary.getInstance().get("success", lang)
+						+ Dictionary.getInstance().get("refreshPrompt", lang);
 			}
 		} catch (Exception e) {
 			return Dictionary.getInstance().get("commError", lang);
@@ -235,13 +199,9 @@ public class Machine {
 
 	public String deleteImage(String imageId) {
 		if (imageId != null) {
-			// delete the image from the DB
 			MachineDB.deleteImage(imageId);
-			// remove the image from the TreeMap
 			this.getImageNames().remove(imageId);
 		}
-		// Set the fetched image to the first in the map no matter what imageId was
-		// passed in
 		if (this.getImageNames().size() > 0) {
 			this.fetchImage(this.getImageNames().firstKey());
 			return this.getImageNames().firstKey();
@@ -250,11 +210,11 @@ public class Machine {
 		}
 	}
 
-	private void refreshLightColorsFromDB() {
+	public void refreshLightColorsFromDB() {
 		TreeMap<String, String> colors = MachineDB.getLightColors(this);
 		TreeMap<String, String> newColors = MachineDB.getCustomLightColors(this);
 		if (newColors != null) {
-			colors.putAll(newColors);			
+			colors.putAll(newColors);
 		}
 		setLightColors(colors);
 	}
@@ -363,7 +323,7 @@ public class Machine {
 
 		if (value.equalsIgnoreCase("0")) {
 			// initialized values are ok
-		} else  {
+		} else {
 			// value = "1"; make sure water level is ok to open it
 			int waterLevel = 0;
 
@@ -373,11 +333,11 @@ public class Machine {
 					output[0] = "1"; // message is still ok, but need to change value
 				} else {
 					// value is still ok, but need to change message
-					output[1] = Dictionary.getInstance().get("waterLevelHighMessage", lang); 					
+					output[1] = Dictionary.getInstance().get("waterLevelHighMessage", lang);
 				}
 			} catch (Exception e) {
 				// number was invalid, so we need to return that message
-				output[1] = Dictionary.getInstance().get("invalidValueMessage", lang); 
+				output[1] = Dictionary.getInstance().get("invalidValueMessage", lang);
 			}
 		}
 		return output;

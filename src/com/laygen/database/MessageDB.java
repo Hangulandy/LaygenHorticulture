@@ -34,6 +34,7 @@ public class MessageDB {
 		return scanColumnFamilyWithRowPrefix(columnFamily, columnQualifier, rowPrefix, null, null);
 	}
 
+	@SuppressWarnings("deprecation")
 	public static TreeSet<Message> scanColumnFamilyWithRowPrefix(String columnFamily, String columnQualifier,
 			String rowPrefix, String startRow, String stopRow) {
 		Connection conn = DBConnection.getInstance().getConnection();

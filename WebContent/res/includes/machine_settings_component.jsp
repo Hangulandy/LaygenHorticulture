@@ -59,7 +59,12 @@ if (machine != null) {
 
 
 <!-- This will only show if machine != null because it is inside the code block following the if statement -->
-<h1>${dict.get('machineSettingsHeading', lang)}</h1>
+<h1 class="sideBySide">${dict.get('machineSettingsHeading', lang)}</h1>
+<form class="sideBySide" action="Controller" method="post">
+	<input class="button" type="submit"
+		value="${dict.get('refresh', lang)}" /> <input type="hidden"
+		name="action" value="viewMachineSettings" />
+</form>
 <hr>
 
 
@@ -209,8 +214,8 @@ if (machine != null) {
 				for (String key : machine.getLightColors().keySet()) {
 				%>
 					<label class="radio-label"><input type="radio"
-						id="<%=key %>" name="light_color" onclick="checkColor(this)"
-						value="<%=key%>"
+						id="<%=key%>-<%=machine.getLightColors().get(key)%>"
+						name="light_color" onclick="checkColor(this)" value="<%=key%>"
 						<%String checkedLightColor = machine.getSettings().get("light_color");%>
 						<%if (checkedLightColor != null && checkedLightColor.equalsIgnoreCase(key)) {%>
 						checked <%}%>> <%=Dictionary.getInstance().get(key, lang1)%></label>
@@ -239,8 +244,8 @@ if (machine != null) {
 
 <div id="custom-color-adjuster">
 	<div class="small-space"></div>
-	<h2>${dict.get('customColorAdjusterHeading', lang)} : <span id="customLightColorName"></span></h2>
-	<form class="custom-color-adjuster">
+	<h2>${dict.get('customColorAdjusterHeading', lang)}</h2>
+	<form action="Controller" method="get">
 		<table>
 			<colgroup span="3">
 				<col class="col-left"></col>
@@ -254,40 +259,110 @@ if (machine != null) {
 			</tr>
 			<tr>
 				<td>${dict.get('red', lang)}</td>
-				<td></td>
-				<td></td>
+				<td id="currentRed"></td>
+				<td><input type="number" id="redInput" name="redValue" step="1"
+					min="0" max="100" value="0"><br class="mobile-only"> <br
+					class="mobile-only"> <input type="range" min="0" max="100"
+					value="0" id="redSlider"></td>
 			</tr>
 			<tr>
 				<td>${dict.get('green', lang)}</td>
-				<td></td>
-				<td></td>
+				<td id="currentGreen"></td>
+				<td><input type="number" id="greenInput" name="greenValue"
+					step="1" min="0" max="100" value="0"><br
+					class="mobile-only"> <br class="mobile-only"> <input
+					type="range" min="0" max="100" value="0" id="greenSlider"></td>
 			</tr>
 			<tr>
 				<td>${dict.get('blue', lang)}</td>
-				<td></td>
-				<td></td>
+				<td id="currentBlue"></td>
+				<td><input type="number" id="blueInput" name="blueValue"
+					step="1" min="0" max="100" value="0"><br
+					class="mobile-only"> <br class="mobile-only"> <input
+					type="range" min="0" max="100" value="0" id="blueSlider"></td>
 			</tr>
 		</table>
+		<input type="hidden" name="action" value="updateCustomColor" /> <input
+			id="light-color-hidden-input" type="hidden" name="light_color"
+			value="red" /> <input class="button-red" type="submit"
+			value="${dict.get('updateButtonLabel', lang)}" class="margin_left" />
 	</form>
 </div>
 
+
+
+
 <script>
-		var a = document.getElementById("brightnessSlider");
-		var b = document.getElementById("brightness");
+		var brs = document.getElementById("brightnessSlider");
+		var br = document.getElementById("brightness");
 		
-		a.oninput = function(){
-			b.value =  this.value;
+		brs.oninput = function(){
+			br.value =  this.value;
 		}
 		
-		b.oninput = function(){
-			a.value = this.value;
+		br.oninput = function(){
+			brs.value = this.value;
+		}
+		
+		var rs = document.getElementById("redSlider");
+		var r = document.getElementById("redInput");
+		
+		rs.oninput = function(){
+			r.value =  this.value;
+		}
+		
+		r.oninput = function(){
+			rs.value = this.value;
+		}
+		
+		var gs = document.getElementById("greenSlider");
+		var g = document.getElementById("greenInput");
+		
+		gs.oninput = function(){
+			g.value =  this.value;
+		}
+		
+		g.oninput = function(){
+			gs.value = this.value;
+		}
+		
+		var bls = document.getElementById("blueSlider");
+		var bl = document.getElementById("blueInput");
+		
+		bls.oninput = function(){
+			bl.value =  this.value;
+		}
+		
+		bl.oninput = function(){
+			bls.value = this.value;
 		}
 		
 		function checkColor(button){
+			var parts = button.id.split("-");
+			var id = parts[0];
+			var value = parts[1];
 			var block = document.getElementById("custom-color-adjuster");
-			if (button.id.includes("custom")){
+			var lightColorInput = document.getElementById("light-color-hidden-input");
+			if (id.includes("custom")){
+				lightColorInput.value = id;
 				block.style.display = "block";
-				document.getElementById("customLightColorName").textContent = button.id;
+				console.log(id, value);
+				
+				value = parseInt(value);
+				var red = Math.floor(value / 1000000);
+				value = value % 1000000;
+				var green = Math.floor(value / 1000);
+				value = value % 1000;
+				var blue = value;
+				
+				console.log(red, green, blue);
+				
+				rs.value = red;
+				r.value = red;
+				gs.value = green;
+				g.value = green;
+				bls.value = blue;
+				bl.value = blue;
 			} else {
 				block.style.display = "none";
 			}
@@ -299,7 +374,6 @@ if (machine != null) {
 <div class="small-space"></div>
 <h2>${dict.get('airSettingsHeading', lang)}</h2>
 <form action="Controller" method="get">
-
 	<table>
 		<colgroup span="3">
 			<col class="col-left"></col>
@@ -357,15 +431,15 @@ if (machine != null) {
 </form>
 
 <script>
-	var a = document.getElementById("humiditySlider");
-	var b = document.getElementById("fan_humidity");
+	var i = document.getElementById("humiditySlider");
+	var j = document.getElementById("fan_humidity");
 
-	a.oninput = function() {
-		b.value = this.value;
+	i.oninput = function() {
+		j.value = this.value;
 	}
 
-	b.oninput = function() {
-		a.value = this.value;
+	j.oninput = function() {
+		i.value = this.value;
 	}
 </script>
 

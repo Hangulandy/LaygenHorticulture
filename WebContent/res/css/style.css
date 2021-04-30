@@ -297,7 +297,7 @@ form.custom-color-adjuster {
 }
 
 .sideBySide {
-	display: inline;
+	display: inline-block;
 }
 
 .small-space {

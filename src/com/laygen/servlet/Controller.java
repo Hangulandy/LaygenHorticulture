@@ -123,6 +123,10 @@ public class Controller extends HttpServlet {
 				updateLightSettings(request, session);
 			}
 
+			if (action.equalsIgnoreCase("updateCustomColor")) {
+				updateCustomColor(request, session);
+			}
+
 			if (action.equalsIgnoreCase("updateAirSettings")) {
 				updateAirSettings(request, session);
 			}
@@ -354,13 +358,13 @@ public class Controller extends HttpServlet {
 
 	private void updateWaterSettings(HttpServletRequest request, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
+		String lang = (String) session.getAttribute("lang");
 
 		if (machine != null && machine.getSerialNumber() != null) {
-			String lang = (String) session.getAttribute("lang");
-			
+
 			String[] messages = machine.setWaterInValve(request.getParameter("water_in_valve_on"), lang);
 			String message = messages[1];
-			
+
 			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
 
 			String waterCyclePeriodHours = request.getParameter("water_cycle_period_hours");
@@ -389,16 +393,50 @@ public class Controller extends HttpServlet {
 
 	private void updateLightSettings(HttpServletRequest request, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
+		String lang = (String) session.getAttribute("lang");
 
 		if (machine != null && machine.getSerialNumber() != null) {
 			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
 
+			String lightColorString = request.getParameter("light_color");
+			String lightColorName = lightColorString.split("-")[0];
+
 			newSettings.put("brightness", request.getParameter("brightness"));
 			newSettings.put("light_on", request.getParameter("light_on"));
-			newSettings.put("light_color", request.getParameter("light_color"));
+			newSettings.put("light_color", lightColorName);
 
-			session.setAttribute("message",
-					machine.updateMachineSettings(newSettings, (String) session.getAttribute("lang")));
+			session.setAttribute("message", machine.updateMachineSettings(newSettings, lang));
+			session.setAttribute("viewComponent", "machineSettings");
+		} else {
+			viewMyMachines(session);
+		}
+	}
+
+	private void updateCustomColor(HttpServletRequest request, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String lang = (String) session.getAttribute("lang");
+		String message = null;
+
+		String lightColor = request.getParameter("light_color");
+		String redString = request.getParameter("redValue");
+		String greenString = request.getParameter("greenValue");
+		String blueString = request.getParameter("blueValue");
+
+		if (machine != null && machine.getLightColors() != null && machine.getLightColors().get(lightColor) != null) {
+			int redValue = 0;
+			int greenValue = 0;
+			int blueValue = 0;
+			try {
+				redValue = Integer.parseInt(redString);
+				greenValue = Integer.parseInt(greenString);
+				blueValue = Integer.parseInt(blueString);
+			} catch (Exception e) {
+				// do nothing since these will be 0 if they fail to parse
+			}
+			int value = redValue * 1000000 + greenValue * 1000 + blueValue;
+			String messageToMachine = String.format("%d#%s", value, lightColor);
+			message = machine.sendCommandToMachine(messageToMachine, lang);
+			session.setAttribute("message", message);
 			session.setAttribute("viewComponent", "machineSettings");
 		} else {
 			viewMyMachines(session);
@@ -416,8 +454,8 @@ public class Controller extends HttpServlet {
 			newSettings.put("fan_auto", request.getParameter("fan_auto"));
 			newSettings.put("fan_humidity", request.getParameter("fan_humidity"));
 
-			session.setAttribute("message",
-					machine.updateMachineSettings(newSettings, (String) session.getAttribute("lang")));
+			String message = machine.updateMachineSettings(newSettings, (String) session.getAttribute("lang"));
+			session.setAttribute("message", message);
 			session.setAttribute("viewComponent", "machineSettings");
 		} else {
 			viewMyMachines(session);
@@ -430,8 +468,10 @@ public class Controller extends HttpServlet {
 		if (machine != null && machine.getSerialNumber() != null) {
 			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
 
-			int totalCameraCycle = getTotalFromHoursMinutes(request.getParameter("camera_cycle_period_hours"),
-					request.getParameter("camera_cycle_period_minutes"));
+			String cameraCyclePeriodHours = request.getParameter("camera_cycle_period_hours");
+			String cameraCyclePeriodMinutes = request.getParameter("camera_cycle_period_minutes");
+
+			int totalCameraCycle = getTotalFromHoursMinutes(cameraCyclePeriodHours, cameraCyclePeriodMinutes);
 
 			newSettings.put("camera_cycle_on", request.getParameter("camera_cycle_on"));
 			newSettings.put("camera_cycle_period", String.valueOf(totalCameraCycle));

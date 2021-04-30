@@ -186,8 +186,9 @@ for (String type : types) {
 		var chart = new Chart(ctx, config);
 	</script>
 	<br>
-	<form class="sideBySide" action="DownloadSpreadsheetServlet">
+	<form class="sideBySide" action="NonLoadingMethodsServlet">
 		<input type="hidden" name="sensor" value="<%=key%>" />
+		<input type="hidden" name="action" value="downloadData"/>
 		<input class="button" type="submit" value="${dict.get('downloadButtonLabel', lang)}" />
 	</form>
 	<form class="sideBySide" action="ShowLargeChartServlet" target="_blank">

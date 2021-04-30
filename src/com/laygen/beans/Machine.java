@@ -44,9 +44,14 @@ public class Machine {
 
 	public void refreshAllFromDB() {
 		refreshInfoFromDB();
+		refreshAuthorizationsFromDB();
 		refreshCurrentReadingsFromDB();
 		refreshSettingsFromDB(); // includes refresh light colors
 		refreshSensorsFromDB();
+	}
+
+	public void refreshAuthorizationsFromDB() {
+		this.setAuthorizedUsers(MachineDB.getAuthorizedUsers(this));
 	}
 
 	public void refreshInfoFromDB() {

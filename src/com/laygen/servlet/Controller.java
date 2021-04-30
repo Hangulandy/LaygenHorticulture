@@ -437,7 +437,7 @@ public class Controller extends HttpServlet {
 				// do nothing since these will be 0 if they fail to parse
 			}
 			int value = redValue * 1000000 + greenValue * 1000 + blueValue;
-			String messageToMachine = String.format("%d#%s", value, lightColor);
+			String messageToMachine = String.format("%d#light_%s", value, lightColor);
 			message = machine.sendCommandToMachine(messageToMachine, lang);
 			session.setAttribute("message", message);
 			session.setAttribute("viewComponent", "machineSettings");

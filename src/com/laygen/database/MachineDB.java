@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.laygen.beans.Sensor;
+import com.laygen.beans.User;
 import com.laygen.beans.Machine;
 import com.laygen.beans.Message;
 
@@ -129,6 +130,16 @@ public class MachineDB {
 		}
 
 		return output;
+	}
+
+	public static TreeSet<User> getAuthorizedUsers(Machine machine) {
+		// TODO Auto-generated method stub
+		
+		TreeSet<User> users = null;
+		
+		TreeSet<Message> messages = MessageDB.scanColumnFamilyWithRowPrefix("C", "uuid", machine.getSerialNumber() + "-U");
+		
+		return null;
 	}
 
 }

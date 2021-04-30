@@ -42,6 +42,21 @@ String lang1 = (String) session.getAttribute("lang");
 </div>
 
 <div class="info-page-tile">
+<h3>Authorized Users</h3>
+<%
+if (machine != null){
+	if (machine.getAuthorizedUsers() != null && machine.getAuthorizedUsers().size() > 0){
+		
+	} else {
+		
+	}
+}
+%>
+
+
+</div>
+
+<div class="info-page-tile">
 	<h3>General</h3>
 	<div class="small-space"></div>
 	<form class="sideBySide" action="Controller" method="post">

@@ -17,7 +17,7 @@
 	--standard-pad: 10px; 
 	--left-head-width: 250px; 
 	--right-head-width: 350px;
-	--chart-container-width: 325px;
+	--chart-container-width: 335px;
 	--content-width: calc(100vw - calc(var(--left-head-width) + calc(4 * var(--standard-pad))));
 	--selector-width: 250px; 
 	--selector-height: 300px; 
@@ -58,7 +58,7 @@ h3 {
 }
 
 input[type=date] {
-	width: 150px;
+	width: 130px;
 }
 
 input[type=text] {
@@ -66,7 +66,7 @@ input[type=text] {
 }
 
 input[type=time] {
-	width: 150px;
+	width: 100px;
 }
 
 label {
@@ -297,7 +297,7 @@ form.custom-color-adjuster {
 }
 
 .sideBySide {
-	display: inline-block;
+	display: inline;
 }
 
 .small-space {

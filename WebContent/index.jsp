@@ -62,14 +62,11 @@
 		if (viewComponent.equalsIgnoreCase("machineData")) {
 		%>
 		<%@ include file="./res/includes/machine_data_component.jsp"%>
-		<%
-		}
-		if (viewComponent.equalsIgnoreCase("cameraPage")) {
-		%>
-		<%@ include file="./res/includes/camera_page_component.jsp"%>
-		<%
-		}
-		%>
+		<%}%>
+
+		<%if (viewComponent.equalsIgnoreCase("cameraPage")) { %>
+		<%@include file="./res/includes/camera_page_component.jsp"%>
+		<%}%>
 		<%
 		} else {
 		%>
@@ -82,7 +79,5 @@
 	</div>
 </div>
 <!-- end of main div -->
-
-<!-- Erase the message so that it does not persist in page reloads -->
 
 <%@ include file="./res/includes/footer_component.jsp"%>

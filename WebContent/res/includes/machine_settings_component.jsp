@@ -2,7 +2,7 @@
 <%@ page import="com.laygen.database.Dictionary"%>
 
 <%
-boolean waterOnChecked = false;
+boolean waterInValveOpenChecked = false;
 boolean lightChecked = false;
 boolean heaterChecked = false;
 boolean fanChecked = false;
@@ -10,49 +10,52 @@ boolean fanAutoChecked = false;
 boolean uvcChecked = false;
 boolean waterCycleOnChecked = false;
 boolean cameraCycleChecked = false;
-String waterOn = "Off";
-String lightOn = "Off";
-String heaterOn = "Off";
-String fanOn = "Off";
-String fanAuto = "Cont";
-String uvcOn = "Off";
-String waterCycleOn = "Off";
-String cameraCycleOn = "Off";
+String waterInValveOpen = "closed";
+String lightOn = "offLabel";
+String heaterOn = "offLabel";
+String fanOn = "offLabel";
+String fanAuto = "cont";
+String uvcOn = "offLabel";
+String waterCycleOn = "offLabel";
+String cameraCycleOn = "offLabel";
 Machine machine = (Machine) session.getAttribute("machine");
 
+String lang1 = (String) session.getAttribute("lang");
+
+
 if (machine != null) {
-	if (machine.getSettings().get("water_on") != null && machine.getSettings().get("water_in_valve_on").equalsIgnoreCase("1")) {
-		waterOnChecked = true;
-		waterOn = "On";
+	if (machine.getSettings().get("water_in_valve_on") != null && machine.getSettings().get("water_in_valve_on").equalsIgnoreCase("1")) {
+		waterInValveOpenChecked = true;
+		waterInValveOpen = "opened";
 	}
 	if (machine.getSettings().get("light_on") != null && machine.getSettings().get("light_on").equalsIgnoreCase("1")) {
 		lightChecked = true;
-		lightOn = "On";
+		lightOn = "onLabel";
 	}
 	if (machine.getSettings().get("heater_on") != null && machine.getSettings().get("heater_on").equalsIgnoreCase("1")) {
 		heaterChecked = true;
-		heaterOn = "On";
+		heaterOn = "onLabel";
 	}
 	if (machine.getSettings().get("fan_on") != null && machine.getSettings().get("fan_on").equalsIgnoreCase("1")) {
 		fanChecked = true;
-		fanOn = "On";
+		fanOn = "onLabel";
 	}
 	if (machine.getSettings().get("fan_auto") != null && machine.getSettings().get("fan_auto").equalsIgnoreCase("1")) {
 		fanAutoChecked = true;
-		fanAuto = "Auto";
+		fanAuto = "auto";
 	}
 	if (machine.getSettings().get("uvc_on") != null && machine.getSettings().get("uvc_on").equalsIgnoreCase("1")) {
 		uvcChecked = true;
-		uvcOn = "On";
+		uvcOn = "onLabel";
 	}
 	if (machine.getSettings().get("water_cycle_on") != null && machine.getSettings().get("water_cycle_on").equalsIgnoreCase("1")) {
 		waterCycleOnChecked = true;
-		waterCycleOn = "On";
+		waterCycleOn = "onLabel";
 	}
 	if (machine.getSettings().get("camera_cycle_on") != null
 	&& machine.getSettings().get("camera_cycle_on").equalsIgnoreCase("1")) {
 		cameraCycleChecked = true;
-		cameraCycleOn = "On";
+		cameraCycleOn = "onLabel";
 	}
 %>
 
@@ -128,24 +131,24 @@ if (machine != null) {
 			<th>${dict.get('adjustLabel', lang)}</th>
 		</tr>
 		<tr>
-			<td class="left">${dict.get('waterOnToggleLabel', lang)}</td>
-			<td><%=waterOn%></td>
+			<td class="left">${dict.get('waterInValveToggle', lang)}</td>
+			<td><%=Dictionary.getInstance().get(waterInValveOpen, lang1) %></td>
 			<td><label class="radio-label"><input type="radio"
 					id="water_in_valve_on" name="water_in_valve_on" value="1"
-					<%if (waterOnChecked) {%> checked <%}%> /> On</label><label
+					<%if (waterInValveOpenChecked) {%> checked <%}%> /> <%=Dictionary.getInstance().get("open", lang1) %></label><label
 				class="radio-label"><input type="radio"
 					id="water_in_valve_off" name="water_in_valve_on" value="0"
-					<%if (!waterOnChecked) {%> checked <%}%> /> Off</label></td>
+					<%if (!waterInValveOpenChecked) {%> checked <%}%> /> <%=Dictionary.getInstance().get("close", lang1) %></label></td>
 		</tr>
 		<tr>
 			<td class="left">${dict.get('waterCycleOnToggleLabel', lang)}</td>
-			<td><%=waterCycleOn%></td>
+			<td><%=Dictionary.getInstance().get(waterCycleOn, lang1)%></td>
 			<td><label class="radio-label"><input type="radio"
 					id="water_cycle_on" name="water_cycle_on" value="1"
-					<%if (waterCycleOnChecked) {%> checked <%}%>> On</label><label
+					<%if (waterCycleOnChecked) {%> checked <%}%>> <%=Dictionary.getInstance().get("turnOnLabel", lang1) %></label><label
 				class="radio-label"><input type="radio" id="water_cycle_off"
 					name="water_cycle_on" value="0" <%if (!waterCycleOnChecked) {%>
-					checked <%}%>> Off</label></td>
+					checked <%}%>> <%=Dictionary.getInstance().get("turnOffLabel", lang1) %></label></td>
 		</tr>
 		<tr>
 			<td class="left">${dict.get('waterCycleDurationLabel', lang)}</td>
@@ -188,12 +191,12 @@ if (machine != null) {
 		</tr>
 		<tr>
 			<td class="left">${dict.get('lightToggleLabel', lang)}</td>
-			<td><%=lightOn%></td>
+			<td><%=Dictionary.getInstance().get(lightOn, lang1) %></td>
 			<td><label class="radio-label"><input type="radio"
 					id="light_on" name="light_on" value="1" <%if (lightChecked) {%>
-					checked <%}%> /> On</label> <label class="radio-label"><input
+					checked <%}%> /> <%=Dictionary.getInstance().get("turnOnLabel", lang1) %></label> <label class="radio-label"><input
 					type="radio" id="light_off" name="light_on" value="0"
-					<%if (!lightChecked) {%> checked <%}%> /> Off</label></td>
+					<%if (!lightChecked) {%> checked <%}%> /> <%=Dictionary.getInstance().get("turnOffLabel", lang1) %></label></td>
 		</tr>
 		<tr>
 			<td class="left">${dict.get('brightnessLabel', lang)}</td>
@@ -210,7 +213,7 @@ if (machine != null) {
 			<td>${dict.get(machine.settings['light_color'], lang) }</td>
 			<td>
 				<div class="button-container">
-					<%String lang1 = (String) session.getAttribute("lang");
+					<%
 				for (String key : machine.getLightColors().keySet()) {
 				%>
 					<label class="radio-label"><input type="radio"
@@ -388,31 +391,31 @@ if (machine != null) {
 		<!-- 
 			<tr>
 				<td class="left">${dict.get('heaterToggleLabel', lang)}</td>
-				<td><%=heaterOn%></td>
+				<td><%=Dictionary.getInstance().get(heaterOn, lang1) %></td>
 				<td><label class="radio-label"><input type="radio"
 						id="heater_on" name="heater_on" value="1" <%if (heaterChecked) {%>
-						checked <%}%> />On</label> <label class="radio-label"><input
+						checked <%}%> /><%=Dictionary.getInstance().get("turnOnLabel", lang1) %></label> <label class="radio-label"><input
 						type="radio" id="heater_off" name="heater_on" value="0"
-						<%if (!heaterChecked) {%> checked <%}%> />Off</label></td>
+						<%if (!heaterChecked) {%> checked <%}%> /><%=Dictionary.getInstance().get("turnOffLabel", lang1) %></label></td>
 			</tr>  -->
 		<tr>
 			<td class="left">${dict.get('fanToggleLabel', lang)}</td>
-			<td><%=fanOn%></td>
+			<td><%=Dictionary.getInstance().get(fanOn, lang1) %></td>
 			<td><label class="radio-label"><input type="radio"
 					id="fan_on" name="fan_on" value="1" <%if (fanChecked) {%> checked
-					<%}%> /> On</label> <label class="radio-label"><input type="radio"
+					<%}%> /> <%=Dictionary.getInstance().get("turnOnLabel", lang1) %></label> <label class="radio-label"><input type="radio"
 					id="fan_off" name="fan_on" value="0" <%if (!fanChecked) {%> checked
-					<%}%> /> Off</label></td>
+					<%}%> /> <%=Dictionary.getInstance().get("turnOffLabel", lang1) %></label></td>
 		</tr>
 
 		<tr>
 			<td class="left">${dict.get('fanAutoToggleLabel', lang)}</td>
-			<td><%=fanAuto%></td>
+			<td><%=Dictionary.getInstance().get(fanAuto, lang1)%></td>
 			<td><label class="radio-label"><input type="radio"
 					id="fan_auto" name="fan_auto" value="1" <%if (fanAutoChecked) {%>
-					checked <%}%> /> Auto</label><label class="radio-label"><input
+					checked <%}%> /> <%=Dictionary.getInstance().get("auto", lang1) %></label><label class="radio-label"><input
 					type="radio" id="fan_cont" name="fan_auto" value="0"
-					<%if (!fanAutoChecked) {%> checked <%}%> /> Cont</label></td>
+					<%if (!fanAutoChecked) {%> checked <%}%> /> <%=Dictionary.getInstance().get("cont", lang1) %></label></td>
 		</tr>
 		<tr>
 			<td class="left">${dict.get('fanHumidityLabel', lang)}</td>
@@ -462,13 +465,13 @@ if (machine != null) {
 		</tr>
 		<tr>
 			<td class="left">${dict.get('cameraCycleToggleLabel', lang)}</td>
-			<td><%=cameraCycleOn%></td>
+			<td><%=Dictionary.getInstance().get(cameraCycleOn, lang1) %></td>
 			<td><label class="radio-label"><input type="radio"
 					id="camera_cycle_on" name="camera_cycle_on" value="1"
-					<%if (cameraCycleChecked) {%> checked <%}%>> On</label> <label
+					<%if (cameraCycleChecked) {%> checked <%}%>> <%=Dictionary.getInstance().get("turnOnLabel", lang1) %></label> <label
 				class="radio-label"><input type="radio"
 					id="camera_cycle_off" name="camera_cycle_on" value="0"
-					<%if (!cameraCycleChecked) {%> checked <%}%>> Off</label></td>
+					<%if (!cameraCycleChecked) {%> checked <%}%>> <%=Dictionary.getInstance().get("turnOffLabel", lang1) %></label></td>
 		</tr>
 
 		<%

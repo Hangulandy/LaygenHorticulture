@@ -90,7 +90,7 @@ SimpleDateFormat parser = new SimpleDateFormat("yyyyMMddHHmmss");
 parser.setTimeZone(TimeZone.getTimeZone("JST"));
 SimpleDateFormat formatter = new SimpleDateFormat("MM-dd HH:mm");
 
-String[] types = {"temperature", "humidity", "co2_ppm", "water_level", "ppdf", "lux", "cds"};
+String[] types = {"temperature", "humidity", "co2_ppm", "water_level", "ppfd", "lux", "cds"};
 
 String dataPoints = null;
 Sensor sensor = null;

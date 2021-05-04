@@ -52,6 +52,10 @@ public class NonLoadingMethodsServlet extends HttpServlet {
 			if (action.equalsIgnoreCase("downloadData")) {
 				downloadData(request, session, response);
 			}
+			
+			if (action.equalsIgnoreCase("downloadImage")) {
+				downloadImage(request, session, response);
+			}
 		}
 	}
 
@@ -95,6 +99,10 @@ public class NonLoadingMethodsServlet extends HttpServlet {
 				workbook.close();
 			}
 		}	
+	}
+	
+	private void downloadImage(HttpServletRequest request, HttpSession session, HttpServletResponse response) {
+		
 	}
 
 	/**

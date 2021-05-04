@@ -88,10 +88,8 @@ table, td, th {
 
 table {
 	margin: var(--standard-pad) 0px;
-	width: 90%;
+	width: 100%;
 }
-
-
 
 td {
 	padding: calc(var(--standard-pad) / 2);
@@ -106,6 +104,24 @@ th {
 
 tr:nth-child(odd) {
 	background-color: #ebf0f9;
+} 
+
+table.transparent, td.transparent, tr.transparent, th.transparent {
+	background-color: var(--light-color);
+	padding: 0px;
+	color: var(--dark-text);
+	border: none;
+	text-align: left;
+	margin: 0px;
+	width: auto;
+}
+
+table.transparent {
+	border-spacing: 0px var(--standard-pad);
+}
+
+td.transparent {
+	min-width: var(--standard-pad);
 }
 
 form.custom-color-adjuster {
@@ -390,6 +406,13 @@ form.custom-color-adjuster {
 		width: 100%;
 		clear: both;
 	}
+	
+	.info-page-tile {
+		width: 100%;
+		float: left;
+		clear: left;
+	}
+	
 	.left-head, .right-head {
 		width: 100%;
 		clear: left;

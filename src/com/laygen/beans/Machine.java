@@ -134,6 +134,7 @@ public class Machine {
 			try (Socket socket = new Socket(this.getInfo().get("ip"), port)) {
 				try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
 					out.println(msg);
+					System.out.println("Sent message to machine : " + msg);
 				}
 				return Dictionary.getInstance().get("success", lang)
 						+ Dictionary.getInstance().get("refreshPrompt", lang);

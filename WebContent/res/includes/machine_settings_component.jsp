@@ -449,14 +449,23 @@ if (machine != null) {
 					<%if (!fanAutoChecked) {%> checked <%}%> /> <%=Dictionary.getInstance().get("cont", lang1) %></label></td>
 		</tr>
 		<tr>
+		<%String fanHumidity = machine.getSettings().get("fan_humidity");
+		int humidity = 0;
+		try {
+			float f = Float.parseFloat(fanHumidity);
+			humidity = (int) Math.floor(f);
+		} catch (Exception e){
+			// do nothing
+		}
+		%>
 			<td class="left">${dict.get('fan_humidity', lang)}</td>
 			<td>${machine.settings['fan_humidity'] }</td>
 			<td><input type="number" id="fan_humidity" name="fan_humidity"
 				step="5" min="0" max="100"
-				value="${machine.settings['fan_humidity'] }"><br
+				value="<%=humidity%>"><br
 				class="mobile-only"> <br class="mobile-only"> <input
 				type="range" step="5" min="0" max="100"
-				value="${machine.settings['fan_humidity']}" id="humiditySlider"></td>
+				value="<%=humidity %>" id="humiditySlider"></td>
 		</tr>
 	</table>
 	<input type="hidden" name="action" value="updateAirSettings" /> <input

@@ -7,9 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -22,11 +20,10 @@ public class Machine {
 	private Map<String, String> info;
 	private Map<String, String> readings;
 	private Map<String, String> settings;
+	private TreeMap<String, String> lightColors;
 	private TreeMap<String, Sensor> sensors;
 	private TreeMap<String, String> images;
 	private TreeSet<User> authorizedUsers;
-	private Socket socket;
-	private PrintWriter out;
 	private String image;
 	private Sensor selectedSensor;
 	private String startDate;
@@ -47,9 +44,14 @@ public class Machine {
 
 	public void refreshAllFromDB() {
 		refreshInfoFromDB();
+		refreshAuthorizationsFromDB();
 		refreshCurrentReadingsFromDB();
-		refreshSettingsFromDB();
+		refreshSettingsFromDB(); // includes refresh light colors
 		refreshSensorsFromDB();
+	}
+
+	public void refreshAuthorizationsFromDB() {
+		this.setAuthorizedUsers(MachineDB.getAuthorizedUsers(this));
 	}
 
 	public void refreshInfoFromDB() {
@@ -67,6 +69,7 @@ public class Machine {
 
 	public void refreshSettingsFromDB() {
 		setSettings(MachineDB.getCurrentSettingsBySerialNumber(getSerialNumber()));
+		this.refreshLightColorsFromDB();
 	}
 
 	public Map<String, String> getSettings() {
@@ -101,91 +104,42 @@ public class Machine {
 		this.authorizedUsers = authorizedUsers;
 	}
 
-	public String updateMachineSettings(HashMap<String, String> newSettings) {
-		// TODO - perhaps this should be asynchronous in the future?
-
-		this.refreshAllFromDB();
-		String portString = this.getInfo().get("port");
-
-		int port = 0;
-
-		if (portString != null) {
-			try {
-				port = Integer.parseInt(portString);
-			} catch (Exception e) {
-				return Dictionary.getInstance().get("noPort");
-			}
-		}
-
+	public String updateMachineSettings(TreeMap<String, String> newSettings, String lang) {
 		try {
-			socket = new Socket(this.getInfo().get("ip"), port);
-			out = new PrintWriter(socket.getOutputStream(), true);
-			String msg;
-			System.out.println();
-			System.out.println("Messages sent to Machine: ");
-			for (String key : newSettings.keySet()) {
-				msg = String.format("%s#%s", newSettings.get(key), key);
-				out.println(msg);
-				this.getSettings().put(key, newSettings.get(key));
-				System.out.println(msg);
+			int port = Integer.parseInt(this.getInfo().get("port"));
+			try (Socket socket = new Socket(this.getInfo().get("ip"), port)) {
+				try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+					String msg;
+					for (String key : newSettings.keySet()) {
+						msg = String.format("%s#%s", newSettings.get(key), key);
+						out.println(msg);
+						this.getSettings().put(key, newSettings.get(key));
+					}
+					return Dictionary.getInstance().get("success", lang)
+							+ Dictionary.getInstance().get("refreshPrompt", lang);
+				}
 			}
-
-			// out.println(generateTimeCommand());
-
-			out.close();
-			socket.close();
-			return Dictionary.getInstance().get("success");
 		} catch (Exception e) {
 			return Dictionary.getInstance().get("commError");
 		}
 	}
 
 	public String takePicture(String lang) {
-		// refreshTime();
 		return sendCommandToMachine("1#flash_on", lang);
 	}
 
-	public String generateTimeCommand() {
-		Date currentTime = new Date();
-
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-		String timeString = sdf.format(currentTime);
-		String msg = String.format("%s#time", timeString);
-
-		return msg;
-	}
-
-	public String refreshTime(String lang) {
-		return sendCommandToMachine(generateTimeCommand(), lang);
-	}
-
 	public String sendCommandToMachine(String msg, String lang) {
-		// TODO - perhaps this should be asynchronous in the future?
-		System.out.println(String.format("Attemptint to send message to machine %s : %s", this.getSerialNumber(), msg));
-
-		String portString = this.getInfo().get("port");
-
-		int port = 0;
-
-		if (portString != null) {
-			try {
-				port = Integer.parseInt(portString);
-			} catch (Exception e) {
-				return Dictionary.getInstance().get("noPort");
-			}
-		}
-
 		try {
-			socket = new Socket(this.getInfo().get("ip"), port);
-			out = new PrintWriter(socket.getOutputStream(), true);
-			System.out.println(String.format("Sending message to machine %s : %s", this.getSerialNumber(), msg));
-			out.println(msg);
-			out.close();
-			socket.close();
-			return Dictionary.getInstance().get("success");
+			int port = Integer.parseInt(this.getInfo().get("port"));
+			try (Socket socket = new Socket(this.getInfo().get("ip"), port)) {
+				try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+					out.println(msg);
+				}
+				return Dictionary.getInstance().get("success", lang)
+						+ Dictionary.getInstance().get("refreshPrompt", lang);
+			}
 		} catch (Exception e) {
-			return Dictionary.getInstance().get("commError");
+			return Dictionary.getInstance().get("commError", lang);
 		}
 	}
 
@@ -233,7 +187,11 @@ public class Machine {
 	}
 
 	public String getImage() {
-		return image;
+		if (this.getImageNames().size() > 0) {
+			return image;
+		} else {
+			return null;
+		}
 	}
 
 	public void setImage(String image) {
@@ -246,19 +204,24 @@ public class Machine {
 
 	public String deleteImage(String imageId) {
 		if (imageId != null) {
-			// delete the image from the DB
 			MachineDB.deleteImage(imageId);
-			// remove the image from the TreeMap
 			this.getImageNames().remove(imageId);
 		}
-		// Set the fetched image to the first in the map no matter what imageId was
-		// passed in
 		if (this.getImageNames().size() > 0) {
 			this.fetchImage(this.getImageNames().firstKey());
 			return this.getImageNames().firstKey();
 		} else {
 			return null;
 		}
+	}
+
+	public void refreshLightColorsFromDB() {
+		TreeMap<String, String> colors = MachineDB.getLightColors(this);
+		TreeMap<String, String> newColors = MachineDB.getCustomLightColors(this);
+		if (newColors != null) {
+			colors.putAll(newColors);
+		}
+		setLightColors(colors);
 	}
 
 	public void refreshSensorsFromDB() {
@@ -293,7 +256,7 @@ public class Machine {
 		} else {
 			startDate = parseDate(String.format("%s %s", this.getStartDate(), this.getStartTime()));
 			endDate = parseDate(String.format("%s %s", this.getEndDate(), this.getEndTime()));
-			sensor.fetchReadingsFromDB(startDate, endDate);			
+			sensor.fetchReadingsFromDB(startDate, endDate);
 		}
 	}
 
@@ -347,6 +310,42 @@ public class Machine {
 
 	public void setEndTime(String endTime) {
 		this.endTime = endTime;
+	}
+
+	public TreeMap<String, String> getLightColors() {
+		return lightColors;
+	}
+
+	public void setLightColors(TreeMap<String, String> lightColors) {
+		this.lightColors = lightColors;
+	}
+
+	public String[] setWaterInValve(String value, String lang) {
+
+		String[] output = new String[2];
+		output[0] = "0";
+		output[1] = ""; // when no message is necessary
+
+		if (value.equalsIgnoreCase("0")) {
+			// initialized values are ok
+		} else {
+			// value = "1"; make sure water level is ok to open it
+			int waterLevel = 0;
+
+			try {
+				waterLevel = Integer.parseInt(this.getReadings().get("water_level1"));
+				if (waterLevel < 4) {
+					output[0] = "1"; // message is still ok, but need to change value
+				} else {
+					// value is still ok, but need to change message
+					output[1] = Dictionary.getInstance().get("waterLevelHighMessage", lang);
+				}
+			} catch (Exception e) {
+				// number was invalid, so we need to return that message
+				output[1] = Dictionary.getInstance().get("invalidValueMessage", lang);
+			}
+		}
+		return output;
 	}
 
 }

@@ -15,8 +15,9 @@
 	--header-height: calc(var(--banner-height) + var(--head-height)); 
 	--head-foot-color: grey; 
 	--standard-pad: 10px; 
-	--left-head-width: 300px; 
-	--right-head-width: 350px; 
+	--left-head-width: 250px; 
+	--right-head-width: 350px;
+	--chart-container-width: 335px;
 	--content-width: calc(100vw - calc(var(--left-head-width) + calc(4 * var(--standard-pad))));
 	--selector-width: 250px; 
 	--selector-height: 300px; 
@@ -56,6 +57,18 @@ h3 {
 	margin: var(--standard-pad) 0px;
 }
 
+input[type=date] {
+	width: 130px;
+}
+
+input[type=text] {
+	width: 150px;
+}
+
+input[type=time] {
+	width: 100px;
+}
+
 label {
 	padding: var(--standard-pad);
 }
@@ -78,6 +91,8 @@ table {
 	width: 90%;
 }
 
+
+
 td {
 	padding: calc(var(--standard-pad) / 2);
 }
@@ -91,6 +106,10 @@ th {
 
 tr:nth-child(odd) {
 	background-color: #ebf0f9;
+}
+
+form.custom-color-adjuster {
+	border: 2px solid red;
 }
 
 .after-float {
@@ -131,7 +150,7 @@ tr:nth-child(odd) {
   	border-right: 1px solid #333333;
   	border-bottom: 1px solid #333333;
   	border-left: 1px solid #CCCCCC;
-  	display: inline;
+  	display: inline-block;
 }
 
 .button:hover, .button-red:hover, .button-white:hover {
@@ -148,10 +167,22 @@ tr:nth-child(odd) {
 	color: var(--main-dark-color);
 }
 
+.button-container {
+	text-align: left;
+	margin: auto;
+	display: inline-block;
+}
+
 .chart-container {
+	margin-top: var(--standard-pad);
 	margin-right: var(--standard-pad);
 	float: left;
-	width: 480px; 
+	width: var(--chart-container-width); 
+}
+
+.chart-container-large {
+	width: 100%;
+	margin: var(--standard-pad);
 }
 
 .content {
@@ -159,6 +190,18 @@ tr:nth-child(odd) {
 	padding-left: var(--standard-pad);
 	padding-right: 0px;
 	width: var(--content-width);
+}
+
+.col-left {
+	width: 33%;
+}
+
+.col-mid {
+	width: 24%;
+}
+
+.col-right {
+	width: 43%;
 }
 
 .info-page-tile {
@@ -173,7 +216,6 @@ tr:nth-child(odd) {
 }
 
 .display-chart {
-	margin-top: var(--standard-margin);
 	border: 1px solid var(--dark-text);
 	width: 100%;
 	height: auto;
@@ -217,7 +259,7 @@ tr:nth-child(odd) {
 }
 
 .left {
-	padding-left: calc(var(--standard-pad) * 2);
+	padding-left: var(--standard-pad);
 	text-align: left;
 }
 
@@ -286,8 +328,16 @@ tr:nth-child(odd) {
 	display: block;
 }
 
+#custom-color-adjuster {
+	display: none;
+}
+
 #data-selector {
 	clear:both;
+}
+
+#settingsRefreshButton {
+	vertical-align: middle;
 }
 
 @media ( max-width : 991px) {
@@ -319,6 +369,10 @@ tr:nth-child(odd) {
 	
 	.box {
 		line-height: 50px;
+	}
+	
+	.chart-container {
+		width: 100%;
 	}
 
 	.content {

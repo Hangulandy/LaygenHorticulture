@@ -21,15 +21,19 @@
 	<div class="under-header"></div>
 
 	<div class="side-bar block">
-	<h3>${dict.get('quickViewHeading', lang)} :</h3>
+		<h3>${dict.get('quickViewHeading', lang)}:</h3>
 
 		<%
-		for (Authorization auth : user.getAuthorizations()) {
+		if (user.getAuthorizations() != null) {
+			for (Authorization auth : user.getAuthorizations()) {
 		%>
 		<a class="shortcut"
 			href="Controller?selectedMachineId=<%=auth.getMachineSerialNumber()%>&action=selectMachine"><%=auth.getMachineNickname()%></a>
 		<br>
-		<%}%>
+		<%
+		}
+		}
+		%>
 	</div>
 	<!-- end of side-bar div -->
 
@@ -58,14 +62,11 @@
 		if (viewComponent.equalsIgnoreCase("machineData")) {
 		%>
 		<%@ include file="./res/includes/machine_data_component.jsp"%>
-		<%
-		}
-		if (viewComponent.equalsIgnoreCase("cameraPage")) {
-		%>
-		<%@ include file="./res/includes/camera_page_component.jsp"%>
-		<%
-		}
-		%>
+		<%}%>
+
+		<%if (viewComponent.equalsIgnoreCase("cameraPage")) { %>
+		<%@include file="./res/includes/camera_page_component.jsp"%>
+		<%}%>
 		<%
 		} else {
 		%>
@@ -78,7 +79,5 @@
 	</div>
 </div>
 <!-- end of main div -->
-
-<!-- Erase the message so that it does not persist in page reloads -->
 
 <%@ include file="./res/includes/footer_component.jsp"%>

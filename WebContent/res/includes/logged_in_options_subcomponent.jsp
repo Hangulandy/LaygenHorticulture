@@ -15,10 +15,10 @@
 			value="${dict.get('myMachines', lang)}" /> <input
 			type="hidden" name="action" value="viewMyMachines" />
 	</form>
-	<!-- 	<form class="sideBySide" action="Controller" method="post">
+	<form class="sideBySide" action="Controller" method="post">
 		<input class="button-red" type="submit" value="${dict.get('backupDB', lang)}" /> <input
 			type="hidden" name="action" value="backupDB" />
-	</form>  -->
+	</form>
 
 </div>
 

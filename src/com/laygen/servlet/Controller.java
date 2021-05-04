@@ -1,7 +1,8 @@
 package com.laygen.servlet;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -110,8 +111,28 @@ public class Controller extends HttpServlet {
 				updateMachineInfo(request, session);
 			}
 
-			if (action.equalsIgnoreCase("updateSettings")) {
-				updateSettings(request, session);
+			if (action.equalsIgnoreCase("updateGrowSettings")) {
+				updateGrowSettings(request, session);
+			}
+
+			if (action.equalsIgnoreCase("updateWaterSettings")) {
+				updateWaterSettings(request, session);
+			}
+
+			if (action.equalsIgnoreCase("updateLightSettings")) {
+				updateLightSettings(request, session);
+			}
+
+			if (action.equalsIgnoreCase("updateCustomColor")) {
+				updateCustomColor(request, session);
+			}
+
+			if (action.equalsIgnoreCase("updateAirSettings")) {
+				updateAirSettings(request, session);
+			}
+
+			if (action.equalsIgnoreCase("updateCameraSettings")) {
+				updateCameraSettings(request, session);
 			}
 
 			if (action.equalsIgnoreCase("viewCameraPage")) {
@@ -166,7 +187,7 @@ public class Controller extends HttpServlet {
 		String password = request.getParameter("password");
 		User user = UserDB.login(email, password);
 		String message = null;
-		String lang = (String)session.getAttribute("lang");
+		String lang = (String) session.getAttribute("lang");
 
 		if (user == null) {
 			message = Dictionary.getInstance().get("userNotFound", lang);
@@ -225,24 +246,21 @@ public class Controller extends HttpServlet {
 				if (machine.getSensors() != null && machine.getSensors().size() > 0) {
 					selectedSensor = machine.getSensors().firstKey();
 				} else {
-					session.setAttribute("message", Dictionary.getInstance().get("noSensors", (String)session.getAttribute("lang")));
+					session.setAttribute("message",
+							Dictionary.getInstance().get("noSensors", (String) session.getAttribute("lang")));
 				}
 			}
-//			if (selectedSensor != null) {
-//				machine.setSelectedSensor(machine.getSensors().get(selectedSensor));
-//				machine.fetchSensorReadingsByDate(startDate, startTime, endDate, endTime, machine.getSelectedSensor());
-//			}
+
 			if (machine.getSensors() != null) {
 				Sensor sensor = null;
 				for (String key : machine.getSensors().keySet()) {
-					sensor  = machine.getSensors().get(key);
+					sensor = machine.getSensors().get(key);
 					if (sensor != null) {
-						machine.fetchSensorReadingsByDate(startDate, startTime, endDate, endTime, sensor);						
+						machine.fetchSensorReadingsByDate(startDate, startTime, endDate, endTime, sensor);
 					}
 				}
 			}
 		} else {
-			// redirect to select machine
 			viewMyMachines(session);
 		}
 
@@ -256,11 +274,9 @@ public class Controller extends HttpServlet {
 		if (user != null && user.getId() != null) {
 			user.refreshAuthorizations();
 
-//			for (Authorization auth : user.getAuthorizations()) {
-//				System.out.println(auth);
-//			}
 			session.setAttribute("user", user);
-			session.setAttribute("message", Dictionary.getInstance().get("selectMachinePrompt", (String) session.getAttribute("lang")));
+			session.setAttribute("message",
+					Dictionary.getInstance().get("selectMachinePrompt", (String) session.getAttribute("lang")));
 			session.setAttribute("machine", null);
 			session.setAttribute("viewComponent", null);
 		} else {
@@ -323,67 +339,148 @@ public class Controller extends HttpServlet {
 			redirectHome(session);
 		}
 	}
-	
 
-	private void openWaterValve(HttpSession session) {
-		Machine machine = (Machine) session.getAttribute("machine");
-		String message = (String) session.getAttribute("message");
-
-		message = message + machine.sendOpenValveMessage((String)session.getAttribute("lang"));
-		session.setAttribute("message", message);
-		session.setAttribute("viewComponent", "machineSettings");
-	}
-
-	private void updateSettings(HttpServletRequest request, HttpSession session) {
+	private void updateGrowSettings(HttpServletRequest request, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 
 		if (machine != null && machine.getSerialNumber() != null) {
-			HashMap<String, String> newSettings = new HashMap<String, String>();
+			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
+
+			newSettings.put("plant_date", request.getParameter("plant_date"));
+
+			session.setAttribute("message",
+					machine.updateMachineSettings(newSettings, (String) session.getAttribute("lang")));
+			session.setAttribute("viewComponent", "machineSettings");
+		} else {
+			viewMyMachines(session);
+		}
+	}
+
+	private void updateWaterSettings(HttpServletRequest request, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String lang = (String) session.getAttribute("lang");
+
+		if (machine != null && machine.getSerialNumber() != null) {
+
+			String[] messages = machine.setWaterInValve(request.getParameter("water_in_valve_on"), lang);
+			String message = messages[1];
+
+			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
 
 			String waterCyclePeriodHours = request.getParameter("water_cycle_period_hours");
 			String waterCyclePeriodMinutes = request.getParameter("water_cycle_period_minutes");
 
 			String waterCycleDuration = request.getParameter("water_cycle_duration");
-
-			int duration = 0;
-			int hours = 0;
-			int minutes = 0;
-			int total = 0;
-			try {
-				duration = Integer.parseInt(waterCycleDuration);
-				hours = Integer.parseInt(waterCyclePeriodHours);
-				minutes = Integer.parseInt(waterCyclePeriodMinutes);
-				total = ((hours * 60) + minutes) * 60;
-			} catch (Exception e) {
-				// do nothing
-			}
-
+			int duration = getIntFromString(waterCycleDuration);
 			int max = 60 * 60 * 24 * 50; // limit to 50 days * 24 hr * 60 min * 60 sec
 			duration = duration > max ? max : duration;
-			total = total > duration ? total : duration;
-			
-			newSettings.put("plant_date", request.getParameter("plant_date"));
+
+			int totalWaterCycle = getTotalFromHoursMinutes(waterCyclePeriodHours, waterCyclePeriodMinutes);
+			totalWaterCycle = totalWaterCycle > duration ? totalWaterCycle : duration;
+
+			newSettings.put("water_cycle_on", request.getParameter("water_cycle_on"));
+			newSettings.put("water_cycle_duration", String.valueOf(duration));
+			newSettings.put("water_cycle_period", String.valueOf(totalWaterCycle));
+			newSettings.put("water_in_valve_on", messages[0]);
+
+			message = message + machine.updateMachineSettings(newSettings, lang);
+			session.setAttribute("message", message);
+			session.setAttribute("viewComponent", "machineSettings");
+		} else {
+			viewMyMachines(session);
+		}
+	}
+
+	private void updateLightSettings(HttpServletRequest request, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String lang = (String) session.getAttribute("lang");
+
+		if (machine != null && machine.getSerialNumber() != null) {
+			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
+
+			String lightColorString = request.getParameter("light_color");
+			if (lightColorString == null) {
+				lightColorString = machine.getLightColors().firstKey();
+			}
+			String lightColorName = lightColorString.split("-")[0];
+
 			newSettings.put("brightness", request.getParameter("brightness"));
 			newSettings.put("light_on", request.getParameter("light_on"));
+			newSettings.put("light_color", lightColorName);
+
+			session.setAttribute("message", machine.updateMachineSettings(newSettings, lang));
+			session.setAttribute("viewComponent", "machineSettings");
+		} else {
+			viewMyMachines(session);
+		}
+	}
+
+	private void updateCustomColor(HttpServletRequest request, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String lang = (String) session.getAttribute("lang");
+		String message = null;
+
+		String lightColor = request.getParameter("light_color");
+		String redString = request.getParameter("redValue");
+		String greenString = request.getParameter("greenValue");
+		String blueString = request.getParameter("blueValue");
+
+		if (machine != null && machine.getLightColors() != null && machine.getLightColors().get(lightColor) != null) {
+			int redValue = 0;
+			int greenValue = 0;
+			int blueValue = 0;
+			try {
+				redValue = Integer.parseInt(redString);
+				greenValue = Integer.parseInt(greenString);
+				blueValue = Integer.parseInt(blueString);
+			} catch (Exception e) {
+				// do nothing since these will be 0 if they fail to parse
+			}
+			int value = redValue * 1000000 + greenValue * 1000 + blueValue;
+			String messageToMachine = String.format("%d#light_%s", value, lightColor);
+			message = machine.sendCommandToMachine(messageToMachine, lang);
+			session.setAttribute("message", message);
+			session.setAttribute("viewComponent", "machineSettings");
+		} else {
+			viewMyMachines(session);
+		}
+	}
+
+	private void updateAirSettings(HttpServletRequest request, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+
+		if (machine != null && machine.getSerialNumber() != null) {
+			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
+
 			// newSettings.put("heater_on", request.getParameter("heater_on"));
 			newSettings.put("fan_on", request.getParameter("fan_on"));
 			newSettings.put("fan_auto", request.getParameter("fan_auto"));
 			newSettings.put("fan_humidity", request.getParameter("fan_humidity"));
-			// newSettings.put("uvc_on", request.getParameter("uvc_on"));
-			newSettings.put("water_cycle_on", request.getParameter("water_cycle_on"));
-			newSettings.put("water_cycle_duration", String.valueOf(duration));
-			newSettings.put("water_cycle_period", String.valueOf(total));
-			newSettings.put("camera_cycle_on", request.getParameter("camera_cycle_on"));
-			newSettings.put("camera_cycle_period", request.getParameter("camera_cycle_period"));
-			
-			String water_in_valve_on = request.getParameter("water_in_valve_on");
-			if (water_in_valve_on != null && water_in_valve_on.equalsIgnoreCase("1")) {
-				openWaterValve(session);
-			} else {
-				newSettings.put("water_in_valve_on", water_in_valve_on);
-			}
 
-			session.setAttribute("message", machine.updateMachineSettings(newSettings));
+			String message = machine.updateMachineSettings(newSettings, (String) session.getAttribute("lang"));
+			session.setAttribute("message", message);
+			session.setAttribute("viewComponent", "machineSettings");
+		} else {
+			viewMyMachines(session);
+		}
+	}
+
+	private void updateCameraSettings(HttpServletRequest request, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+
+		if (machine != null && machine.getSerialNumber() != null) {
+			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
+
+			String cameraCyclePeriodHours = request.getParameter("camera_cycle_period_hours");
+			String cameraCyclePeriodMinutes = request.getParameter("camera_cycle_period_minutes");
+
+			int totalCameraCycle = getTotalFromHoursMinutes(cameraCyclePeriodHours, cameraCyclePeriodMinutes);
+
+			newSettings.put("camera_cycle_on", request.getParameter("camera_cycle_on"));
+			newSettings.put("camera_cycle_period", String.valueOf(totalCameraCycle));
+
+			session.setAttribute("message",
+					machine.updateMachineSettings(newSettings, (String) session.getAttribute("lang")));
 			session.setAttribute("viewComponent", "machineSettings");
 		} else {
 			viewMyMachines(session);
@@ -419,18 +516,16 @@ public class Controller extends HttpServlet {
 		String lang = (String) session.getAttribute("lang");
 
 		if (machine != null) {
-			message = machine.takePicture((String)session.getAttribute("lang"));
+			message = machine.takePicture((String) session.getAttribute("lang"));
+			if (message.equalsIgnoreCase("success")) {
+				message = message + " " + Dictionary.getInstance().get("refreshPrompt", lang);
+			}
+			session.setAttribute("message", message);
+			session.setAttribute("viewComponent", "cameraPage");
 		} else {
 			message = Dictionary.getInstance().get("machineNull", lang);
+			viewMyMachines(session);
 		}
-
-		if (message.equalsIgnoreCase("success")) {
-			message = message + " " + Dictionary.getInstance().get("refreshPrompt", lang);
-		}
-
-		session.setAttribute("message", message);
-		// session.setAttribute("popup", message);
-		session.setAttribute("viewComponent", "cameraPage");
 	}
 
 	private void deleteImageFromMachine(HttpServletRequest request, HttpSession session) {
@@ -441,6 +536,23 @@ public class Controller extends HttpServlet {
 			session.setAttribute("selectedImageId", machine.deleteImage(imageId));
 		}
 		session.setAttribute("viewComponent", "cameraPage");
+	}
+
+	private int getTotalFromHoursMinutes(String hoursString, String minutesString) {
+
+		int hours = getIntFromString(hoursString);
+		int minutes = getIntFromString(minutesString);
+		return ((hours * 60) + minutes) * 60;
+	}
+
+	private int getIntFromString(String string) {
+		int output = 0;
+		try {
+			output = Integer.parseInt(string);
+		} catch (Exception e) {
+			// do nothing
+		}
+		return output;
 	}
 
 	/**

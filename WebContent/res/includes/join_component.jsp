@@ -3,6 +3,7 @@
 <h3>${dict.get('joinPrompt', lang)}</h3>
 <br>
 
+<h3>${message}</h3>
 <form action="Controller" method="post">
 	<input type="hidden" name="action" value="join" /> <label
 		class="pad_top">${dict.get('emailLabel', lang)}:</label> <input

@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.laygen.beans.Sensor;
+import com.laygen.beans.User;
 import com.laygen.beans.Machine;
 import com.laygen.beans.Message;
 
@@ -33,7 +34,8 @@ public class MachineDB {
 		if (messages != null) {
 			map = new HashMap<String, String>();
 			for (Message message : messages) {
-				map.put(message.getColumnName(), message.getValue());
+				String value = message.getValue().equalsIgnoreCase("") ? "0" : message.getValue();
+				map.put(message.getColumnName(), value);
 			}
 		}
 		return map;
@@ -81,6 +83,39 @@ public class MachineDB {
 		}
 		return sensors;
 	}
+	
+
+	public static TreeMap<String, String> getLightColors(Machine machine) {
+		TreeMap<String, String> lightColors = null;
+
+		if (machine.getInfo() != null && machine.getInfo().get("model_name") != null) {
+			TreeSet<Message> messages = MessageDB
+					.getRowMessagesByColumnFamily(machine.getInfo().get("model_name") + "-L", "C");
+			if (messages.size() > 0) {
+				lightColors = new TreeMap<String, String>();
+				for (Message message : messages) {
+					lightColors.put(message.getColumnName(), message.getValue());
+				}
+			}
+		}
+		return lightColors;
+	}
+	
+	public static TreeMap<String, String> getCustomLightColors(Machine machine){
+		TreeMap<String, String> lightColors = null;
+
+		if (machine.getSerialNumber() != null) {
+			TreeSet<Message> messages = MessageDB
+					.getRowMessagesByColumnFamily(machine.getSerialNumber() + "-L", "C");
+			if (messages.size() > 0) {
+				lightColors = new TreeMap<String, String>();
+				for (Message message : messages) {
+					lightColors.put(message.getColumnName(), message.getValue());
+				}
+			}
+		}
+		return lightColors;
+	}
 
 	public static String putNickname(Machine machine) {
 		String output = null;
@@ -95,6 +130,16 @@ public class MachineDB {
 		}
 
 		return output;
+	}
+
+	public static TreeSet<User> getAuthorizedUsers(Machine machine) {
+		// TODO Auto-generated method stub
+		
+		// TreeSet<User> users = null;
+		
+		// TreeSet<Message> messages = MessageDB.scanColumnFamilyWithRowPrefix("C", "uuid", machine.getSerialNumber() + "-U");
+		
+		return null;
 	}
 
 }

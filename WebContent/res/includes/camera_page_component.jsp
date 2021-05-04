@@ -1,5 +1,4 @@
-<%@ page
-	import="com.laygen.beans.Machine"%>
+<%@ page import="com.laygen.beans.Machine"%>
 
 <%
 Machine machine = (Machine) session.getAttribute("machine");
@@ -15,25 +14,24 @@ Machine machine = (Machine) session.getAttribute("machine");
 	<div>
 		<form class="sideBySide" action="Controller" method="post">
 			<input class="button" type="submit"
-				value="${dict.get('capture', lang)}" /> <input
-				type="hidden" name="action" value="takePicture" />
+				value="${dict.get('capture', lang)}" /> <input type="hidden"
+				name="action" value="takePicture" />
 		</form>
 		<form class="sideBySide" action="Controller" method="post">
 			<input class="button" type="submit"
-				value="${dict.get('refresh', lang)}" /> <input
-				type="hidden" name="action" value="viewCameraPage" />
+				value="${dict.get('refresh', lang)}" /> <input type="hidden"
+				name="action" value="viewCameraPage" />
 		</form>
 	</div>
 
 
 	<!-- Image list div -->
 	<!-- label block -->
-	<h3>${dict.get('selectAnImageLabel', lang)}:
-	</h3>
+	<h3>${dict.get('selectAnImageLabel', lang)}:</h3>
 	<form class="sideBySide" action="Controller" method="post">
 		<%
 		String id = (String) session.getAttribute("selectedImageId");
-		if (machine != null && machine.getImageNames() != null) {
+		if (machine != null && machine.getImageNames() != null && machine.getImageNames().size() > 0) {
 		%>
 		<!-- list box -->
 		<select name="image" size="10">
@@ -55,13 +53,16 @@ Machine machine = (Machine) session.getAttribute("machine");
 		}
 		%>
 		<br class="not-mobile"> <input class="button" type="submit"
-			value="${dict.get('select', lang)}" /> <input
-			type="hidden" name="action" value="viewCameraPage" />
+			value="${dict.get('select', lang)}" /> <input type="hidden"
+			name="action" value="viewCameraPage" />
 	</form>
 
 </div>
 
 <div class="img-container">
+	<%String imageString = machine.getImage();
+if (imageString != null){ %>
+
 	<img class="display-img" src="data:image/jpg;base64,${machine.image }" />
 	<!-- delete image button will only show if there is still a selected image id session variable -->
 	<%
@@ -70,11 +71,18 @@ Machine machine = (Machine) session.getAttribute("machine");
 	<div class="small-space"></div>
 	<form>
 		<input class="button-red" type="submit"
-			value="${dict.get('delete', lang)}" /> <input
-			type="hidden" name="action" value="deleteImage" /> <input
-			type="hidden" name="image" value="<%=id%>" />
+			value="${dict.get('delete', lang)}" /> <input type="hidden"
+			name="action" value="deleteImage" /> <input type="hidden"
+			name="image" value="<%=id%>" />
 	</form>
 	<%
 	}
 	%>
+
+	<%} else { %>
+
+	<h3>${dict.get('noImageMessage', lang) }</h3>
+
+	<%} %>
+
 </div>

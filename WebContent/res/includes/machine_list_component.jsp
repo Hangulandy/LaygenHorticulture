@@ -12,7 +12,7 @@ if (userHere.getAuthorizations() != null && userHere.getAuthorizations().size() 
 	<tr>
 		<th>${dict.get('serialNumberLabel', lang)}</th>
 		<th>${dict.get('nickname', lang)}</th>
-		<th class="not-mobile">${dict.get('ownerEmail', lang)}</th>
+		<th class="not-mobile">${dict.get('owner_email', lang)}</th>
 		<th>${dict.get('select', lang)}</th>
 	</tr>
 

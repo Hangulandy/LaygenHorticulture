@@ -28,44 +28,44 @@
 
 
 		<%
-			String startDate;
-			String startTime;
-			String endDate;
-			String endTime;
+		String startDate;
+		String startTime;
+		String endDate;
+		String endTime;
 
-			// Order of priority is 1) user-chosen start date 2) plant date 3) minimum date 
-			if (machine.getStartDate() != null) {
-				startDate = machine.getStartDate();
-			} else if (machine.getSettings().get("plant_date") != null) {
-				startDate = machine.getSettings().get("plant_date");
-			} else {
-				startDate = "2021-01-01";
-			}
+		// Order of priority is 1) user-chosen start date 2) plant date 3) minimum date 
+		if (machine.getStartDate() != null) {
+			startDate = machine.getStartDate();
+		} else if (machine.getSettings().get("plant_date") != null) {
+			startDate = machine.getSettings().get("plant_date");
+		} else {
+			startDate = "2021-01-01";
+		}
 
-			// Order of priority is 1) user-chosen start time 2) midnight
-			if (machine.getStartTime() != null) {
-				startTime = machine.getStartTime();
-			} else {
-				startTime = "00:00";
-			}
+		// Order of priority is 1) user-chosen start time 2) midnight
+		if (machine.getStartTime() != null) {
+			startTime = machine.getStartTime();
+		} else {
+			startTime = "00:00";
+		}
 
-			// Order of priority is 1) user=chosen end date 2) current date
-			if (machine.getEndDate() != null) {
-				endDate = machine.getEndDate();
-			} else {
-				Date currentTime = new Date();
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-				endDate = sdf.format(currentTime);
-			}
+		// Order of priority is 1) user=chosen end date 2) current date
+		if (machine.getEndDate() != null) {
+			endDate = machine.getEndDate();
+		} else {
+			Date currentTime = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+			endDate = sdf.format(currentTime);
+		}
 
-			// Order of priority is 1) user-chosen end time 2) before midnight
-			if (machine.getEndTime() != null) {
-				endTime = machine.getEndTime();
-			} else {
-				endTime = "23:59";
-			}
-			%>
+		// Order of priority is 1) user-chosen end time 2) before midnight
+		if (machine.getEndTime() != null) {
+			endTime = machine.getEndTime();
+		} else {
+			endTime = "23:59";
+		}
+		%>
 		<label>${dict.get('fromLabel', lang)}:</label> <input type="date"
 			id="start-date" name="startDate" value="<%=startDate%>"
 			min="2021-01-01" max="2030-12-31" required /> <input type="time"
@@ -122,14 +122,14 @@ for (String type : types) {
 		}
 		count++;
 	}
-	
-	list.sort(new Comparator<Map<Object, Object>>(){
-	    @Override
-	    public int compare(Map<Object, Object> m1, Map<Object, Object> m2) {
-	        return m1.get("date").toString().compareTo(m2.get("date").toString());
-	     }
+
+	list.sort(new Comparator<Map<Object, Object>>() {
+		@Override
+		public int compare(Map<Object, Object> m1, Map<Object, Object> m2) {
+			return m1.get("date").toString().compareTo(m2.get("date").toString());
+		}
 	});
-	
+
 	dataPoints = gsonObj.toJson(list);
 	chartId = String.format("canvas%s", chartNum);
 %>
@@ -177,7 +177,7 @@ for (String type : types) {
 				},
 				title : {
 					display : true,
-					text : "<%=sensor.getType()%> on sensor <%=dict1.get(sensor.getName(), lang1)%>",
+					text : "<%=dict1.get(sensor.getName(), lang1)%> : <%=dict1.get(sensor.getType(), lang1)%> <%=!sensor.getUnits().equalsIgnoreCase("") ? "(" + sensor.getUnits() + ")" : ""%>",
 				},
 				responsive : true,
 			}
@@ -187,13 +187,15 @@ for (String type : types) {
 	</script>
 	<br>
 	<form class="sideBySide" action="NonLoadingMethodsServlet">
-		<input type="hidden" name="sensor" value="<%=key%>" />
-		<input type="hidden" name="action" value="downloadData"/>
-		<input class="button" type="submit" value="${dict.get('downloadButtonLabel', lang)}" />
+		<input type="hidden" name="sensor" value="<%=key%>" /> <input
+			type="hidden" name="action" value="downloadData" /> <input
+			class="button" type="submit"
+			value="${dict.get('downloadButtonLabel', lang)}" />
 	</form>
 	<form class="sideBySide" action="ShowLargeChartServlet" target="_blank">
-		<input type="hidden" name="sensor" value="<%=key%>" /> 
-		<input class="button" type="submit" value="${dict.get('enlargeButtonLabel', lang)}" />
+		<input type="hidden" name="sensor" value="<%=key%>" /> <input
+			class="button" type="submit"
+			value="${dict.get('enlargeButtonLabel', lang)}" />
 	</form>
 	<br>
 </div>

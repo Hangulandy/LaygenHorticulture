@@ -91,6 +91,8 @@ table {
 	width: 90%;
 }
 
+
+
 td {
 	padding: calc(var(--standard-pad) / 2);
 }

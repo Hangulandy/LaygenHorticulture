@@ -135,9 +135,9 @@ public class MachineDB {
 	public static TreeSet<User> getAuthorizedUsers(Machine machine) {
 		// TODO Auto-generated method stub
 		
-		TreeSet<User> users = null;
+		// TreeSet<User> users = null;
 		
-		TreeSet<Message> messages = MessageDB.scanColumnFamilyWithRowPrefix("C", "uuid", machine.getSerialNumber() + "-U");
+		// TreeSet<Message> messages = MessageDB.scanColumnFamilyWithRowPrefix("C", "uuid", machine.getSerialNumber() + "-U");
 		
 		return null;
 	}

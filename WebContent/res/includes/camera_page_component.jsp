@@ -69,12 +69,15 @@ if (imageString != null){ %>
 	if (id != null) {
 	%>
 	<div class="small-space"></div>
-	<form>
+	<form class="sideBySide" action="Controller" method="post">
 		<input class="button-red" type="submit"
 			value="${dict.get('delete', lang)}" /> <input type="hidden"
 			name="action" value="deleteImage" /> <input type="hidden"
-			name="image" value="<%=id%>" />
+			name="imageId" value="<%=id%>" />
 	</form>
+	<a class="download" href="data:image/jpg;base64,${machine.image}" download="<%=id%>">
+	<button id="editButton" class="button sideBySide" type="button">${dict.get('downloadButtonLabel', lang)}</button>
+	</a>
 	<%
 	}
 	%>

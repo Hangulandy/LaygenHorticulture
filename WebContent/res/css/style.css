@@ -33,6 +33,7 @@
 	margin: 0px;
 }
 
+
 a.shortcut:link {
 	color: var(--dark-text);
 }
@@ -47,6 +48,10 @@ a.footer-link:link{
 
 a.footer-link:visited {
 	color: var(--visited-text);
+}
+
+a.download {
+	text-decoration: none;
 }
 
 h1 {

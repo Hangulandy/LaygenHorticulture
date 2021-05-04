@@ -102,6 +102,9 @@ public class NonLoadingMethodsServlet extends HttpServlet {
 	}
 	
 	private void downloadImage(HttpServletRequest request, HttpSession session, HttpServletResponse response) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String imageId = request.getParameter("imageId");
+		
 		
 	}
 

@@ -6,10 +6,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="./../css/normalize.css" />
-<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.0.0/Chart.min.js"></script>
-<link rel="stylesheet" href="./../css/style.css" />
+<link rel="stylesheet" href="./res/css/normalize.css" />
+<script src="./res/js/chart.min.js"></script>
+<link rel="stylesheet" href="./res/css/style.css" />
 <title>Data View</title>
 </head>
 

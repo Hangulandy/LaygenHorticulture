@@ -13,7 +13,7 @@
 <%@ page import="java.util.Date"%>
 <%@ page import="java.util.TimeZone"%>
 
-<h1>${dict.get('sensorHeading', lang)}</h1>
+<h1 class="sideBySide">${dict.get('sensorHeading', lang)}</h1>
 <hr>
 <div class="small-space"></div>
 <div id="data-selector">

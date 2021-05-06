@@ -63,8 +63,8 @@ if (machine != null) {
 
 <!-- This will only show if machine != null because it is inside the code block following the if statement -->
 <h1 class="sideBySide">${dict.get('machineSettingsHeading', lang)}</h1>
-<form class="sideBySide" action="Controller" method="post">
-	<input id="settingsRefreshButton" class="button" type="submit"
+<form class="sideBySide margin-top" action="Controller" method="post">
+	<input class="button" type="submit"
 		value="${dict.get('refresh', lang)}" /> <input type="hidden"
 		name="action" value="viewMachineSettings" />
 </form>
@@ -194,9 +194,10 @@ if (machine != null) {
 			<td><%=Dictionary.getInstance().get(lightOn, lang1) %></td>
 			<td><label class="radio-label"><input type="radio"
 					id="light_on" name="light_on" value="1" <%if (lightChecked) {%>
-					checked <%}%> /> <%=Dictionary.getInstance().get("turnOnLabel", lang1) %></label> <label class="radio-label"><input
-					type="radio" id="light_off" name="light_on" value="0"
-					<%if (!lightChecked) {%> checked <%}%> /> <%=Dictionary.getInstance().get("turnOffLabel", lang1) %></label></td>
+					checked <%}%> /> <%=Dictionary.getInstance().get("turnOnLabel", lang1) %></label>
+				<label class="radio-label"><input type="radio"
+					id="light_off" name="light_on" value="0" <%if (!lightChecked) {%>
+					checked <%}%> /> <%=Dictionary.getInstance().get("turnOffLabel", lang1) %></label></td>
 		</tr>
 		<tr>
 			<td class="left">${dict.get('brightness', lang)}</td>
@@ -214,8 +215,10 @@ if (machine != null) {
 			<td>
 				<div class="button-container">
 					<%
-				for (String key : machine.getLightColors().keySet()) {
-				%>
+				String[] order = {"red", "green", "blue", "yellow", "magenta", "cyan", "custom1", "custom2", "custom3"};
+					for (String color : order){
+						for (String key : machine.getLightColors().keySet()) {
+							if (key.equalsIgnoreCase(color)){ %>
 					<label class="radio-label"><input type="radio"
 						id="<%=key%>-<%=machine.getLightColors().get(key)%>"
 						name="light_color" onclick="checkColor(this)" value="<%=key%>"
@@ -223,9 +226,8 @@ if (machine != null) {
 						<%if (checkedLightColor != null && checkedLightColor.equalsIgnoreCase(key)) {%>
 						checked <%}%>> <%=Dictionary.getInstance().get(key, lang1)%></label>
 					<div class="small-space"></div>
-					<%
-				}
-				%>
+
+					<%}}} %>
 				</div>
 			</td>
 		</tr>
@@ -255,7 +257,7 @@ if (machine != null) {
 				<col class="col-mid"></col>
 				<col class="col-right"></col>
 			</colgroup>
-			<tr >
+			<tr>
 				<th class="left">${dict.get('itemLabel', lang)}</th>
 				<th>${dict.get('valueLabel', lang)}</th>
 				<th>${dict.get('adjustLabel', lang)}</th>
@@ -265,8 +267,8 @@ if (machine != null) {
 				<td id="currentRed"></td>
 				<td><input type="number" id="redInput" name="redValue" step="5"
 					min="0" max="100" value="0"><br class="mobile-only"> <br
-					class="mobile-only"> <input type="range" step="5" min="0" max="100"
-					value="0" id="redSlider"></td>
+					class="mobile-only"> <input type="range" step="5" min="0"
+					max="100" value="0" id="redSlider"></td>
 			</tr>
 			<tr id="greenRow" class="custom-color-row">
 				<td>${dict.get('green', lang)}</td>
@@ -434,9 +436,9 @@ if (machine != null) {
 			<td><%=Dictionary.getInstance().get(fanOn, lang1) %></td>
 			<td><label class="radio-label"><input type="radio"
 					id="fan_on" name="fan_on" value="1" <%if (fanChecked) {%> checked
-					<%}%> /> <%=Dictionary.getInstance().get("turnOnLabel", lang1) %></label> <label class="radio-label"><input type="radio"
-					id="fan_off" name="fan_on" value="0" <%if (!fanChecked) {%> checked
-					<%}%> /> <%=Dictionary.getInstance().get("turnOffLabel", lang1) %></label></td>
+					<%}%> /> <%=Dictionary.getInstance().get("turnOnLabel", lang1) %></label>
+				<label class="radio-label"><input type="radio" id="fan_off"
+					name="fan_on" value="0" <%if (!fanChecked) {%> checked <%}%> /> <%=Dictionary.getInstance().get("turnOffLabel", lang1) %></label></td>
 		</tr>
 
 		<tr>
@@ -444,12 +446,13 @@ if (machine != null) {
 			<td><%=Dictionary.getInstance().get(fanAuto, lang1)%></td>
 			<td><label class="radio-label"><input type="radio"
 					id="fan_auto" name="fan_auto" value="1" <%if (fanAutoChecked) {%>
-					checked <%}%> /> <%=Dictionary.getInstance().get("auto", lang1) %></label><label class="radio-label"><input
-					type="radio" id="fan_cont" name="fan_auto" value="0"
-					<%if (!fanAutoChecked) {%> checked <%}%> /> <%=Dictionary.getInstance().get("cont", lang1) %></label></td>
+					checked <%}%> /> <%=Dictionary.getInstance().get("auto", lang1) %></label><label
+				class="radio-label"><input type="radio" id="fan_cont"
+					name="fan_auto" value="0" <%if (!fanAutoChecked) {%> checked <%}%> />
+					<%=Dictionary.getInstance().get("cont", lang1) %></label></td>
 		</tr>
 		<tr>
-		<%String fanHumidity = machine.getSettings().get("fan_humidity");
+			<%String fanHumidity = machine.getSettings().get("fan_humidity");
 		int humidity = 0;
 		try {
 			float f = Float.parseFloat(fanHumidity);
@@ -461,11 +464,10 @@ if (machine != null) {
 			<td class="left">${dict.get('fan_humidity', lang)}</td>
 			<td>${machine.settings['fan_humidity'] }</td>
 			<td><input type="number" id="fan_humidity" name="fan_humidity"
-				step="5" min="0" max="100"
-				value="<%=humidity%>"><br
+				step="5" min="0" max="100" value="<%=humidity%>"><br
 				class="mobile-only"> <br class="mobile-only"> <input
-				type="range" step="5" min="0" max="100"
-				value="<%=humidity %>" id="humiditySlider"></td>
+				type="range" step="5" min="0" max="100" value="<%=humidity %>"
+				id="humiditySlider"></td>
 		</tr>
 	</table>
 	<input type="hidden" name="action" value="updateAirSettings" /> <input
@@ -508,8 +510,8 @@ if (machine != null) {
 			<td><%=Dictionary.getInstance().get(cameraCycleOn, lang1) %></td>
 			<td><label class="radio-label"><input type="radio"
 					id="camera_cycle_on" name="camera_cycle_on" value="1"
-					<%if (cameraCycleChecked) {%> checked <%}%>> <%=Dictionary.getInstance().get("turnOnLabel", lang1) %></label> <label
-				class="radio-label"><input type="radio"
+					<%if (cameraCycleChecked) {%> checked <%}%>> <%=Dictionary.getInstance().get("turnOnLabel", lang1) %></label>
+				<label class="radio-label"><input type="radio"
 					id="camera_cycle_off" name="camera_cycle_on" value="0"
 					<%if (!cameraCycleChecked) {%> checked <%}%>> <%=Dictionary.getInstance().get("turnOffLabel", lang1) %></label></td>
 		</tr>

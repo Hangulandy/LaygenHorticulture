@@ -361,8 +361,8 @@ form.custom-color-adjuster {
 	clear:both;
 }
 
-#settingsRefreshButton {
-	vertical-align: middle;
+.settingsRefreshButton {
+	margin-bottom: var(--standard-pad);
 }
 
 @media ( max-width : 991px) {

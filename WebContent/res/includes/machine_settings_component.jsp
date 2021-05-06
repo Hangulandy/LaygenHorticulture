@@ -260,7 +260,7 @@ if (machine != null) {
 				<th>${dict.get('valueLabel', lang)}</th>
 				<th>${dict.get('adjustLabel', lang)}</th>
 			</tr>
-			<tr id="redRow">
+			<tr id="redRow" class="custom-color-row">
 				<td>${dict.get('red', lang)}</td>
 				<td id="currentRed"></td>
 				<td><input type="number" id="redInput" name="redValue" step="5"
@@ -268,7 +268,7 @@ if (machine != null) {
 					class="mobile-only"> <input type="range" step="5" min="0" max="100"
 					value="0" id="redSlider"></td>
 			</tr>
-			<tr id="greenRow">
+			<tr id="greenRow" class="custom-color-row">
 				<td>${dict.get('green', lang)}</td>
 				<td id="currentGreen"></td>
 				<td><input type="number" id="greenInput" name="greenValue"
@@ -276,7 +276,7 @@ if (machine != null) {
 					class="mobile-only"> <br class="mobile-only"> <input
 					type="range" step="5" min="0" max="100" value="0" id="greenSlider"></td>
 			</tr>
-			<tr id="blueRow">
+			<tr id="blueRow" class="custom-color-row">
 				<td>${dict.get('blue', lang)}</td>
 				<td id="currentBlue"></td>
 				<td><input type="number" id="blueInput" name="blueValue"

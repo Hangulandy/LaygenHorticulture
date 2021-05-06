@@ -15,7 +15,7 @@
 	--header-height: calc(var(--banner-height) + var(--head-height)); 
 	--head-foot-color: grey; 
 	--standard-pad: 10px; 
-	--left-head-width: 250px; 
+	--left-head-width: 255px; 
 	--right-head-width: 350px;
 	--chart-container-width: 335px;
 	--content-width: calc(100vw - calc(var(--left-head-width) + calc(4 * var(--standard-pad))));
@@ -127,6 +127,10 @@ table.transparent {
 
 td.transparent {
 	min-width: var(--standard-pad);
+}
+
+tr.custom-color-row:nth-child(odd) {
+	background-color: var(--light-color);
 }
 
 form.custom-color-adjuster {
@@ -276,7 +280,7 @@ form.custom-color-adjuster {
 
 .img-container {
 	float: left;
-	width: calc(calc(var(--content-width) - calc(2 * var(--standard-border))) - calc(var(--selector-width) + calc(4 * var(--standard-pad))));
+	width: calc(calc(var(--content-width) - calc(2 * var(--standard-border))) - calc(var(--selector-width) + calc(3 * var(--standard-pad))));
 }
 
 .left {

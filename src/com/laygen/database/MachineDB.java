@@ -16,22 +16,22 @@ public class MachineDB {
 
 	static Charset enc = StandardCharsets.UTF_8;
 
-	public static HashMap<String, String> getMachineCurrentInfoBySerialNumber(String serialNumber) {
+	public static HashMap<String, String> fetchMachineInfoBySerialNumber(String serialNumber) {
 		return getGroupBySerialNumber(serialNumber, "C");
 	}
 
-	public static HashMap<String, String> getCurrentSettingsBySerialNumber(String serialNumber) {
+	public static HashMap<String, String> fetchCurrentSettingsBySerialNumber(String serialNumber) {
 		return getGroupBySerialNumber(serialNumber, "S");
 	}
 
-	public static HashMap<String, String> getCurrentReadingsBySerialNumber(String serialNumber) {
+	public static HashMap<String, String> fetchCurrentReadingsBySerialNumber(String serialNumber) {
 		return getGroupBySerialNumber(serialNumber, "R");
 	}
 
 	public static HashMap<String, String> getGroupBySerialNumber(String serialNumber, String group) {
 		HashMap<String, String> map = null;
 		TreeSet<Message> messages = MessageDB.getRowMessagesByColumnFamily(serialNumber, group);
-		if (messages != null) {
+		if (messages != null && messages.size() > 0) {
 			map = new HashMap<String, String>();
 			for (Message message : messages) {
 				String value = message.getValue().equalsIgnoreCase("") ? "0" : message.getValue();
@@ -64,7 +64,7 @@ public class MachineDB {
 		MessageDB.deleteValue(imageId, "I", "data");
 	}
 
-	public static TreeMap<String, Sensor> getSensorList(Machine machine) {
+	public static TreeMap<String, Sensor> fetchSensorList(Machine machine) {
 		TreeMap<String, Sensor> sensors = null;
 
 		if (machine.getInfo() != null && machine.getInfo().get("model_name") != null) {
@@ -83,7 +83,6 @@ public class MachineDB {
 		}
 		return sensors;
 	}
-	
 
 	public static TreeMap<String, String> getLightColors(Machine machine) {
 		TreeMap<String, String> lightColors = null;
@@ -100,13 +99,12 @@ public class MachineDB {
 		}
 		return lightColors;
 	}
-	
-	public static TreeMap<String, String> getCustomLightColors(Machine machine){
+
+	public static TreeMap<String, String> getCustomLightColors(Machine machine) {
 		TreeMap<String, String> lightColors = null;
 
 		if (machine.getSerialNumber() != null) {
-			TreeSet<Message> messages = MessageDB
-					.getRowMessagesByColumnFamily(machine.getSerialNumber() + "-L", "C");
+			TreeSet<Message> messages = MessageDB.getRowMessagesByColumnFamily(machine.getSerialNumber() + "-L", "C");
 			if (messages.size() > 0) {
 				lightColors = new TreeMap<String, String>();
 				for (Message message : messages) {
@@ -132,14 +130,49 @@ public class MachineDB {
 		return output;
 	}
 
-	public static TreeSet<User> getAuthorizedUsers(Machine machine) {
-		// TODO Auto-generated method stub
-		
-		// TreeSet<User> users = null;
-		
-		// TreeSet<Message> messages = MessageDB.scanColumnFamilyWithRowPrefix("C", "uuid", machine.getSerialNumber() + "-U");
-		
-		return null;
+	public static TreeSet<User> fetchAuthorizedUsers(Machine machine) {
+		TreeSet<User> users = new TreeSet<User>();
+		TreeSet<Message> messages = MessageDB.scanColumnFamilyWithRowPrefix("C", "uuid",
+				machine.getSerialNumber() + "-U");
+
+		User user = null;
+		for (Message message : messages) {
+			user = UserDB.getUserByUUID(message.getValue());
+			if (user != null) {
+				users.add(user);
+			}
+		}
+		return users;
+	}
+
+	public static boolean addAuthorization(String uuid, Machine machine) {
+		boolean success = false;
+		String rowId = String.format("%s-U-%s", machine.getSerialNumber(), uuid);
+		String cf = "C";
+		String cq = "uuid";
+
+		success = MessageDB.simplePut(rowId, cf, cq, uuid);
+		if (success) {
+			rowId = String.format("%s-U-%s", uuid, machine.getSerialNumber());
+			cq = "sn";
+			success = MessageDB.simplePut(rowId, cf, cq, machine.getSerialNumber());
+		}
+		return success;
+	}
+
+	public static boolean removeAuthorization(String uuid, Machine machine) {
+		boolean success = false;
+		String rowId = String.format("%s-U-%s", machine.getSerialNumber(), uuid);
+		String cf = "C";
+		String cq = "uuid";
+
+		success = MessageDB.deleteValue(rowId, cf, cq);
+		if (success) {
+			rowId = String.format("%s-U-%s", uuid, machine.getSerialNumber());
+			cq = "sn";
+			success = MessageDB.deleteValue(rowId, cf, cq);
+		}
+		return success;
 	}
 
 }

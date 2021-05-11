@@ -147,6 +147,17 @@ public class Controller extends HttpServlet {
 				deleteImageFromMachine(request, session);
 			}
 
+			if (action.equalsIgnoreCase("searchForUser")) {
+				searchForUser(request, session);
+			}
+
+			if (action.equalsIgnoreCase("addUser")) {
+				addUser(request, session);
+			}
+
+			if (action.equalsIgnoreCase("removeUser")) {
+				removeUser(request, session);
+			}
 		}
 
 		getServletContext().getRequestDispatcher(url).forward(request, response);
@@ -156,6 +167,7 @@ public class Controller extends HttpServlet {
 		session.setAttribute("message", null);
 		session.setAttribute("viewComponent", null);
 		session.setAttribute("selectedImage", null);
+		session.setAttribute("searchedUser", null);
 	}
 
 	private void redirectHome(HttpSession session) {
@@ -220,16 +232,16 @@ public class Controller extends HttpServlet {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String message = null;
 
-		if (machine != null && machine.getSerialNumber() != null) {
-			machine.refreshSettingsFromDB();
+		if (machine != null && machine.getSerialNumber() != null && userIsAuth(session)) {
+			machine.fetchSettingsFromDB();
 			if (machine.getSettings() == null) {
 				message = Dictionary.getInstance().get("noSettings", (String) session.getAttribute("lang"));
 			}
+			session.setAttribute("message", message);
+			session.setAttribute("viewComponent", "machineSettings");
 		} else {
 			viewMyMachines(session);
 		}
-		session.setAttribute("message", message);
-		session.setAttribute("viewComponent", "machineSettings");
 	}
 
 	private void viewMachineData(HttpServletRequest request, HttpSession session) {
@@ -240,8 +252,8 @@ public class Controller extends HttpServlet {
 		String endDate = (String) request.getParameter("endDate");
 		String endTime = (String) request.getParameter("endTime");
 
-		if (machine != null) {
-			machine.refreshCurrentReadingsFromDB();
+		if (machine != null && userIsAuth(session)) {
+			machine.fetchCurrentReadingsFromDB();
 			if (selectedSensor == null) {
 				if (machine.getSensors() != null && machine.getSensors().size() > 0) {
 					selectedSensor = machine.getSensors().firstKey();
@@ -290,26 +302,34 @@ public class Controller extends HttpServlet {
 		Machine machine = null;
 		String message = null;
 
+		// First, validate serial number; get all machine info if it exists, otherwise
+		// show user's machines
 		if (serialNumber != null) {
 			machine = new Machine();
 			machine.setSerialNumber(serialNumber);
-			machine.refreshAllFromDB();
+			machine.fetchAllFromDB();
 		} else {
 			viewMyMachines(session);
 		}
 
-		if (machine.getInfo() == null) {
-			viewMyMachines(session);
-		} else {
+		// Next, check that there is info returned from DB; if yes, check user auth; if
+		// good, load machine info, otherwise show user's machines
+		if (machine != null && machine.getInfo() != null) {
 			session.setAttribute("machine", machine);
 			session.setAttribute("message", message);
-			session.setAttribute("viewComponent", "machineInfo");
+			if (userIsAuth(session)) {
+				session.setAttribute("viewComponent", "machineInfo");
+			} else {
+				viewMyMachines(session);
+			}
+		} else {
+			viewMyMachines(session);
 		}
 	}
 
 	private void viewMachineInfo(HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
-		if (machine != null && machine.getSerialNumber() != null && machine.getInfo() != null) {
+		if (machine != null && machine.getSerialNumber() != null && machine.getInfo() != null && userIsAuth(session)) {
 			session.setAttribute("viewComponent", "machineInfo");
 		} else {
 			viewMyMachines(session);
@@ -325,7 +345,7 @@ public class Controller extends HttpServlet {
 			String nickname = request.getParameter("nickname");
 			String message = null;
 
-			if (machine != null && machine.getSerialNumber() != null && nickname != null) {
+			if (machine != null && machine.getSerialNumber() != null && userIsAuth(session) && nickname != null) {
 				message = machine.updateNickname(nickname);
 				session.setAttribute("message", message);
 				viewMachineInfo(session);
@@ -343,13 +363,13 @@ public class Controller extends HttpServlet {
 	private void updateGrowSettings(HttpServletRequest request, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 
-		if (machine != null && machine.getSerialNumber() != null) {
+		if (machine != null && machine.getSerialNumber() != null && userIsAuth(session)) {
 			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
 
 			newSettings.put("plant_date", request.getParameter("plant_date"));
 
 			session.setAttribute("message",
-					machine.updateMachineSettings(newSettings, (String) session.getAttribute("lang")));
+					machine.sendMachineSettngs(newSettings, (String) session.getAttribute("lang")));
 			session.setAttribute("viewComponent", "machineSettings");
 		} else {
 			viewMyMachines(session);
@@ -360,7 +380,7 @@ public class Controller extends HttpServlet {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String lang = (String) session.getAttribute("lang");
 
-		if (machine != null && machine.getSerialNumber() != null) {
+		if (machine != null && machine.getSerialNumber() != null && userIsAuth(session)) {
 
 			String[] messages = machine.setWaterInValve(request.getParameter("water_in_valve_on"), lang);
 			String message = messages[1];
@@ -383,7 +403,7 @@ public class Controller extends HttpServlet {
 			newSettings.put("water_cycle_period", String.valueOf(totalWaterCycle));
 			newSettings.put("water_in_valve_on", messages[0]);
 
-			message = message + machine.updateMachineSettings(newSettings, lang);
+			message = message + machine.sendMachineSettngs(newSettings, lang);
 			session.setAttribute("message", message);
 			session.setAttribute("viewComponent", "machineSettings");
 		} else {
@@ -395,7 +415,7 @@ public class Controller extends HttpServlet {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String lang = (String) session.getAttribute("lang");
 
-		if (machine != null && machine.getSerialNumber() != null) {
+		if (machine != null && machine.getSerialNumber() != null && userIsAuth(session)) {
 			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
 
 			String lightColorString = request.getParameter("light_color");
@@ -408,7 +428,7 @@ public class Controller extends HttpServlet {
 			newSettings.put("light_on", request.getParameter("light_on"));
 			newSettings.put("light_color", lightColorName);
 
-			session.setAttribute("message", machine.updateMachineSettings(newSettings, lang));
+			session.setAttribute("message", machine.sendMachineSettngs(newSettings, lang));
 			session.setAttribute("viewComponent", "machineSettings");
 		} else {
 			viewMyMachines(session);
@@ -425,7 +445,8 @@ public class Controller extends HttpServlet {
 		String greenString = request.getParameter("greenValue");
 		String blueString = request.getParameter("blueValue");
 
-		if (machine != null && machine.getLightColors() != null && machine.getLightColors().get(lightColor) != null) {
+		if (machine != null && userIsAuth(session) && machine.getLightColors() != null
+				&& machine.getLightColors().get(lightColor) != null) {
 			int redValue = 0;
 			int greenValue = 0;
 			int blueValue = 0;
@@ -449,7 +470,7 @@ public class Controller extends HttpServlet {
 	private void updateAirSettings(HttpServletRequest request, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 
-		if (machine != null && machine.getSerialNumber() != null) {
+		if (machine != null && userIsAuth(session) && machine.getSerialNumber() != null) {
 			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
 
 			// newSettings.put("heater_on", request.getParameter("heater_on"));
@@ -457,7 +478,7 @@ public class Controller extends HttpServlet {
 			newSettings.put("fan_auto", request.getParameter("fan_auto"));
 			newSettings.put("fan_humidity", request.getParameter("fan_humidity"));
 
-			String message = machine.updateMachineSettings(newSettings, (String) session.getAttribute("lang"));
+			String message = machine.sendMachineSettngs(newSettings, (String) session.getAttribute("lang"));
 			session.setAttribute("message", message);
 			session.setAttribute("viewComponent", "machineSettings");
 		} else {
@@ -468,7 +489,7 @@ public class Controller extends HttpServlet {
 	private void updateCameraSettings(HttpServletRequest request, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 
-		if (machine != null && machine.getSerialNumber() != null) {
+		if (machine != null && userIsAuth(session) && machine.getSerialNumber() != null) {
 			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
 
 			String cameraCyclePeriodHours = request.getParameter("camera_cycle_period_hours");
@@ -480,7 +501,7 @@ public class Controller extends HttpServlet {
 			newSettings.put("camera_cycle_period", String.valueOf(totalCameraCycle));
 
 			session.setAttribute("message",
-					machine.updateMachineSettings(newSettings, (String) session.getAttribute("lang")));
+					machine.sendMachineSettngs(newSettings, (String) session.getAttribute("lang")));
 			session.setAttribute("viewComponent", "machineSettings");
 		} else {
 			viewMyMachines(session);
@@ -490,8 +511,8 @@ public class Controller extends HttpServlet {
 	private void viewCameraPage(HttpServletRequest request, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 
-		if (machine != null && machine.getSerialNumber() != null) {
-			machine.refreshImages();
+		if (machine != null && userIsAuth(session) && machine.getSerialNumber() != null) {
+			machine.fetchImageList();
 			String image = (String) request.getParameter("image");
 
 			if (image == null) {
@@ -515,7 +536,7 @@ public class Controller extends HttpServlet {
 		String message = null;
 		String lang = (String) session.getAttribute("lang");
 
-		if (machine != null) {
+		if (machine != null && userIsAuth(session)) {
 			message = machine.takePicture((String) session.getAttribute("lang"));
 			if (message.equalsIgnoreCase("success")) {
 				message = message + " " + Dictionary.getInstance().get("refreshPrompt", lang);
@@ -532,10 +553,70 @@ public class Controller extends HttpServlet {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String imageId = (String) request.getParameter("imageId");
 
-		if (machine != null && imageId != null) {
+		if (machine != null && userIsAuth(session) && imageId != null) {
 			session.setAttribute("selectedImageId", machine.deleteImage(imageId));
 		}
 		session.setAttribute("viewComponent", "cameraPage");
+	}
+
+	private void searchForUser(HttpServletRequest request, HttpSession session) {
+		// First, get machine and user variables
+		Machine machine = (Machine) session.getAttribute("machine");
+
+		// Make sure user is owner of machine (or just authorized?)
+		if (machine != null && userIsAuth(session)) {
+
+		}
+		// Get user by email
+		String email = (String) request.getParameter("email");
+		String uuid = UserDB.getUUIDByEmail(email.trim());
+		User searchedUser = null;
+		if (uuid != null) {
+			searchedUser = UserDB.getUserByUUID(uuid);
+		} else {
+			session.setAttribute("message", "Cannot find that user");
+		}
+
+		// Return user to session variable
+		session.setAttribute("searchedUser", searchedUser);
+		session.setAttribute("viewComponent", "machineInfo");
+	}
+
+	private void addUser(HttpServletRequest request, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = null;
+
+		if (machine != null && userIsOwner(session)) {
+			String userIdToAdd = request.getParameter("userToAdd");
+			User userToAdd = UserDB.getUserByUUID(userIdToAdd);
+
+			if (userToAdd != null) {
+				message = machine.addAuthorizationByUUID(userIdToAdd);
+			}
+		} else {
+			message = "Must own a machine to add a user";
+		}
+		machine.fetchAuthorizedUsersFromDB();
+		session.setAttribute("message", message);
+		session.setAttribute("viewComponent", "machineInfo");
+	}
+
+	private void removeUser(HttpServletRequest request, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = null;
+		String userIdToRemove = request.getParameter("userToRemove");
+		User owner = (User) session.getAttribute("user");
+
+		if (machine != null && userIsOwner(session) && machine.userIsAuthorized(userIdToRemove)
+				&& !owner.getId().equalsIgnoreCase(userIdToRemove)) {
+			message = machine.removeAuthorizationByUUID(userIdToRemove);
+		} else {
+			message = "To remove a user you must be the owner, and you cannot remove yourself";
+		}
+		machine.fetchAuthorizedUsersFromDB();
+		session.setAttribute("message", message);
+		session.setAttribute("viewComponent", "machineInfo");
+
 	}
 
 	private int getTotalFromHoursMinutes(String hoursString, String minutesString) {
@@ -553,6 +634,18 @@ public class Controller extends HttpServlet {
 			// do nothing
 		}
 		return output;
+	}
+
+	private boolean userIsAuth(HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		User user = (User) session.getAttribute("user");
+		return machine.userIsAuthorized(user);
+	}
+
+	private boolean userIsOwner(HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		User user = (User) session.getAttribute("user");
+		return user.getEmail().equalsIgnoreCase(machine.getInfo().get("owner_email"));
 	}
 
 	/**

@@ -26,7 +26,7 @@ if (userHere.getAuthorizations() != null && userHere.getAuthorizations().size() 
 		<td><%=auth.getMachineSerialNumber()%></td>
 		<td><%=auth.getMachineNickname()%></td>
 		<td class="not-mobile"><%=auth.getOwnerEmail()%></td>
-		<td><form class="sideBySide" action="Controller" method="post">
+		<td><form class="sideBySide" action="Controller" method="get">
 				<input class="button" type="submit"
 					value="${dict.get('select', lang)}" /> <input type="hidden"
 					name="action" value="selectMachine" /> <input type="hidden"

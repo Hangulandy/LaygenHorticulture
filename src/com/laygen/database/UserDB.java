@@ -30,7 +30,7 @@ public class UserDB {
 				put.addColumn(cf, Bytes.toBytes("password"), Bytes.toBytes(user.getPassword()));
 				put.addColumn(cf, Bytes.toBytes("organization"), Bytes.toBytes(user.getOrganization()));
 				table.put(put);
-				
+
 				put = new Put(Bytes.toBytes(user.getEmail()));
 				put.addColumn(cf, Bytes.toBytes("UUID"), Bytes.toBytes(user.getId()));
 				table.put(put);
@@ -46,22 +46,22 @@ public class UserDB {
 		return output;
 	}
 
-	private static boolean emailAvailable(String email) {	
-			TreeSet<Message> messages = MessageDB.getRowById(email);
-			return messages.size() == 0 ? true : false;
+	private static boolean emailAvailable(String email) {
+		TreeSet<Message> messages = MessageDB.getRowById(email);
+		return messages.size() == 0 ? true : false;
 	}
 
 	public static User login(String email, String password) {
 		User user = null;
-		
+
 		// First, get the ID using email
 		String uuid = getUUIDByEmail(email);
-		
+
 		// If a uuid comes back (i.e. email is in the db), get the user data by uuid
 		if (uuid != null) {
 			user = getCompleteUserByUUID(uuid);
 		}
-			
+
 		// if a user object came back, check password
 		if (user != null) {
 			if (password.equalsIgnoreCase(user.getPassword())) {
@@ -73,13 +73,14 @@ public class UserDB {
 		}
 		return user;
 	}
-	
+
 	public static String getUUIDByEmail(String email) {
 		String output = null;
 		TreeSet<Message> messages = MessageDB.getRowById(email);
 		if (messages.size() > 0) {
 			for (Message message : messages) {
-				if (message.getColumnFamily().equalsIgnoreCase("C") && message.getColumnName().equalsIgnoreCase("uuid")) {
+				if (message.getColumnFamily().equalsIgnoreCase("C")
+						&& message.getColumnName().equalsIgnoreCase("uuid")) {
 					output = message.getValue();
 					break;
 				}
@@ -87,7 +88,7 @@ public class UserDB {
 		}
 		return output;
 	}
-	
+
 	public static User getUserByUUID(String uuid) {
 		User user = getCompleteUserByUUID(uuid);
 		if (user != null) {
@@ -95,37 +96,40 @@ public class UserDB {
 		}
 		return user;
 	}
-	
+
 	private static User getCompleteUserByUUID(String uuid) {
 		User user = null;
-		TreeSet<Message> messages = MessageDB.getRowMessagesByColumnFamily(uuid, "C");
-		
-		if (messages.size() > 0) {
-			user = new User();
-			user.setId(uuid);
-			for (Message message : messages) {
-				if (message.getColumnName().equalsIgnoreCase("email")) {
-					user.setEmail(message.getValue());
-				}
-				if (message.getColumnName().equalsIgnoreCase("name")) {
-					user.setName(message.getValue());
-				}
-				if (message.getColumnName().equalsIgnoreCase("username")) {
-					user.setUsername(message.getValue());
-				}
-				if (message.getColumnName().equalsIgnoreCase("organization")) {
-					user.setOrganization(message.getValue());
-				}
-				if (message.getColumnName().equalsIgnoreCase("password")) {
-					user.setPassword(message.getValue());
+
+		if (uuid != null) {
+			TreeSet<Message> messages = MessageDB.getRowMessagesByColumnFamily(uuid, "C");
+
+			if (messages.size() > 0) {
+				user = new User();
+				user.setId(uuid);
+				for (Message message : messages) {
+					if (message.getColumnName().equalsIgnoreCase("email")) {
+						user.setEmail(message.getValue());
+					}
+					if (message.getColumnName().equalsIgnoreCase("name")) {
+						user.setName(message.getValue());
+					}
+					if (message.getColumnName().equalsIgnoreCase("username")) {
+						user.setUsername(message.getValue());
+					}
+					if (message.getColumnName().equalsIgnoreCase("organization")) {
+						user.setOrganization(message.getValue());
+					}
+					if (message.getColumnName().equalsIgnoreCase("password")) {
+						user.setPassword(message.getValue());
+					}
 				}
 			}
 		}
 		return user;
 	}
-	
-	public static TreeSet<Machine> getMachinesForUser(User user){
-		
+
+	public static TreeSet<Machine> getMachinesForUser(User user) {
+
 		return null;
 	}
 

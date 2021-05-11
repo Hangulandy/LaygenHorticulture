@@ -210,6 +210,10 @@ form.custom-color-adjuster {
 	margin: var(--standard-pad);
 }
 
+.clear {
+	clear: left;
+}
+
 .content {
 	border: var(--standard-border) solid var(--dark-text);
 	padding-left: var(--standard-pad);
@@ -227,11 +231,6 @@ form.custom-color-adjuster {
 
 .col-right {
 	width: 43%;
-}
-
-.info-page-tile {
-	margin-right: calc(2 * var(--standard-pad));
-	float: left;
 }
 
 .display-img {
@@ -281,6 +280,12 @@ form.custom-color-adjuster {
 .img-container {
 	float: left;
 	width: calc(calc(var(--content-width) - calc(2 * var(--standard-border))) - calc(var(--selector-width) + calc(3 * var(--standard-pad))));
+}
+
+
+.info-page-tile {
+	margin-right: calc(2 * var(--standard-pad));
+	float: left;
 }
 
 .left {

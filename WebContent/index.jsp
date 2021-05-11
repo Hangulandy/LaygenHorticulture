@@ -40,7 +40,6 @@
 
 	<!-- Display component based on the return from the servlet -->
 	<div class="content block">
-		<h3>${message }</h3>
 
 		<%
 		if (viewComponent != null) {

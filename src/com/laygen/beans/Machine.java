@@ -42,21 +42,37 @@ public class Machine {
 		this.serialNumber = serialNumber;
 	}
 
-	public void refreshAllFromDB() {
-		refreshInfoFromDB();
-		refreshAuthorizationsFromDB();
-		refreshCurrentReadingsFromDB();
-		refreshSettingsFromDB(); // includes refresh light colors
-		refreshSensorsFromDB();
+	public void fetchAllFromDB() {
+		
+		fetchInfoFromDB();
+		if (this.getInfo() == null) {
+			return;
+		}
+		
+		fetchCurrentReadingsFromDB();
+		if (this.getReadings() == null) {
+			return;
+		}
+		
+		fetchSettingsFromDB(); // includes fetch light colors
+		if (this.getSettings() == null) {
+			return;
+		}
+		
+		fetchSensorsFromDB();
+		if (this.getSensors() == null) {
+			return;
+		}
+		
+		fetchAuthorizedUsersFromDB();
+		if (this.getAuthorizedUsers() == null) {
+			return;
+		}
 	}
 
-	public void refreshAuthorizationsFromDB() {
-		this.setAuthorizedUsers(MachineDB.getAuthorizedUsers(this));
-	}
-
-	public void refreshInfoFromDB() {
+	public void fetchInfoFromDB() {
 		setInfo(null);
-		setInfo(MachineDB.getMachineCurrentInfoBySerialNumber(getSerialNumber()));
+		setInfo(MachineDB.fetchMachineInfoBySerialNumber(getSerialNumber()));
 	}
 
 	public Map<String, String> getInfo() {
@@ -67,9 +83,9 @@ public class Machine {
 		this.info = info;
 	}
 
-	public void refreshSettingsFromDB() {
-		setSettings(MachineDB.getCurrentSettingsBySerialNumber(getSerialNumber()));
-		this.refreshLightColorsFromDB();
+	public void fetchSettingsFromDB() {
+		setSettings(MachineDB.fetchCurrentSettingsBySerialNumber(getSerialNumber()));
+		this.fetchLightColorsFromDB();
 	}
 
 	public Map<String, String> getSettings() {
@@ -95,6 +111,10 @@ public class Machine {
 	public void setImageNames(TreeMap<String, String> images) {
 		this.images = images;
 	}
+	
+	public void fetchAuthorizedUsersFromDB() {
+		this.setAuthorizedUsers(MachineDB.fetchAuthorizedUsers(this));
+	}
 
 	public TreeSet<User> getAuthorizedUsers() {
 		return authorizedUsers;
@@ -104,7 +124,7 @@ public class Machine {
 		this.authorizedUsers = authorizedUsers;
 	}
 
-	public String updateMachineSettings(TreeMap<String, String> newSettings, String lang) {
+	public String sendMachineSettngs(TreeMap<String, String> newSettings, String lang) {
 		try {
 			int port = Integer.parseInt(this.getInfo().get("port"));
 			try (Socket socket = new Socket(this.getInfo().get("ip"), port)) {
@@ -114,6 +134,7 @@ public class Machine {
 						msg = String.format("%s#%s", newSettings.get(key), key);
 						out.println(msg);
 						this.getSettings().put(key, newSettings.get(key));
+						System.out.println(msg);
 					}
 					return Dictionary.getInstance().get("success", lang)
 							+ Dictionary.getInstance().get("refreshPrompt", lang);
@@ -147,7 +168,7 @@ public class Machine {
 	public String sendOpenValveMessage(String lang) {
 		String result = null;
 		// check for current value of water level
-		this.refreshCurrentReadingsFromDB();
+		this.fetchCurrentReadingsFromDB();
 		if (this.getReadings().get("water_level1") != null) {
 			String waterLevel = this.getReadings().get("water_level1");
 			try {
@@ -166,8 +187,8 @@ public class Machine {
 		return result;
 	}
 
-	public void refreshCurrentReadingsFromDB() {
-		setReadings(MachineDB.getCurrentReadingsBySerialNumber(getSerialNumber()));
+	public void fetchCurrentReadingsFromDB() {
+		setReadings(MachineDB.fetchCurrentReadingsBySerialNumber(getSerialNumber()));
 	}
 
 	public Map<String, String> getReadings() {
@@ -178,15 +199,15 @@ public class Machine {
 		this.readings = readings;
 	}
 
-	public void refreshImages() {
-		TreeMap<String, String> map = new TreeMap<String, String>(Collections.reverseOrder());
-		Map<String, String> otherMap = MachineDB.getImageNamesForMachine(this.getSerialNumber());
-		for (String key : otherMap.keySet()) {
-			map.put(key, otherMap.get(key));
-		}
-		setImageNames(map);
+	public void fetchImageList() {
+		TreeMap<String, String> outputMap = new TreeMap<String, String>(Collections.reverseOrder());
+		outputMap.putAll(MachineDB.getImageNamesForMachine(this.getSerialNumber()));
+		setImageNames(outputMap);
 	}
 
+	/*
+	 * This is odd-looking because of Base64 encoding
+	 */
 	public String getImage() {
 		if (this.getImageNames().size() > 0) {
 			return image;
@@ -216,7 +237,7 @@ public class Machine {
 		}
 	}
 
-	public void refreshLightColorsFromDB() {
+	public void fetchLightColorsFromDB() {
 		TreeMap<String, String> colors = MachineDB.getLightColors(this);
 		TreeMap<String, String> newColors = MachineDB.getCustomLightColors(this);
 		if (newColors != null) {
@@ -225,14 +246,16 @@ public class Machine {
 		setLightColors(colors);
 	}
 
-	public void refreshSensorsFromDB() {
-		setSensors(MachineDB.getSensorList(this));
+	public void fetchSensorsFromDB() {
+		setSensors(MachineDB.fetchSensorList(this));
 
 		Sensor sensor = null;
-		for (String key : this.getSensors().keySet()) {
-			sensor = this.getSensors().get(key);
-			sensor.fetchUnitsFromDB();
-			sensor.setReadings(null);
+		if (this.getSensors() != null && this.getSensors().keySet() != null) {
+			for (String key : this.getSensors().keySet()) {
+				sensor = this.getSensors().get(key);
+				sensor.fetchUnitsFromDB();
+				sensor.setReadings(null);
+			}			
 		}
 	}
 
@@ -348,5 +371,49 @@ public class Machine {
 		}
 		return output;
 	}
+	
+	public boolean userIsAuthorized(User user) {
+		return this.userIsAuthorized(user.getId());
+	}
+	
+
+	public boolean userIsAuthorized(String userId) {
+		boolean output = false;
+		
+		if (userId != null && this.getAuthorizedUsers() != null && this.getAuthorizedUsers().size() > 0) {
+			for (User authorizedUser : this.getAuthorizedUsers()) {
+				if (authorizedUser.getId().equalsIgnoreCase(userId)) {
+					output = true;
+					break;
+				}
+			}
+		}
+		return output;
+	}
+
+	public String addAuthorizationByUUID(String uuid) {
+		boolean success = MachineDB.addAuthorization(uuid, this);
+		String message = null;
+		
+		if (success) {
+			message = "Success";
+		} else {
+			message = "Failed to add authorization for that user";
+		}
+		return message;
+	}
+
+	public String removeAuthorizationByUUID(String uuid) {
+		boolean success = MachineDB.removeAuthorization(uuid, this);
+		String message = null;
+		
+		if (success) {
+			message = "Success";
+		} else {
+			message = "Failed to remove authorization for that user";
+		}
+		return message;
+	}
+
 
 }

@@ -27,7 +27,7 @@ public class AuthorizationDB {
 			Machine machine = null;
 			for (Authorization item : output) {
 				machine = new Machine();
-				machine.setInfo(MachineDB.getMachineCurrentInfoBySerialNumber(item.getMachineSerialNumber()));
+				machine.setInfo(MachineDB.fetchMachineInfoBySerialNumber(item.getMachineSerialNumber()));
 				item.setMachineNickname(machine.getInfo().get("nickname"));
 				item.setOwnerEmail(machine.getInfo().get("owner_email"));
 			}

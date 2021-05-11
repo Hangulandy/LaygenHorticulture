@@ -15,7 +15,7 @@
 	--header-height: calc(var(--banner-height) + var(--head-height)); 
 	--head-foot-color: grey; 
 	--standard-pad: 10px; 
-	--left-head-width: 250px; 
+	--left-head-width: 255px; 
 	--right-head-width: 350px;
 	--chart-container-width: 335px;
 	--content-width: calc(100vw - calc(var(--left-head-width) + calc(4 * var(--standard-pad))));
@@ -33,6 +33,7 @@
 	margin: 0px;
 }
 
+
 a.shortcut:link {
 	color: var(--dark-text);
 }
@@ -47,6 +48,10 @@ a.footer-link:link{
 
 a.footer-link:visited {
 	color: var(--visited-text);
+}
+
+a.download {
+	text-decoration: none;
 }
 
 h1 {
@@ -88,10 +93,8 @@ table, td, th {
 
 table {
 	margin: var(--standard-pad) 0px;
-	width: 90%;
+	width: 100%;
 }
-
-
 
 td {
 	padding: calc(var(--standard-pad) / 2);
@@ -106,6 +109,28 @@ th {
 
 tr:nth-child(odd) {
 	background-color: #ebf0f9;
+} 
+
+table.transparent, td.transparent, tr.transparent, th.transparent {
+	background-color: var(--light-color);
+	padding: 0px;
+	color: var(--dark-text);
+	border: none;
+	text-align: left;
+	margin: 0px;
+	width: auto;
+}
+
+table.transparent {
+	border-spacing: 0px var(--standard-pad);
+}
+
+td.transparent {
+	min-width: var(--standard-pad);
+}
+
+tr.custom-color-row:nth-child(odd) {
+	background-color: var(--light-color);
 }
 
 form.custom-color-adjuster {
@@ -255,7 +280,7 @@ form.custom-color-adjuster {
 
 .img-container {
 	float: left;
-	width: calc(calc(var(--content-width) - calc(2 * var(--standard-border))) - calc(var(--selector-width) + calc(4 * var(--standard-pad))));
+	width: calc(calc(var(--content-width) - calc(2 * var(--standard-border))) - calc(var(--selector-width) + calc(3 * var(--standard-pad))));
 }
 
 .left {
@@ -336,8 +361,8 @@ form.custom-color-adjuster {
 	clear:both;
 }
 
-#settingsRefreshButton {
-	vertical-align: middle;
+.settingsRefreshButton {
+	margin-bottom: var(--standard-pad);
 }
 
 @media ( max-width : 991px) {
@@ -390,6 +415,13 @@ form.custom-color-adjuster {
 		width: 100%;
 		clear: both;
 	}
+	
+	.info-page-tile {
+		width: 100%;
+		float: left;
+		clear: left;
+	}
+	
 	.left-head, .right-head {
 		width: 100%;
 		clear: left;

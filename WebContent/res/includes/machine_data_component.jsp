@@ -13,7 +13,7 @@
 <%@ page import="java.util.Date"%>
 <%@ page import="java.util.TimeZone"%>
 
-<h1>${dict.get('sensorHeading', lang)}</h1>
+<h1 class="sideBySide">${dict.get('sensorHeading', lang)}</h1>
 <hr>
 <div class="small-space"></div>
 <div id="data-selector">
@@ -90,7 +90,7 @@ SimpleDateFormat parser = new SimpleDateFormat("yyyyMMddHHmmss");
 parser.setTimeZone(TimeZone.getTimeZone("JST"));
 SimpleDateFormat formatter = new SimpleDateFormat("MM-dd HH:mm");
 
-String[] types = {"temperature", "humidity", "co2_ppm", "water_level", "ppdf", "lux", "cds"};
+String[] types = {"temperature", "humidity", "co2_ppm", "water_level", "ppfd", "lux", "cds"};
 
 String dataPoints = null;
 Sensor sensor = null;

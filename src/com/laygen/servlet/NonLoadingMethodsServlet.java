@@ -63,10 +63,15 @@ public class NonLoadingMethodsServlet extends HttpServlet {
 		if (machine != null && machine.getSensors() != null && machine.getSensors().get(sensorString) != null) {
 			Sensor sensor = machine.getSensors().get(sensorString);
 
-			if (sensor.getReadings() != null) {
+			if (sensor.getReadings() != null && sensor.getReadings().size() > 0) {
 
 				TreeSet<Message> readings = sensor.getReadings();
 
+				Message firstMessage = readings.first();
+				String firstRowId = firstMessage.getRowId();
+				Message lastMessage = readings.last();
+				String lastDate = lastMessage.getTime();
+				
 				Workbook workbook = new HSSFWorkbook();
 				Sheet sheet = workbook.createSheet(sensorString);
 
@@ -85,8 +90,12 @@ public class NonLoadingMethodsServlet extends HttpServlet {
 					row.createCell(3).setCellValue(reading.getValue());
 					index++;
 				}
+				
+				String fileName = String.format("%s-%s", firstRowId, lastDate);
 
-				response.setHeader("content-disposition", "attachment; filename=data.csv");
+				response.setHeader("content-disposition", String.format("attachment; filename=%s.csv", fileName));
+
+				// response.setHeader("content-disposition", "attachment; filename=data.csv");
 				response.setHeader("cache-control", "no-cache");
 
 				OutputStream out = response.getOutputStream();

@@ -4,9 +4,11 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import com.laygen.database.MachineDB;
 import com.laygen.database.MessageDB;
 
 public class GetImageTest {
@@ -37,7 +39,17 @@ public class GetImageTest {
 	}
 	
 	public static void main(String[] args) {
-		downloadImageFromHBase("imageTest1", "test1.jpg");
+		
+		String[] sns = {"0123456789"};
+		
+		for (String sn : sns) {
+			
+			Map<String, String> map = MachineDB.getImageNamesForMachine(sn);
+			
+			for (String key : map.keySet()) {
+				downloadImageFromHBase(key, key);			
+			}
+		}
 	}
 	
 	

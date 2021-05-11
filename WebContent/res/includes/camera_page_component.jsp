@@ -4,9 +4,7 @@
 Machine machine = (Machine) session.getAttribute("machine");
 %>
 
-<div>
-	<h1>${dict.get('cameraHeading', lang)}</h1>
-</div>
+<h1 class="sideBySide">${dict.get('cameraHeading', lang)}</h1>
 <hr>
 <div class="small-space"></div>
 
@@ -60,8 +58,10 @@ Machine machine = (Machine) session.getAttribute("machine");
 </div>
 
 <div class="img-container">
-	<%String imageString = machine.getImage();
-if (imageString != null){ %>
+	<%
+	String imageString = machine.getImage();
+	if (imageString != null) {
+	%>
 
 	<img class="display-img" src="data:image/jpg;base64,${machine.image }" />
 	<!-- delete image button will only show if there is still a selected image id session variable -->
@@ -69,20 +69,28 @@ if (imageString != null){ %>
 	if (id != null) {
 	%>
 	<div class="small-space"></div>
-	<form>
+	<form class="sideBySide" action="Controller" method="post">
 		<input class="button-red" type="submit"
 			value="${dict.get('delete', lang)}" /> <input type="hidden"
 			name="action" value="deleteImage" /> <input type="hidden"
-			name="image" value="<%=id%>" />
+			name="imageId" value="<%=id%>" />
 	</form>
+	<a class="download" href="data:image/jpg;base64,${machine.image}"
+		download="<%=id%>">
+		<button id="editButton" class="button sideBySide" type="button">${dict.get('downloadButtonLabel', lang)}</button>
+	</a>
 	<%
 	}
 	%>
 
-	<%} else { %>
+	<%
+	} else {
+	%>
 
 	<h3>${dict.get('noImageMessage', lang) }</h3>
 
-	<%} %>
+	<%
+	}
+	%>
 
 </div>

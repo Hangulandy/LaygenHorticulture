@@ -530,7 +530,7 @@ public class Controller extends HttpServlet {
 
 	private void deleteImageFromMachine(HttpServletRequest request, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
-		String imageId = (String) request.getParameter("image");
+		String imageId = (String) request.getParameter("imageId");
 
 		if (machine != null && imageId != null) {
 			session.setAttribute("selectedImageId", machine.deleteImage(imageId));

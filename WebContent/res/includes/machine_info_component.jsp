@@ -9,7 +9,7 @@
 		name="action" value="selectMachine" /> <input type="hidden"
 		name="selectedMachineId" value="${machine.serialNumber}" />
 </form>
-<h3 class="sideBySide">${message}</h3>
+<h3 class="sideBySide"> ${message}</h3>
 <hr>
 
 <%
@@ -171,7 +171,7 @@ String lang1 = (String) session.getAttribute("lang");
 </script>
 
 <div class="info-page-tile clear">
-	<h3>Authorized Users</h3>
+	<h3>${dict.get('authorizedUsersHeading', lang) }</h3>
 
 	<%
 	if (machine != null && machine.getAuthorizedUsers() != null && machine.getAuthorizedUsers().size() > 0) {
@@ -179,10 +179,10 @@ String lang1 = (String) session.getAttribute("lang");
 
 	<table>
 		<tr>
-			<th class="left">Name</th>
-			<th>Organization</th>
-			<th>Email</th>
-			<th>Revoke</th>
+			<th class="left">${dict.get('nameLabel', lang) }</th>
+			<th>${dict.get('organizationLabel', lang) }</th>
+			<th>${dict.get('emailLabel', lang) }</th>
+			<th>${dict.get('revokeLabel', lang) }</th>
 		</tr>
 
 		<%
@@ -194,7 +194,7 @@ String lang1 = (String) session.getAttribute("lang");
 			<td class="left"><%=authUser.getEmail()%></td>
 			<td>
 				<form class="sideBySide" action="Controller" method="get">
-					<input class="button" type="submit" value="Revoke" /> <input
+					<input class="button" type="submit" value="${dict.get('revokeLabel', lang) }" /> <input
 						type="hidden" name="action" value="removeUser" /> <input
 						type="hidden" name="userToRemove" value="<%=authUser.getId()%>" />
 				</form>
@@ -216,9 +216,9 @@ String lang1 = (String) session.getAttribute("lang");
 <div class="info-page-tile">
 	<h3>Search Users</h3>
 	<form action="Controller" method="get">
-		<input type="text" name="email" placeholder="other user email"
+		<input type="text" name="email" placeholder="${dict.get('emailPlaceholder', lang) }"
 			required /> <input type="hidden" name="action" value="searchForUser">
-		<input class="button" type="submit" value="Search" />
+		<input class="button" type="submit" value="${dict.get('searchLabel', lang) }" />
 	</form>
 </div>
 
@@ -229,14 +229,14 @@ String lang1 = (String) session.getAttribute("lang");
 	User searchedUser = (User) session.getAttribute("searchedUser");
 	if (searchedUser != null) {
 	%>
-	<h3>Add User</h3>
+	<h3>${dict.get('addUserHeading', lang) }</h3>
 
 	<table>
 		<tr>
-			<th class="left">Name</th>
-			<th>Organization</th>
-			<th>Email</th>
-			<th>Add</th>
+			<th class="left">${dict.get('nameLabel', lang) }</th>
+			<th>${dict.get('organizationLabel', lang) }</th>
+			<th>${dict.get('emailLabel', lang) }</th>
+			<th>${dict.get('addLabel', lang) }</th>
 		</tr>
 		<tr>
 			<td class="left"><%=searchedUser.getName()%></td>
@@ -244,7 +244,6 @@ String lang1 = (String) session.getAttribute("lang");
 			<td class="left"><%=searchedUser.getEmail()%></td>
 			<td>
 				<%
-				// What are the conditions to show the add button?
 				User user1 = (User) session.getAttribute("user");
 				if (user1 != null && user1.getEmail() != null && machine != null && machine.getInfo() != null
 						&& machine.getInfo().get("owner_email") != null
@@ -253,7 +252,7 @@ String lang1 = (String) session.getAttribute("lang");
 						&& machine.getAuthorizedUsers() != null && !machine.getAuthorizedUsers().contains(searchedUser)) {
 				%>
 				<form class="sideBySide" action="Controller" method="get">
-					<input class="button" type="submit" value="Add" /> <input
+					<input class="button" type="submit" value="${dict.get('addLabel', lang) }" /> <input
 						type="hidden" name="action" value="addUser" /> <input
 						type="hidden" name="userToAdd" value="<%=searchedUser.getId()%>" />
 				</form> <% } %>

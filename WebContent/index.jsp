@@ -66,6 +66,11 @@
 		<%if (viewComponent.equalsIgnoreCase("cameraPage")) { %>
 		<%@include file="./res/includes/camera_page_component.jsp"%>
 		<%}%>
+		
+		<%if (viewComponent.equalsIgnoreCase("registerMachine")) { %>
+		<%@include file="./res/includes/register_machine.jsp"%>
+		<%}%>		
+		
 		<%
 		} else {
 		%>

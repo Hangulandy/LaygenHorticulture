@@ -43,27 +43,27 @@ public class Machine {
 	}
 
 	public void fetchAllFromDB() {
-		
+
 		fetchInfoFromDB();
 		if (this.getInfo() == null) {
 			return;
 		}
-		
+
 		fetchCurrentReadingsFromDB();
 		if (this.getReadings() == null) {
 			return;
 		}
-		
+
 		fetchSettingsFromDB(); // includes fetch light colors
 		if (this.getSettings() == null) {
 			return;
 		}
-		
+
 		fetchSensorsFromDB();
 		if (this.getSensors() == null) {
 			return;
 		}
-		
+
 		fetchAuthorizedUsersFromDB();
 		if (this.getAuthorizedUsers() == null) {
 			return;
@@ -111,7 +111,7 @@ public class Machine {
 	public void setImageNames(TreeMap<String, String> images) {
 		this.images = images;
 	}
-	
+
 	public void fetchAuthorizedUsersFromDB() {
 		this.setAuthorizedUsers(MachineDB.fetchAuthorizedUsers(this));
 	}
@@ -145,11 +145,11 @@ public class Machine {
 		}
 	}
 
-	public String takePicture(String lang) {
-		return sendCommandToMachine("1#flash_on", lang);
+	public String takePicture() {
+		return sendCommandToMachine("1#flash_on");
 	}
 
-	public String sendCommandToMachine(String msg, String lang) {
+	public String sendCommandToMachine(String msg) {
 		try {
 			int port = Integer.parseInt(this.getInfo().get("port"));
 			try (Socket socket = new Socket(this.getInfo().get("ip"), port)) {
@@ -157,16 +157,15 @@ public class Machine {
 					out.println(msg);
 					System.out.println("Sent message to machine : " + msg);
 				}
-				return Dictionary.getInstance().get("success", lang)
-						+ Dictionary.getInstance().get("refreshPrompt", lang);
+				return "successAndRefreshPrompt";
 			}
 		} catch (Exception e) {
-			return Dictionary.getInstance().get("commError", lang);
+			return "commError";
 		}
 	}
 
-	public String sendOpenValveMessage(String lang) {
-		String result = null;
+	public String sendOpenValveMessage() {
+		String result = "null";
 		// check for current value of water level
 		this.fetchCurrentReadingsFromDB();
 		if (this.getReadings().get("water_level1") != null) {
@@ -174,15 +173,15 @@ public class Machine {
 			try {
 				int wl = Integer.parseInt(waterLevel);
 				if (wl <= 4) {
-					result = this.sendCommandToMachine("1#water_in_valve_on", lang);
+					result = this.sendCommandToMachine("1#water_in_valve_on");
 				} else {
-					result = Dictionary.getInstance().get("waterLevelHighMessage", lang);
+					result = "waterLevelHighMessage";
 				}
 			} catch (Exception e) {
-				result = Dictionary.getInstance().get("invalidValueMessage", lang);
+				result = "invalidValueMessage";
 			}
 		} else {
-			result = Dictionary.getInstance().get("invalidValueMessage", lang);
+			result = "invalidValueMessage";
 		}
 		return result;
 	}
@@ -201,7 +200,7 @@ public class Machine {
 
 	public void fetchImageList() {
 		TreeMap<String, String> outputMap = new TreeMap<String, String>(Collections.reverseOrder());
-		outputMap.putAll(MachineDB.getImageNamesForMachine(this.getSerialNumber()));
+		outputMap.putAll(MachineDB.fetchImageNamesForMachine(this.getSerialNumber()));
 		setImageNames(outputMap);
 	}
 
@@ -238,8 +237,8 @@ public class Machine {
 	}
 
 	public void fetchLightColorsFromDB() {
-		TreeMap<String, String> colors = MachineDB.getLightColors(this);
-		TreeMap<String, String> newColors = MachineDB.getCustomLightColors(this);
+		TreeMap<String, String> colors = MachineDB.fetchLightColors(this);
+		TreeMap<String, String> newColors = MachineDB.fetchCustomLightColors(this);
 		if (newColors != null) {
 			colors.putAll(newColors);
 		}
@@ -255,7 +254,7 @@ public class Machine {
 				sensor = this.getSensors().get(key);
 				sensor.fetchUnitsFromDB();
 				sensor.setReadings(null);
-			}			
+			}
 		}
 	}
 
@@ -285,7 +284,7 @@ public class Machine {
 	}
 
 	public String updateNickname(String nickname) {
-		String output = null;
+		String output = "null";
 		this.getInfo().put("nickname", nickname);
 		output = MachineDB.putNickname(this);
 		return output;
@@ -348,7 +347,7 @@ public class Machine {
 
 		String[] output = new String[2];
 		output[0] = "0";
-		output[1] = ""; // when no message is necessary
+		output[1] = "null"; // when no message is necessary
 
 		if (value.equalsIgnoreCase("0")) {
 			// initialized values are ok
@@ -362,24 +361,27 @@ public class Machine {
 					output[0] = "1"; // message is still ok, but need to change value
 				} else {
 					// value is still ok, but need to change message
-					output[1] = Dictionary.getInstance().get("waterLevelHighMessage", lang);
+					output[1] = "waterLevelHighMessage";
 				}
 			} catch (Exception e) {
 				// number was invalid, so we need to return that message
-				output[1] = Dictionary.getInstance().get("invalidValueMessage", lang);
+				output[1] = "invalidValueMessage";
 			}
 		}
 		return output;
 	}
-	
+
 	public boolean userIsAuthorized(User user) {
-		return this.userIsAuthorized(user.getId());
+		boolean isAuth = false;
+		if (user != null && user.getId() != null) {
+			isAuth = this.userIsAuthorized(user.getId());
+		}
+		return isAuth;
 	}
-	
 
 	public boolean userIsAuthorized(String userId) {
 		boolean output = false;
-		
+
 		if (userId != null && this.getAuthorizedUsers() != null && this.getAuthorizedUsers().size() > 0) {
 			for (User authorizedUser : this.getAuthorizedUsers()) {
 				if (authorizedUser.getId().equalsIgnoreCase(userId)) {
@@ -394,11 +396,11 @@ public class Machine {
 	public String addAuthorizationByUUID(String uuid) {
 		boolean success = MachineDB.addAuthorization(uuid, this);
 		String message = null;
-		
+
 		if (success) {
-			message = "Success";
+			message = "addAuthSuccessMessage";
 		} else {
-			message = "Failed to add authorization for that user";
+			message = "addAuthFailedMessage";
 		}
 		return message;
 	}
@@ -406,14 +408,36 @@ public class Machine {
 	public String removeAuthorizationByUUID(String uuid) {
 		boolean success = MachineDB.removeAuthorization(uuid, this);
 		String message = null;
-		
+
 		if (success) {
-			message = "Success";
+			message = "removeAuthSuccessMessage";
 		} else {
-			message = "Failed to remove authorization for that user";
+			message = "removeAuthFailedMessage";
 		}
 		return message;
 	}
 
+	public String transferOwnership(String newOwnerId) {
+		String message = "null";
+
+		// Check that new owner is already authorized
+		if (this.userIsAuthorized(newOwnerId)) {
+			// if so, can change
+			message = MachineDB.changeOwner(this, newOwnerId);
+			this.fetchInfoFromDB();
+			this.fetchAuthorizedUsersFromDB();
+		} else {
+			// otherwise, cannot
+			message = "userMustBeAuthorizedToTransferOwnership";
+		}
+		return message;
+	}
+
+	public String getOwnerEmail() {
+		if (this.getInfo() != null) {
+			return this.getInfo().get("owner_email");
+		}
+		return null;
+	}
 
 }

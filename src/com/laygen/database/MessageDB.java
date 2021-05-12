@@ -196,7 +196,7 @@ public class MessageDB {
 	}
 
 	public static String backupDB() {
-		String message = null;
+		String message = "null";
 		
 		Connection conn = DBConnection.getInstance().getConnection();
 		
@@ -211,10 +211,10 @@ public class MessageDB {
 			String snapshotName = String.format("%s-snapshot-%s", tableString, dateString);
 			admin.snapshot(snapshotName, tableName);
 			
-			message = "Success!";
+			message = "success";
 		} catch (Exception e) {
 			e.printStackTrace();
-			message = "Failed to create snapshot";
+			message = "failed";
 		}
 		return message;
 	}

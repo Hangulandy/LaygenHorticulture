@@ -1,7 +1,7 @@
 <h1>${dict.get('joinHeading', lang)}</h1>
 <hr>
 <h3>${dict.get('joinPrompt', lang)}</h3>
-<h3>${message}</h3>
+<h3>${dict.get(message, lang)}</h3>
 <form action="Controller" method="post">
 	<table class="transparent">
 		<tr class="transparent">

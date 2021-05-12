@@ -4,7 +4,7 @@
 Machine machine = (Machine) session.getAttribute("machine");
 %>
 
-<h1 class="sideBySide">${dict.get('cameraHeading', lang)}</h1>
+<h1 class="sideBySide">${dict.get('cameraHeading', lang)}</h1><h3 class="sideBySide">${dict.get(message, lang) }</h3>
 <hr>
 <div class="small-space"></div>
 

@@ -2,10 +2,10 @@
 	pageEncoding="UTF-8"%>
 
 
-<% String popup = (String) session.getAttribute("popup");
-if (popup != null){%>
+<% String popupMessage = (String) session.getAttribute("popupMessage");
+if (popupMessage != null && !popupMessage.equalsIgnoreCase("null")){%>
 <script type="text/javascript">
-confirm("${popup}");
+confirm("${dict.get(popupMessage, lang)}");
 
 </script>
 <%} %>

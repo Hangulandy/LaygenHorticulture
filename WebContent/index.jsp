@@ -40,7 +40,6 @@
 
 	<!-- Display component based on the return from the servlet -->
 	<div class="content block">
-		<h3>${message }</h3>
 
 		<%
 		if (viewComponent != null) {
@@ -67,6 +66,11 @@
 		<%if (viewComponent.equalsIgnoreCase("cameraPage")) { %>
 		<%@include file="./res/includes/camera_page_component.jsp"%>
 		<%}%>
+		
+		<%if (viewComponent.equalsIgnoreCase("registerMachine")) { %>
+		<%@include file="./res/includes/register_machine.jsp"%>
+		<%}%>		
+		
 		<%
 		} else {
 		%>

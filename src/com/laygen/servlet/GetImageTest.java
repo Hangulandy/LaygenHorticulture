@@ -44,7 +44,7 @@ public class GetImageTest {
 		
 		for (String sn : sns) {
 			
-			Map<String, String> map = MachineDB.getImageNamesForMachine(sn);
+			Map<String, String> map = MachineDB.fetchImageNamesForMachine(sn);
 			
 			for (String key : map.keySet()) {
 				downloadImageFromHBase(key, key);			

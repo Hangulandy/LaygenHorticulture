@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.laygen.database.AuthorizationDB;
 import com.laygen.database.Dictionary;
+import com.laygen.database.UserDB;
 
 public class User implements Serializable, Comparable<User> {
 
@@ -20,11 +21,10 @@ public class User implements Serializable, Comparable<User> {
 	private String username;
 	private String organization;
 	private String password;
-	private String errorMsg;
 	private boolean loggedIn;
 	private TreeSet<Authorization> authorizations;
 	public final static int MAX_NAME_LEN = 40;
-	
+
 	public User(String email, String name, String userName, String organization) {
 		this.id = UUID.randomUUID().toString();
 		this.email = email;
@@ -32,7 +32,6 @@ public class User implements Serializable, Comparable<User> {
 		this.username = userName;
 		this.organization = organization;
 		this.password = null;
-		this.errorMsg = "";
 		setLoggedIn(false);
 	}
 
@@ -43,7 +42,6 @@ public class User implements Serializable, Comparable<User> {
 		this.username = null;
 		this.organization = null;
 		this.password = null;
-		this.errorMsg = "";
 		this.loggedIn = false;
 	}
 
@@ -128,51 +126,49 @@ public class User implements Serializable, Comparable<User> {
 	}
 
 	public String getErrorMsg() {
-		StringBuilder sb = new StringBuilder("");
 
 		if (getEmail().trim().length() == 0) {
-			sb.append("Email address is not valid. ");
+			return "emailNotValidMessage";
 		}
 
 		if (getName().trim().length() == 0) {
-			sb.append("Name must be at least one character in length. ");
+			return "nameTooShortMessage";
 		}
 
 		if (getName().trim().length() > MAX_NAME_LEN) {
-			sb.append(String.format("Name can be no more than %d characters long.", MAX_NAME_LEN));
+			return "nameTooLongMessage";
 		}
 
 		if (getUsername().trim().length() == 0) {
-			sb.append("Username must be at least one character in length. ");
+			return "usernameTooShortMessage";
 		}
 
 		if (getUsername().trim().length() > MAX_NAME_LEN) {
-			sb.append(String.format("Username can only be no more than %d characters long.", MAX_NAME_LEN));
+			return "usernameTooLongMessage";
 		}
 
 		if (getPassword() == null) {
-			sb.append("Passwords do not match. ");
+			return "passwordsDoNoMatchMessage";
 		} else {
 			if (getPassword().length() < 8 || getPassword().length() > 20) {
-				sb.append("Password must be between 8 and 20 characters in length. ");
+				return "passwordWrongLengthMessage";
 			}
 		}
-		errorMsg = sb.toString();
-		return errorMsg;
+		return null;
 	}
 
 	@Override
 	public int compareTo(User other) {
 		return this.getEmail().compareTo(other.getEmail());
 	}
-	
+
 	public String getUserMsg(String lang) {
 		if (this.isLoggedIn()) {
 			return String.format("%s, %s", Dictionary.getInstance().get("hello", lang), getName());
 		}
 		return Dictionary.getInstance().get("notLoggedIn", lang);
 	}
-	
+
 	public void printUser() {
 		System.out.println(this.toString());
 		System.out.println("UUID on file : " + this.id);
@@ -182,7 +178,7 @@ public class User implements Serializable, Comparable<User> {
 		System.out.println("Password on file : " + this.password);
 	}
 
-	public void refreshAuthorizations() {
+	public void fetchAuthorizations() {
 		this.setAuthorizations(AuthorizationDB.getUserAuthorizations(this));
 	}
 
@@ -192,6 +188,12 @@ public class User implements Serializable, Comparable<User> {
 
 	public void setAuthorizations(TreeSet<Authorization> authorizations) {
 		this.authorizations = authorizations;
+	}
+
+	public String registerMachine(String serialNumber, String registrationKey) {
+		String message = this.getId() != null ? UserDB.registerMachine(this, serialNumber, registrationKey) : "failure";
+		this.fetchAuthorizations();
+		return message;
 	}
 
 }

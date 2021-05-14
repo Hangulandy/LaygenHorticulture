@@ -30,7 +30,7 @@ if (machine != null) {
 
 <div class="right-head">
 	<p>${dict.get('selectedMachineLabel', lang)}
-		: ${ machine.serialNumber}
+		: ${ machine.info.get('nickname')}
 	</p>
 	<form class="sideBySide" action="Controller" method="post">
 		<input class="button-white" type="submit"

@@ -8,6 +8,7 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import com.laygen.beans.Authorization;
 import com.laygen.beans.Machine;
 import com.laygen.beans.Message;
 import com.laygen.beans.User;
@@ -15,9 +16,7 @@ import com.laygen.beans.User;
 public class UserDB {
 
 	public static String insert(User user) {
-		// output should be the message that will be passed to the view saying if the
-		// insert was successful or not and why
-		String output = "Unable to set up an account for that email address at this time. ";
+		String message = "cannotCreateAccountMessage";
 
 		if (emailAvailable(user.getEmail())) {
 			Connection conn = DBConnection.getInstance().getConnection();
@@ -30,38 +29,37 @@ public class UserDB {
 				put.addColumn(cf, Bytes.toBytes("password"), Bytes.toBytes(user.getPassword()));
 				put.addColumn(cf, Bytes.toBytes("organization"), Bytes.toBytes(user.getOrganization()));
 				table.put(put);
-				
+
 				put = new Put(Bytes.toBytes(user.getEmail()));
 				put.addColumn(cf, Bytes.toBytes("UUID"), Bytes.toBytes(user.getId()));
 				table.put(put);
 
-				output = String.format("User with email address %s successfully inserted into database.",
-						user.getEmail());
+				message = "userAccountCreated";
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		} else {
-			output = "Email is NOT available. " + output;
+			message = "emailNotAvailableMessage";
 		}
-		return output;
+		return message;
 	}
 
-	private static boolean emailAvailable(String email) {	
-			TreeSet<Message> messages = MessageDB.getRowById(email);
-			return messages.size() == 0 ? true : false;
+	private static boolean emailAvailable(String email) {
+		TreeSet<Message> messages = MessageDB.getRowById(email);
+		return messages.size() == 0 ? true : false;
 	}
 
 	public static User login(String email, String password) {
 		User user = null;
-		
+
 		// First, get the ID using email
-		String uuid = getUUIDByEmail(email);
-		
+		String uuid = fetchUUIDByEmail(email);
+
 		// If a uuid comes back (i.e. email is in the db), get the user data by uuid
 		if (uuid != null) {
-			user = getCompleteUserByUUID(uuid);
+			user = fetchCompleteUserByUUID(uuid);
 		}
-			
+
 		// if a user object came back, check password
 		if (user != null) {
 			if (password.equalsIgnoreCase(user.getPassword())) {
@@ -73,13 +71,14 @@ public class UserDB {
 		}
 		return user;
 	}
-	
-	public static String getUUIDByEmail(String email) {
+
+	public static String fetchUUIDByEmail(String email) {
 		String output = null;
 		TreeSet<Message> messages = MessageDB.getRowById(email);
 		if (messages.size() > 0) {
 			for (Message message : messages) {
-				if (message.getColumnFamily().equalsIgnoreCase("C") && message.getColumnName().equalsIgnoreCase("uuid")) {
+				if (message.getColumnFamily().equalsIgnoreCase("C")
+						&& message.getColumnName().equalsIgnoreCase("uuid")) {
 					output = message.getValue();
 					break;
 				}
@@ -87,46 +86,65 @@ public class UserDB {
 		}
 		return output;
 	}
-	
-	public static User getUserByUUID(String uuid) {
-		User user = getCompleteUserByUUID(uuid);
+
+	public static User fetchUserByUUID(String uuid) {
+		User user = fetchCompleteUserByUUID(uuid);
 		if (user != null) {
 			user.setPassword(null);
 		}
 		return user;
 	}
-	
-	private static User getCompleteUserByUUID(String uuid) {
+
+	private static User fetchCompleteUserByUUID(String uuid) {
 		User user = null;
-		TreeSet<Message> messages = MessageDB.getRowMessagesByColumnFamily(uuid, "C");
-		
-		if (messages.size() > 0) {
-			user = new User();
-			user.setId(uuid);
-			for (Message message : messages) {
-				if (message.getColumnName().equalsIgnoreCase("email")) {
-					user.setEmail(message.getValue());
-				}
-				if (message.getColumnName().equalsIgnoreCase("name")) {
-					user.setName(message.getValue());
-				}
-				if (message.getColumnName().equalsIgnoreCase("username")) {
-					user.setUsername(message.getValue());
-				}
-				if (message.getColumnName().equalsIgnoreCase("organization")) {
-					user.setOrganization(message.getValue());
-				}
-				if (message.getColumnName().equalsIgnoreCase("password")) {
-					user.setPassword(message.getValue());
+
+		if (uuid != null) {
+			TreeSet<Message> messages = MessageDB.getRowMessagesByColumnFamily(uuid, "C");
+
+			if (messages.size() > 0) {
+				user = new User();
+				user.setId(uuid);
+				for (Message message : messages) {
+					if (message.getColumnName().equalsIgnoreCase("email")) {
+						user.setEmail(message.getValue());
+					}
+					if (message.getColumnName().equalsIgnoreCase("name")) {
+						user.setName(message.getValue());
+					}
+					if (message.getColumnName().equalsIgnoreCase("username")) {
+						user.setUsername(message.getValue());
+					}
+					if (message.getColumnName().equalsIgnoreCase("organization")) {
+						user.setOrganization(message.getValue());
+					}
+					if (message.getColumnName().equalsIgnoreCase("password")) {
+						user.setPassword(message.getValue());
+					}
 				}
 			}
 		}
 		return user;
 	}
-	
-	public static TreeSet<Machine> getMachinesForUser(User user){
-		
-		return null;
+
+	public static TreeSet<Authorization> fetchAuthorizationsForUser(User user) {
+		return AuthorizationDB.getUserAuthorizations(user);
+	}
+
+	public static String registerMachine(User user, String serialNumber, String registrationKey) {
+		// TODO Auto-generated method stub
+		String message = "null";
+
+		Machine machine = new Machine();
+		machine.setSerialNumber(serialNumber);
+		machine.fetchInfoFromDB();
+
+		if (machine.getInfo() != null && machine.getInfo().get("registration_key") != null
+				&& machine.getInfo().get("registration_key").equalsIgnoreCase(registrationKey)) {
+			message = MachineDB.changeOwner(machine, user.getId());
+		} else {
+			message = "invalidMachineMessage";
+		}
+		return message;
 	}
 
 }

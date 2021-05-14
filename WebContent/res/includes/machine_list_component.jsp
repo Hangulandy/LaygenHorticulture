@@ -3,11 +3,13 @@
 <%@ page
 	import="com.laygen.beans.Authorization, com.laygen.beans.User, java.util.TreeSet"%>
 
+<h1 class="sideBySide">${dict.get('machineListHeading', lang)}:</h1><h3 class="sideBySide">${dict.get(message, lang)}</h3>
+<hr>
 
 <%
 User userHere = (User) session.getAttribute("user");
 if (userHere.getAuthorizations() != null && userHere.getAuthorizations().size() > 0) {%>
-<h1>${dict.get('machineListHeading', lang)}:</h1>
+
 <table>
 	<tr>
 		<th>${dict.get('serialNumberLabel', lang)}</th>
@@ -26,7 +28,7 @@ if (userHere.getAuthorizations() != null && userHere.getAuthorizations().size() 
 		<td><%=auth.getMachineSerialNumber()%></td>
 		<td><%=auth.getMachineNickname()%></td>
 		<td class="not-mobile"><%=auth.getOwnerEmail()%></td>
-		<td><form class="sideBySide" action="Controller" method="post">
+		<td><form class="sideBySide" action="Controller" method="get">
 				<input class="button" type="submit"
 					value="${dict.get('select', lang)}" /> <input type="hidden"
 					name="action" value="selectMachine" /> <input type="hidden"
@@ -36,5 +38,12 @@ if (userHere.getAuthorizations() != null && userHere.getAuthorizations().size() 
 	<%}}%>
 </table>
 <%} else {%>
-<p>No machines found for that user.</p>
+<h3>${dict.get('noAuthorizedMachines', lang)}</h3>
 <%}%>
+
+<h3 class="sideBySide">Register a new machine :</h3>
+<form class="sideBySide" action="Controller" method="get">
+	<input class="button" type="submit"
+		value="${dict.get('registerLabel', lang)}" /> <input type="hidden"
+		name="action" value="redirectToRegister" />
+</form>

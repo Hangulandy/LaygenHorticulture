@@ -16,22 +16,22 @@ public class MachineDB {
 
 	static Charset enc = StandardCharsets.UTF_8;
 
-	public static HashMap<String, String> getMachineCurrentInfoBySerialNumber(String serialNumber) {
-		return getGroupBySerialNumber(serialNumber, "C");
+	public static HashMap<String, String> fetchMachineInfoBySerialNumber(String serialNumber) {
+		return fetchGroupBySerialNumber(serialNumber, "C");
 	}
 
-	public static HashMap<String, String> getCurrentSettingsBySerialNumber(String serialNumber) {
-		return getGroupBySerialNumber(serialNumber, "S");
+	public static HashMap<String, String> fetchCurrentSettingsBySerialNumber(String serialNumber) {
+		return fetchGroupBySerialNumber(serialNumber, "S");
 	}
 
-	public static HashMap<String, String> getCurrentReadingsBySerialNumber(String serialNumber) {
-		return getGroupBySerialNumber(serialNumber, "R");
+	public static HashMap<String, String> fetchCurrentReadingsBySerialNumber(String serialNumber) {
+		return fetchGroupBySerialNumber(serialNumber, "R");
 	}
 
-	public static HashMap<String, String> getGroupBySerialNumber(String serialNumber, String group) {
+	public static HashMap<String, String> fetchGroupBySerialNumber(String serialNumber, String group) {
 		HashMap<String, String> map = null;
 		TreeSet<Message> messages = MessageDB.getRowMessagesByColumnFamily(serialNumber, group);
-		if (messages != null) {
+		if (messages != null && messages.size() > 0) {
 			map = new HashMap<String, String>();
 			for (Message message : messages) {
 				String value = message.getValue().equalsIgnoreCase("") ? "0" : message.getValue();
@@ -41,11 +41,11 @@ public class MachineDB {
 		return map;
 	}
 
-	public static TreeSet<Message> getReadingsForMachine(String serialNumber) {
+	public static TreeSet<Message> fetchReadingsForMachine(String serialNumber) {
 		return MessageDB.scanColumnFamilyWithRowPrefix("R", null, serialNumber);
 	}
 
-	public static Map<String, String> getImageNamesForMachine(String serialNumber) {
+	public static Map<String, String> fetchImageNamesForMachine(String serialNumber) {
 		TreeSet<Message> messages = MessageDB.scanColumnFamilyWithRowPrefix("I", "name", serialNumber + "-I-");
 		HashMap<String, String> images = new HashMap<String, String>();
 
@@ -64,7 +64,7 @@ public class MachineDB {
 		MessageDB.deleteValue(imageId, "I", "data");
 	}
 
-	public static TreeMap<String, Sensor> getSensorList(Machine machine) {
+	public static TreeMap<String, Sensor> fetchSensorList(Machine machine) {
 		TreeMap<String, Sensor> sensors = null;
 
 		if (machine.getInfo() != null && machine.getInfo().get("model_name") != null) {
@@ -83,9 +83,8 @@ public class MachineDB {
 		}
 		return sensors;
 	}
-	
 
-	public static TreeMap<String, String> getLightColors(Machine machine) {
+	public static TreeMap<String, String> fetchLightColors(Machine machine) {
 		TreeMap<String, String> lightColors = null;
 
 		if (machine.getInfo() != null && machine.getInfo().get("model_name") != null) {
@@ -100,13 +99,12 @@ public class MachineDB {
 		}
 		return lightColors;
 	}
-	
-	public static TreeMap<String, String> getCustomLightColors(Machine machine){
+
+	public static TreeMap<String, String> fetchCustomLightColors(Machine machine) {
 		TreeMap<String, String> lightColors = null;
 
 		if (machine.getSerialNumber() != null) {
-			TreeSet<Message> messages = MessageDB
-					.getRowMessagesByColumnFamily(machine.getSerialNumber() + "-L", "C");
+			TreeSet<Message> messages = MessageDB.getRowMessagesByColumnFamily(machine.getSerialNumber() + "-L", "C");
 			if (messages.size() > 0) {
 				lightColors = new TreeMap<String, String>();
 				for (Message message : messages) {
@@ -118,28 +116,113 @@ public class MachineDB {
 	}
 
 	public static String putNickname(Machine machine) {
-		String output = null;
+		String output = "null";
 		String cq = "nickname";
 
 		boolean success = MessageDB.simplePut(machine.getSerialNumber(), "C", cq, machine.getInfo().get(cq));
-
 		if (!success) {
-			output = Dictionary.getInstance().get("unableToUpdate");
+			output = "unableToUpdate";
 		} else {
-			output = Dictionary.getInstance().get("updated");
+			output = "updated";
 		}
-
 		return output;
 	}
 
-	public static TreeSet<User> getAuthorizedUsers(Machine machine) {
-		// TODO Auto-generated method stub
-		
-		// TreeSet<User> users = null;
-		
-		// TreeSet<Message> messages = MessageDB.scanColumnFamilyWithRowPrefix("C", "uuid", machine.getSerialNumber() + "-U");
-		
-		return null;
+	public static TreeSet<User> fetchAuthorizedUsers(Machine machine) {
+		TreeSet<User> users = new TreeSet<User>();
+		TreeSet<Message> messages = MessageDB.scanColumnFamilyWithRowPrefix("C", "uuid",
+				machine.getSerialNumber() + "-U");
+
+		User user = null;
+		for (Message message : messages) {
+			user = UserDB.fetchUserByUUID(message.getValue());
+			if (user != null) {
+				users.add(user);
+			}
+		}
+		return users;
+	}
+
+	public static boolean addAuthorization(String uuid, Machine machine) {
+		boolean success = false;
+		String rowId = String.format("%s-U-%s", machine.getSerialNumber(), uuid);
+		String cf = "C";
+		String cq = "uuid";
+
+		success = MessageDB.simplePut(rowId, cf, cq, uuid);
+		if (success) {
+			rowId = String.format("%s-U-%s", uuid, machine.getSerialNumber());
+			cq = "sn";
+			success = MessageDB.simplePut(rowId, cf, cq, machine.getSerialNumber());
+		}
+		return success;
+	}
+
+	public static boolean removeAuthorization(String uuid, Machine machine) {
+		boolean success = false;
+		String rowId = String.format("%s-U-%s", machine.getSerialNumber(), uuid);
+		String cf = "C";
+		String cq = "uuid";
+
+		success = MessageDB.deleteValue(rowId, cf, cq);
+		if (success) {
+			rowId = String.format("%s-U-%s", uuid, machine.getSerialNumber());
+			cq = "sn";
+			success = MessageDB.deleteValue(rowId, cf, cq);
+		}
+		return success;
+	}
+
+	public static String changeOwner(Machine machine, String newOwnerId) {
+		String message = "null";
+
+		// First, fetch the user
+		User newOwner = UserDB.fetchUserByUUID(newOwnerId);
+		if (newOwner != null) {
+			// If it is a valid user...
+			try {
+				// attempt to change the owner email on the machine
+				String rowId = machine.getSerialNumber();
+				String cf = "C";
+				String cq = "owner_email";
+				String value = newOwner.getEmail();
+				boolean success = MessageDB.simplePut(rowId, cf, cq, value);
+				
+				cq = "registration_key";
+				MessageDB.deleteValue(rowId, cf, cq);
+				
+				rowId = String.format("%s-U-%s", machine.getSerialNumber(), newOwner.getId());
+				cq = "uuid";
+				value = newOwner.getId();
+				MessageDB.simplePut(rowId, cf, cq, value);
+				
+				rowId = String.format("%s-U-%s", newOwner.getId(), machine.getSerialNumber());
+				cq = "sn";
+				value = machine.getSerialNumber();
+				MessageDB.simplePut(rowId, cf, cq, value);
+
+				rowId = machine.getSerialNumber();
+				cq = "organization";
+				value = newOwner.getOrganization();
+				MessageDB.simplePut(rowId, cf, cq, value);
+				
+				// and set the result message
+				if (success) {
+					message = "success";
+					
+				} else {
+					message = "failed";
+				}
+			} catch (Exception e) {
+				// return connection exception message if there was a problem with the database
+				message = "databaseErrorMessage";
+			}
+
+		} else {
+			// Otherwise, return cannot find user message
+			message = "cannotFindUserMessage";
+		}
+		return message;
 	}
 
 }

@@ -18,3 +18,5 @@
 	</table>
 	<input type="hidden" name="action" value="login" /> 
 </form>
+
+<h3>${dict.get(message, lang) }</h3>

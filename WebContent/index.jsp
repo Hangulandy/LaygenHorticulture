@@ -3,7 +3,7 @@
 
 <%@ page
 	import="com.laygen.beans.*, com.laygen.database.Dictionary, javax.servlet.http.HttpSession"%>
-	
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,15 +17,13 @@
 </head>
 
 <%
-	Dictionary dict = (Dictionary) session.getAttribute("dict");
-	String lang = (String) session.getAttribute("lang");
-	lang = lang == null ? "ko" : "en";
-	%>
-<%
-	if (dict == null) {
-		session.setAttribute("dict", Dictionary.getInstance());
-	}
-	%>
+Dictionary dict = (Dictionary) session.getAttribute("dict");
+String lang = (String) session.getAttribute("lang");
+lang = lang == null ? "ko" : "en";
+if (dict == null) {
+	session.setAttribute("dict", Dictionary.getInstance());
+}
+%>
 
 <body ng-app='HorticultureApp'>
 

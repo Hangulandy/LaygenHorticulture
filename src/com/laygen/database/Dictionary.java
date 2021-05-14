@@ -2,6 +2,7 @@ package com.laygen.database;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -92,6 +93,17 @@ public class Dictionary {
 
 	public String get(String string) {
 		return get(string, null);
+	}
+	
+	public int getSize() {
+		if (entries != null) {
+			return entries.size();			
+		}
+		return 0;
+	}
+
+	public Map<String, HashMap<String, String>> getEntries() {
+		return entries;
 	}
 
 }

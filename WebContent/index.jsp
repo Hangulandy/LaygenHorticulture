@@ -1,87 +1,67 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 
-<%@ include file="./res/includes/header_component.jsp"%>
+<%@ page
+	import="com.laygen.beans.*, com.laygen.database.Dictionary, javax.servlet.http.HttpSession"%>
+	
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Must start with the login component if there is no logged in user -->
-<div class="view-area">
-	<%
-	String viewComponent = (String) session.getAttribute("viewComponent");
-	if ((user == null || !user.isLoggedIn())) {
+<link rel="stylesheet" href="lib/bootstrap.min.css">
+<link rel="stylesheet" href="styles/style.css">
+<link rel="shortcut icon" href="favicon.ico">
+<title>Horticulture by Laygen</title>
+</head>
+
+<%
+	Dictionary dict = (Dictionary) session.getAttribute("dict");
+	String lang = (String) session.getAttribute("lang");
+	lang = lang == null ? "ko" : "en";
 	%>
-	<div class="under-header-not-logged-in"></div>
-	<%
-	if (viewComponent != null && viewComponent.equalsIgnoreCase("join")) { // include join
+<%
+	if (dict == null) {
+		session.setAttribute("dict", Dictionary.getInstance());
+	}
 	%>
-	<%@ include file="./res/includes/join_component.jsp"%>
-	<%} else { // include login %>
-	<%@ include file="./res/includes/login_component.jsp"%>
-	<%}%>
-	<%
-	} else {// place side-bar and then list all the logged in options
-	%>
-	<div class="under-header"></div>
 
-	<div class="side-bar block">
-		<h3>${dict.get('quickViewHeading', lang)}:</h3>
+<body ng-app='HorticultureApp'>
 
-		<%
-		if (user.getAuthorizations() != null) {
-			for (Authorization auth : user.getAuthorizations()) {
-		%>
-		<a class="shortcut"
-			href="Controller?selectedMachineId=<%=auth.getMachineSerialNumber()%>&action=selectMachine"><%=auth.getMachineNickname()%></a>
-		<br>
-		<%
-		}
-		}
-		%>
+	<h1>${dict.get('bannerText', lang) }</h1>
+
+	<ui-view></ui-view>
+
+	<!-- Libraries -->
+	<script src="lib/jquery-2.1.4.min.js"></script>
+	<script src="lib/bootstrap.min.js"></script>
+	<script src="lib/angular.min.js"></script>
+	<script src="lib/angular-ui-router.min.js"></script>
+
+	<!-- Main Horticulture App Module -->
+	<script src="src/horticultureapp.module.js"></script>
+
+	<!-- Public Module -->
+	<script src="src/public/public.module.js"></script>
+	<script src="src/public/public.routes.js"></script>
+	<script src="src/public/not-logged-in/login/login.controller.js"></script>
+
+	<!-- Common Module -->
+	<script src="src/common/common.module.js"></script>
+	<script src="src/common/appdata.service.js"></script>
+
+	<div>
+		<a href="Controller?selectedLanguage=en&action=selectLanguage"><img
+			class="flag" src="img/united-kingdom.png" /></a> <a
+			href="Controller?selectedLanguage=ko&action=selectLanguage"><img
+			class="flag" src="img/south-korea.png" /></a><br>
+		<p class="small-print">
+			Flag icons made by <a class="footer-link"
+				href="https://www.freepik.com" title="Freepik">Freepik</a> from <a
+				class="footer-link" href="https://www.flaticon.com/"
+				title="Flaticon">www.flaticon.com</a>
+		</p>
 	</div>
-	<!-- end of side-bar div -->
-
-
-	<!-- Display component based on the return from the servlet -->
-	<div class="content block">
-
-		<%
-		if (viewComponent != null) {
-			if (viewComponent.equalsIgnoreCase("machineInfo")) {
-		%>
-		<%@ include file="./res/includes/machine_info_component.jsp"%>
-		<%
-		}
-		if (viewComponent.equalsIgnoreCase("machineSettings")) {
-		%>
-		<%@ include file="./res/includes/machine_settings_component.jsp"%>
-		<%
-		}
-		if (viewComponent.equalsIgnoreCase("join")) {
-		%>
-		<%@ include file="./res/includes/join_component.jsp"%>
-		<%
-		}
-		if (viewComponent.equalsIgnoreCase("machineData")) {
-		%>
-		<%@ include file="./res/includes/machine_data_component.jsp"%>
-		<%}%>
-
-		<%if (viewComponent.equalsIgnoreCase("cameraPage")) { %>
-		<%@include file="./res/includes/camera_page_component.jsp"%>
-		<%}%>
-		
-		<%if (viewComponent.equalsIgnoreCase("registerMachine")) { %>
-		<%@include file="./res/includes/register_machine.jsp"%>
-		<%}%>		
-		
-		<%
-		} else {
-		%>
-		<%@ include file="./res/includes/machine_list_component.jsp"%>
-		<%
-		}
-		%>
-		<!-- end of content-view div -->
-		<%}%>
-	</div>
-</div>
-<!-- end of main div -->
-
-<%@ include file="./res/includes/footer_component.jsp"%>
+</body>
+</html>

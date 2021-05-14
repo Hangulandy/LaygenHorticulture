@@ -1,6 +1,5 @@
 package com.laygen.beans;
 
-import java.io.Serializable;
 import java.util.TreeSet;
 import java.util.UUID;
 
@@ -12,9 +11,8 @@ import com.laygen.database.AuthorizationDB;
 import com.laygen.database.Dictionary;
 import com.laygen.database.UserDB;
 
-public class User implements Serializable, Comparable<User> {
+public class User implements Comparable<User> {
 
-	private static final long serialVersionUID = 1L;
 	private String id;
 	private String email;
 	private String name;

@@ -24,6 +24,9 @@ public class Dictionary {
 	}
 
 	public static Dictionary getInstance() {
+		if (entries == null) {
+			refreshDictionary();
+		}
 		return instance;
 	}
 
@@ -80,26 +83,6 @@ public class Dictionary {
 
 	public static void refreshDictionary() {
 		entries = getDictionary();
-	}
-
-	public String get(String string, String language) {
-		while (entries == null) {
-			refreshDictionary();
-		}
-		language = ((language == null) || language.equalsIgnoreCase("")) ? "ko" : language;
-		String result = entries.get(string).get(language);
-		return result != null ? result : get(string);
-	}
-
-	public String get(String string) {
-		return get(string, null);
-	}
-	
-	public int getSize() {
-		if (entries != null) {
-			return entries.size();			
-		}
-		return 0;
 	}
 
 	public Map<String, HashMap<String, String>> getEntries() {

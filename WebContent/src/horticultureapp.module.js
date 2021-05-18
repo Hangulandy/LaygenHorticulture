@@ -4,7 +4,7 @@
 	/**
 	 * HorticultureApp module that includes the public module as a dependency
 	 */
-	angular.module('HorticultureApp', ['public'])
+	angular.module('HorticultureApp', ['common', 'public'])
 		.config(config);
 
 	config.$inject = ['$urlRouterProvider'];

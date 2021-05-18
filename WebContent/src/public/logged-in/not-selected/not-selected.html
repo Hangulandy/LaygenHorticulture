@@ -1,0 +1,16 @@
+<h2>Not Selected</h2>
+
+<table>
+	<tr>
+		<th>{{notSelectedCtrl.get('serialNumberLabel');}}</th>
+		<th>{{notSelectedCtrl.get('nickname');}}</th>
+		<th>{{notSelectedCtrl.get('owner_email');}}</th>
+		<th></th>
+	</tr>
+	<tr ng-repeat="auth in notSelectedCtrl.authorizations">
+		<td>{{auth.machineSerialNumber}}</td>
+		<td>{{auth.machineNickname}}</td>
+		<td>{{auth.ownerEmail}}</td>
+		<td></td>
+	</tr>
+</table>

@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import com.laygen.database.Dictionary;
 import com.laygen.database.MachineDB;
 
 public class Machine {
@@ -136,12 +135,11 @@ public class Machine {
 						this.getSettings().put(key, newSettings.get(key));
 						System.out.println(msg);
 					}
-					return Dictionary.getInstance().get("success", lang)
-							+ Dictionary.getInstance().get("refreshPrompt", lang);
+					return "successAndRefreshPrompt";
 				}
 			}
 		} catch (Exception e) {
-			return Dictionary.getInstance().get("commError");
+			return "commError";
 		}
 	}
 

@@ -4,6 +4,7 @@ public class MyResponse {
 
 	private User user;
 	private Object object;
+	private String message;
 
 	public User getUser() {
 		return user;
@@ -19,6 +20,14 @@ public class MyResponse {
 
 	public void setObject(Object object) {
 		this.object = object;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
 }

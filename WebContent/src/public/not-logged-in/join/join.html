@@ -1,0 +1,43 @@
+<h1>{{joinCtrl.get('joinHeading');}}</h1>
+<hr>
+<h3>{{joinCtrl.get('joinPrompt');}}</h3>
+<h3>{{joinCtrl.getMessage();}}</h3>
+<table class="transparent">
+	<tr class="transparent">
+		<td class="transparent">{{joinCtrl.get('emailLabel');}} :</td>
+		<td class="transparent"><input type="email"
+			ng-model="joinCtrl.email" required /></td>
+	</tr>
+	<tr class="transparent">
+		<td class="transparent">{{joinCtrl.get('nameLabel');}} :</td>
+		<td class="transparent"><input type="text"
+			ng-model="joinCtrl.name" required /></td>
+	</tr>
+	<tr class="transparent">
+		<td class="transparent">{{joinCtrl.get('usernameLabel');}} :</td>
+		<td class="transparent"><input type="text"
+			ng-model="joinCtrl.username" required /></td>
+	</tr>
+	<tr class="transparent">
+		<td class="transparent">{{joinCtrl.get('organizationLabel');}} :
+		</td>
+		<td class="transparent"><input type="text"
+			ng-model="joinCtrl.organization" required /></td>
+	</tr>
+	<tr class="transparent">
+		<td class="transparent">{{joinCtrl.get('passwordLabel');}} :</td>
+		<td class="transparent"><input type="password"
+			ng-model="joinCtrl.pw1" required maxlength="20" /></td>
+	</tr>
+	<tr class="transparent">
+		<td class="transparent">{{joinCtrl.get('confirmPasswordLabel');}}
+			:</td>
+		<td class="transparent"><input type="password"
+			ng-model="joinCtrl.pw2" required maxlength="20" /></td>
+	</tr>
+	<tr class="transparent">
+		<td class="transparent"></td>
+		<td class="transparent"><button ng-click="joinCtrl.join();">{{joinCtrl.get('submitLabel');}}</button></td>
+	</tr>
+
+</table>

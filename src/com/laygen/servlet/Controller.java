@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.laygen.beans.MyResponse;
 import com.laygen.beans.User;
@@ -42,7 +43,7 @@ public class Controller extends HttpServlet {
 
 		String action = request.getParameter("action");
 		action = action == null ? "home" : action;
-		
+
 		HttpSession session = request.getSession();
 
 		final Object lock = session.getId().intern();
@@ -51,19 +52,31 @@ public class Controller extends HttpServlet {
 
 			Dictionary dict = (Dictionary) session.getAttribute("dict");
 
-			if (dict == null) {
+			if (dict == null || dict.getEntries() == null) {
 				dict = Dictionary.getInstance();
 				session.setAttribute("dict", dict);
 			}
 
-			if (action.equalsIgnoreCase("selectLanguage")) {
-				selectLanguage(request, response, session);
+			if (action.equalsIgnoreCase("getDictionary")) {
+				getDictionary(request, response, session);
 			} else {
 				initializeSessionAttributes(session);
 			}
 
 			if (action.equalsIgnoreCase("login")) {
 				login(request, response, session);
+			}
+
+			if (action.equalsIgnoreCase("logout")) {
+				logout(session);
+			}
+
+			if (action.equalsIgnoreCase("join")) {
+				join(request, response, session);
+			}
+
+			if (action.equalsIgnoreCase("getAuthorizations")) {
+				getAuthorizations(request, response, session);
 			}
 		}
 
@@ -72,20 +85,48 @@ public class Controller extends HttpServlet {
 	private void login(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
-		User user = UserDB.login(email, password);
+		User user = new User();
+		String message = user.login(email, password);
+
 		session.setAttribute("user", user);
-		sendObjectWithResponse(user, session, response);
+		sendObjectWithResponse(user, message, session, response);
 	}
 
-	private void sendObjectWithResponse(Object obj, HttpSession session, HttpServletResponse response) {
-		
-		//User user = (User) session.getAttribute("user");
-		User user = null;
-		
+	private void logout(HttpSession session) {
+		session.invalidate();
+	}
+
+	private void join(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		User user = User.buildUserFromRequest(request);
+		String message = user.getErrorMsg() == null ? UserDB.insert(user) : "null";
+
+		sendObjectWithResponse(user, message, session, response);
+	}
+
+	private void getAuthorizations(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		User user = (User) session.getAttribute("user");
+		String message = "null";
+
+		if (user != null && user.getId() != null) {
+			user.fetchAuthorizations();
+			System.out.println(user.getAuthorizations().size());
+			message = "selectMachinePrompt";
+		} else {
+			user = null;
+			logout(session);
+		}
+		sendObjectWithResponse(user, message, session, response);		
+	}
+
+	private void sendObjectWithResponse(Object obj, String message, HttpSession session, HttpServletResponse response) {
+
+		User user = (User) session.getAttribute("user");
+
 		MyResponse resp = new MyResponse();
 		resp.setUser(user);
 		resp.setObject(user == null ? null : obj);
-		
+		resp.setMessage(message);
+
 		try {
 			PrintWriter out = response.getWriter();
 			response.setContentType("application/json");
@@ -98,31 +139,26 @@ public class Controller extends HttpServlet {
 		}
 	}
 
-//	private void sendMapAsResponse(Map map, HttpServletResponse response) {
-//		try {
-//			PrintWriter out = response.getWriter();
-//			response.setContentType("application/json");
-//			Gson gson = new Gson();
-//			Type gsonType = new TypeToken<Map>(){}.getType();
-//			String jsonData = gson.toJson(map, gsonType);
-//			out.print(jsonData);
-//			out.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
+	private void sendMapAsResponse(Map map, HttpServletResponse response) {
+		try {
+			response.setCharacterEncoding("UTF-8");
+			response.setContentType("application/json; charset=UTF-8");
 
-	private void selectLanguage(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
-		String lang = request.getParameter("selectedLanguage");
-		String url = "/";
-
-		if (lang != null) {
-			session.setAttribute("lang", lang);
-		} else {
-			session.setAttribute("lang", "ko");
+			PrintWriter out = response.getWriter();
+			Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+			Type gsonType = new TypeToken<Map>() {
+			}.getType();
+			String jsonData = gson.toJson(map, gsonType);
+			out.print(jsonData);
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		
-		redirect(url, request, response);
+	}
+
+	private void getDictionary(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Dictionary dict = (Dictionary) session.getAttribute("dict");
+		sendMapAsResponse(dict.getEntries(), response);
 	}
 
 	private void initializeSessionAttributes(HttpSession session) {
@@ -131,18 +167,6 @@ public class Controller extends HttpServlet {
 		session.setAttribute("viewComponent", null);
 		session.setAttribute("selectedImage", null);
 		session.setAttribute("searchedUser", null);
-	}
-	
-	private void redirect(String url, HttpServletRequest request, HttpServletResponse response) {
-		try {
-			getServletContext().getRequestDispatcher(url).forward(request, response);
-		} catch (ServletException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	/**

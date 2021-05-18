@@ -41,6 +41,7 @@ public class UserDB {
 		} else {
 			message = "emailNotAvailableMessage";
 		}
+		user.setPassword(null);
 		return message;
 	}
 
@@ -49,27 +50,36 @@ public class UserDB {
 		return messages.size() == 0 ? true : false;
 	}
 
-	public static User login(String email, String password) {
-		User user = null;
-
+	public static String login(User user) {
+		String message = "userNotFound";
+		User userFromDB = null;
 		// First, get the ID using email
-		String uuid = fetchUUIDByEmail(email);
+		String uuid = fetchUUIDByEmail(user.getEmail());
 
 		// If a uuid comes back (i.e. email is in the db), get the user data by uuid
 		if (uuid != null) {
-			user = fetchCompleteUserByUUID(uuid);
+			userFromDB = fetchCompleteUserByUUID(uuid);
+			// if a user object came back, check password
+			if (userFromDB != null) {
+				if (userFromDB.getPassword().equalsIgnoreCase(user.getPassword())) {
+					userFromDB.setLoggedIn(true);
+				} else {
+					message = "wrongPassword";
+					userFromDB.setLoggedIn(false);
+				}
+				userFromDB.setPassword(null);
+			}
+			user.setId(userFromDB.getId());
+			user.setEmail(userFromDB.getEmail());
+			user.setName(userFromDB.getName());
+			user.setUsername(userFromDB.getUsername());
+			user.setOrganization(userFromDB.getOrganization());
+			user.setPassword(null);
+		} else {
+			user = null;
 		}
 
-		// if a user object came back, check password
-		if (user != null) {
-			if (password.equalsIgnoreCase(user.getPassword())) {
-				user.setLoggedIn(true);
-			} else {
-				user.setLoggedIn(false);
-			}
-			user.setPassword(null);
-		}
-		return user;
+		return message;
 	}
 
 	public static String fetchUUIDByEmail(String email) {

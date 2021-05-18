@@ -1,11 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-
-<%@ page
-	import="com.laygen.beans.*, com.laygen.database.Dictionary, javax.servlet.http.HttpSession"%>
-
 <!DOCTYPE html>
-<html>
+<html ng-app="HorticultureApp">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,18 +10,9 @@
 <title>Horticulture by Laygen</title>
 </head>
 
-<%
-Dictionary dict = (Dictionary) session.getAttribute("dict");
-String lang = (String) session.getAttribute("lang");
-lang = lang == null ? "ko" : "en";
-if (dict == null) {
-	session.setAttribute("dict", Dictionary.getInstance());
-}
-%>
+<body ng-controller="CommonController as commonCtrl">
 
-<body ng-app='HorticultureApp'>
-
-	<h1>${dict.get('bannerText', lang) }</h1>
+	<h1>{{commonCtrl.get('bannerText')}}</h1>
 
 	<ui-view></ui-view>
 
@@ -44,16 +29,20 @@ if (dict == null) {
 	<script src="src/public/public.module.js"></script>
 	<script src="src/public/public.routes.js"></script>
 	<script src="src/public/not-logged-in/login/login.controller.js"></script>
+	<script src="src/public/not-logged-in/join/join.controller.js"></script>
+	<script src="src/public/logged-in/logged-in.controller.js"></script>
+	<script src="src/public/logged-in/not-selected/not-selected.controller.js"></script>
 
 	<!-- Common Module -->
 	<script src="src/common/common.module.js"></script>
 	<script src="src/common/appdata.service.js"></script>
+	<script src="src/common/common.controller.js"></script>
 
 	<div>
-		<a href="Controller?selectedLanguage=en&action=selectLanguage"><img
-			class="flag" src="img/united-kingdom.png" /></a> <a
-			href="Controller?selectedLanguage=ko&action=selectLanguage"><img
-			class="flag" src="img/south-korea.png" /></a><br>
+		<a ng-click="commonCtrl.setLang('en')"><img class="flag"
+			src="img/united-kingdom.png" /></a> <a
+			ng-click="commonCtrl.setLang('ko')"><img class="flag"
+			src="img/south-korea.png" /></a><br>
 		<p class="small-print">
 			Flag icons made by <a class="footer-link"
 				href="https://www.freepik.com" title="Freepik">Freepik</a> from <a

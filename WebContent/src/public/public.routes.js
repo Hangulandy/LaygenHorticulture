@@ -13,17 +13,37 @@
 		$stateProvider
 			.state('public', {
 				abstract: true,
-				templateUrl: 'src/public/public.jsp'
+				templateUrl: 'src/public/public.html',
 			})
-			.state('public.login', {
+			.state('public.not-logged-in', {
+				abstract: true,
+				templateUrl: 'src/public/not-logged-in/not-logged-in.html',
+				controller: 'CommonController',
+				controllerAs: 'commonCtrl'
+			})
+			.state('public.not-logged-in.login', {
 				url: '/',
-				templateUrl: 'src/public/not-logged-in/login/login.jsp',
+				templateUrl: 'src/public/not-logged-in/login/login.html',
 				controller: 'LoginController',
 				controllerAs: 'loginCtrl'
 			})
-			.state('public.join', {
+			.state('public.not-logged-in.join', {
 				url: '/join',
-				templateUrl: 'src/public/not-logged-in/join/join.jsp'
+				templateUrl: 'src/public/not-logged-in/join/join.html',
+				controller: 'JoinController',
+				controllerAs: 'joinCtrl'
+			})
+			.state('public.logged-in', {
+				abstract: true,
+				templateUrl: 'src/public/logged-in/logged-in.html',
+				controller: 'LoggedInController',
+				controllerAs: 'loggedInCtrl'
+			})
+			.state('public.logged-in.not-selected', {
+				url: '/logged-in/',
+				templateUrl: 'src/public/logged-in/not-selected/not-selected.html',
+				controller: 'NotSelectedController',
+				controllerAs: 'notSelectedCtrl'
 			});
 	}
 })();

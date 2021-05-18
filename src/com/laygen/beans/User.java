@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 
 import com.laygen.database.AuthorizationDB;
-import com.laygen.database.Dictionary;
 import com.laygen.database.UserDB;
 
 public class User implements Comparable<User> {
@@ -23,11 +22,11 @@ public class User implements Comparable<User> {
 	private TreeSet<Authorization> authorizations;
 	public final static int MAX_NAME_LEN = 40;
 
-	public User(String email, String name, String userName, String organization) {
+	public User(String email, String name, String username, String organization) {
 		this.id = UUID.randomUUID().toString();
 		this.email = email;
 		this.name = name;
-		this.username = userName;
+		this.username = username;
 		this.organization = organization;
 		this.password = null;
 		setLoggedIn(false);
@@ -46,10 +45,10 @@ public class User implements Comparable<User> {
 	public static User buildUserFromRequest(HttpServletRequest request) {
 		String email = request.getParameter("email");
 		String name = request.getParameter("name");
-		String userName = request.getParameter("userName");
+		String username = request.getParameter("username");
 		String organization = request.getParameter("organization");
 
-		User user = new User(email, name, userName, organization);
+		User user = new User(email, name, username, organization);
 
 		if (pwSame(request)) {
 			user.setPassword(request.getParameter("pw1"));
@@ -160,13 +159,6 @@ public class User implements Comparable<User> {
 		return this.getEmail().compareTo(other.getEmail());
 	}
 
-	public String getUserMsg(String lang) {
-		if (this.isLoggedIn()) {
-			return String.format("%s, %s", Dictionary.getInstance().get("hello", lang), getName());
-		}
-		return Dictionary.getInstance().get("notLoggedIn", lang);
-	}
-
 	public void printUser() {
 		System.out.println(this.toString());
 		System.out.println("UUID on file : " + this.id);
@@ -192,6 +184,13 @@ public class User implements Comparable<User> {
 		String message = this.getId() != null ? UserDB.registerMachine(this, serialNumber, registrationKey) : "failure";
 		this.fetchAuthorizations();
 		return message;
+	}
+
+	public String login(String email, String password) {
+		this.email = email;
+		this.password = password;
+
+		return UserDB.login(this);
 	}
 
 }

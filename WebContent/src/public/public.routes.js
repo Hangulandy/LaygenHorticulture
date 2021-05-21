@@ -4,12 +4,9 @@
 	angular.module('public')
 		.config(routeConfig);
 
-	/**
-	 * Configures the routes and views
-	 */
 	routeConfig.$inject = ['$stateProvider'];
 	function routeConfig($stateProvider) {
-		// Routes
+
 		$stateProvider
 			.state('public', {
 				abstract: true,
@@ -44,6 +41,40 @@
 				templateUrl: 'src/public/logged-in/not-selected/not-selected.html',
 				controller: 'NotSelectedController',
 				controllerAs: 'notSelectedCtrl'
+			})
+			.state('public.logged-in.selected', {
+				abstract: true,
+				templateUrl: 'src/public/logged-in/selected/selected.html',
+				controller: 'SelectedController',
+				controllerAs: 'selectedCtrl'
+			})
+			.state('public.logged-in.selected.info', {
+				url: '/logged-in/info',
+				templateUrl: 'src/public/logged-in/selected/info/info.html',
+				controller: 'InfoController',
+				controllerAs: 'infoCtrl',
+				resolve: {
+					machine: ['AppDataService', function(AppDataService) {
+						var machine = AppDataService.getMachine();
+						if (machine !== undefined) {
+							return machine;
+						} else {
+							return undefined;
+						}
+					}]
+				}
+			})
+			.state('public.logged-in.selected.settings', {
+				url: '/logged-in/settings',
+				templateUrl: 'src/public/logged-in/selected/settings/settings.html'
+			})
+			.state('public.logged-in.selected.data', {
+				url: '/logged-in/data',
+				templateUrl: 'src/public/logged-in/selected/data/data.html'
+			})
+			.state('public.logged-in.selected.camera', {
+				url: '/logged-in/camera',
+				templateUrl: 'src/public/logged-in/selected/camera/camera.html'
 			});
 	}
 })();

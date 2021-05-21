@@ -1,0 +1,9 @@
+<h4>{{settingsCtrl.get('currentSettingsHeading');}}</h4>
+
+<table class="transparent">
+	<tr class="transparent"
+		ng-repeat="(k, v) in settingsCtrl.machine.settings">
+		<td class="transparent">{{settingsCtrl.get(k);}}</td>
+		<td class="transparent">{{v}}</td>
+	</tr>
+</table>

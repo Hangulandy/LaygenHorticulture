@@ -1,0 +1,12 @@
+<h2>Selected</h2>
+
+<h3>{{selectedCtrl.getMessage();}}</h3>
+
+<div>
+	<button ui-sref="public.logged-in.selected.info">{{ selectedCtrl.get('info'); }}</button>
+	<button ui-sref="public.logged-in.selected.settings">{{ selectedCtrl.get('settings'); }}</button>
+	<button ui-sref="public.logged-in.selected.data">{{ selectedCtrl.get('data'); }}</button>
+	<button ui-sref="public.logged-in.selected.camera">{{ selectedCtrl.get('camera'); }}</button>
+</div>
+
+<ui-view></ui-view>

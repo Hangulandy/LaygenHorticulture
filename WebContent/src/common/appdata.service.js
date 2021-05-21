@@ -32,6 +32,7 @@
 
 		service.logout = function() {
 			service.setUser(undefined);
+			service.setMachine(undefined);
 			$http({
 				method: "GET",
 				url: url,
@@ -98,20 +99,72 @@
 					.then(function(result) {
 						var data = result.data;
 						service.setUser(data);
-						return data.user.authorizations;
+						return data;
 					}).catch(function(error) {
 						console.log("Something went terribly wrong", error);
 					});
 			}
-			return "No user is logged in";
+			return undefined;
+		}
+
+		service.fetchMachine = function(sn) {
+			service.setMachine(undefined);
+			return $http({
+				method: "GET",
+				url: url,
+				params: {
+					selectedMachineId: sn,
+					action: "selectMachine"
+				}
+			}).then(function(result) {
+				var data = result.data;
+				if (result.status == 200) {
+					service.setMachine(data.object);
+					console.log(data.object);
+				} else {
+					console.log(result);
+				}
+				return data;
+			}).catch(function(error) {
+				console.log("Something went terribly wrong", error);
+			});
 		}
 
 		service.getUser = function() {
-			return localStorage.getItem("user");
+			return service.getFromStorage("user");
 		}
 
 		service.setUser = function(user) {
-			localStorage.setItem("user", user);
+			service.setInStorage("user", user);
+		}
+
+		service.getMachine = function() {
+			return service.getFromStorage("machine");
+		}
+
+		service.setMachine = function(machine) {
+			service.setInStorage("machine", machine);
+		}
+
+		service.resetMachine = function() {
+			service.setMachine(undefined);
+		}
+
+		service.getFromStorage = function(itemName) {
+			var item = sessionStorage.getItem(itemName);
+			var returnItem = undefined;
+			if (item != null) {
+				returnItem = JSON.parse(item);
+			}
+			return returnItem;
+		}
+
+		service.setInStorage = function(itemName, item) {
+			if (item === undefined) {
+				sessionStorage.removeItem(itemName);
+			} else {
+				sessionStorage.setItem(itemName, JSON.stringify(item));
+			}
 		}
 
 		service.getLang = function() {

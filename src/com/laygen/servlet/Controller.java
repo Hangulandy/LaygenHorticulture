@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.laygen.beans.Machine;
 import com.laygen.beans.MyResponse;
 import com.laygen.beans.User;
 import com.laygen.database.Dictionary;
@@ -44,42 +45,70 @@ public class Controller extends HttpServlet {
 		String action = request.getParameter("action");
 		action = action == null ? "home" : action;
 
-		HttpSession session = request.getSession();
+		try {
+			HttpSession session = request.getSession();
 
-		final Object lock = session.getId().intern();
+			final Object lock = session.getId().intern();
 
-		synchronized (lock) {
+			synchronized (lock) {
 
-			Dictionary dict = (Dictionary) session.getAttribute("dict");
+				Dictionary dict = (Dictionary) session.getAttribute("dict");
 
-			if (dict == null || dict.getEntries() == null) {
-				dict = Dictionary.getInstance();
-				session.setAttribute("dict", dict);
+				if (dict == null || dict.getEntries() == null) {
+					dict = Dictionary.getInstance();
+					session.setAttribute("dict", dict);
+				}
+
+				if (action.equalsIgnoreCase("getDictionary")) {
+					getDictionary(request, response, session);
+				} else {
+					initializeSessionAttributes(session);
+				}
+
+				if (action.equalsIgnoreCase("login")) {
+					login(request, response, session);
+				}
+
+				if (action.equalsIgnoreCase("logout")) {
+					logout(session);
+				}
+
+				if (action.equalsIgnoreCase("join")) {
+					join(request, response, session);
+				}
+
+				if (action.equalsIgnoreCase("getAuthorizations")) {
+					getAuthorizations(request, response, session);
+				}
+
+				if (action.equalsIgnoreCase("selectMachine")) {
+					selectMachine(request, response, session);
+				}
 			}
 
-			if (action.equalsIgnoreCase("getDictionary")) {
-				getDictionary(request, response, session);
-			} else {
-				initializeSessionAttributes(session);
-			}
-
-			if (action.equalsIgnoreCase("login")) {
-				login(request, response, session);
-			}
-
-			if (action.equalsIgnoreCase("logout")) {
-				logout(session);
-			}
-
-			if (action.equalsIgnoreCase("join")) {
-				join(request, response, session);
-			}
-
-			if (action.equalsIgnoreCase("getAuthorizations")) {
-				getAuthorizations(request, response, session);
-			}
+		} catch (IllegalStateException e) {
+			sendSessionExpireMessage(response);
 		}
 
+	}
+
+	private void sendSessionExpireMessage(HttpServletResponse response) {
+
+		MyResponse resp = new MyResponse();
+		resp.setUser(null);
+		resp.setObject(null);
+		resp.setMessage("sessionExpiredMessage");
+
+		try {
+			PrintWriter out = response.getWriter();
+			response.setContentType("application/json");
+			Gson gson = new Gson();
+			String jsonData = gson.toJson(resp);
+			out.print(jsonData);
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void login(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
@@ -109,13 +138,42 @@ public class Controller extends HttpServlet {
 
 		if (user != null && user.getId() != null) {
 			user.fetchAuthorizations();
-			System.out.println(user.getAuthorizations().size());
 			message = "selectMachinePrompt";
 		} else {
 			user = null;
 			logout(session);
 		}
-		sendObjectWithResponse(user, message, session, response);		
+		sendObjectWithResponse(user, message, session, response);
+	}
+
+	private void selectMachine(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		String serialNumber = request.getParameter("selectedMachineId");
+		Machine machine = null;
+		String message = "invalidValueMessage";
+
+		// First, validate serial number; get all machine info if it exists
+		if (serialNumber != null) {
+			machine = new Machine();
+			machine.setSerialNumber(serialNumber);
+			machine.fetchAllFromDB();
+			// Next, check that there is info returned from DB; if yes, check user auth; if
+			// good, send machine info, otherwise send null response
+			if (machine != null && machine.getInfo() != null) {
+				session.setAttribute("machine", machine);
+				if (!userIsAuth(session)) {
+					message = "userNotAuthorized";
+				} else {
+					message = "null";
+				}
+			}
+		}
+		sendObjectWithResponse(machine, message, session, response);
+	}
+
+	private boolean userIsAuth(HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		User user = (User) session.getAttribute("user");
+		return machine.userIsAuthorized(user);
 	}
 
 	private void sendObjectWithResponse(Object obj, String message, HttpSession session, HttpServletResponse response) {

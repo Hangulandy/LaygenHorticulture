@@ -1,5 +1,6 @@
 <h2>Not Selected</h2>
 
+<h3>{{notSelectedCtrl.getMessage();}}</h3>
 <table>
 	<tr>
 		<th>{{notSelectedCtrl.get('serialNumberLabel');}}</th>
@@ -11,6 +12,6 @@
 		<td>{{auth.machineSerialNumber}}</td>
 		<td>{{auth.machineNickname}}</td>
 		<td>{{auth.ownerEmail}}</td>
-		<td></td>
+		<td><button ng-click="notSelectedCtrl.selectMachine($index);">{{notSelectedCtrl.get('select');}}</button></td>
 	</tr>
 </table>

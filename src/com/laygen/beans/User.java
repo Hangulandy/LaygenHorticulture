@@ -124,11 +124,11 @@ public class User implements Comparable<User> {
 
 	public String getErrorMsg() {
 
-		if (getEmail().trim().length() == 0) {
+		if (getEmail().trim().length() < 2) {
 			return "emailNotValidMessage";
 		}
 
-		if (getName().trim().length() == 0) {
+		if (getName().trim().length() <2) {
 			return "nameTooShortMessage";
 		}
 
@@ -136,7 +136,7 @@ public class User implements Comparable<User> {
 			return "nameTooLongMessage";
 		}
 
-		if (getUsername().trim().length() == 0) {
+		if (getUsername().trim().length() < 2) {
 			return "usernameTooShortMessage";
 		}
 

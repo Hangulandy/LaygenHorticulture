@@ -1,0 +1,13 @@
+<div>
+
+	<h4>{{genInfoCtrl.get('generalInfoHeading')}}</h4>
+
+	<table class="transparent">
+		<tr ng-repeat="(k, v) in genInfoCtrl.machine.info">
+			<td>{{genInfoCtrl.get(k);}}</td>
+			<td>:</td>
+			<td>{{v}}</td>
+		</tr>
+	</table>
+
+</div>

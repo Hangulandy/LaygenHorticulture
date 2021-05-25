@@ -84,6 +84,10 @@ public class Controller extends HttpServlet {
 				if (action.equalsIgnoreCase("selectMachine")) {
 					selectMachine(request, response, session);
 				}
+				
+				if (action.equalsIgnoreCase("addUser")) {
+					addUser(request, response, session);
+				}
 			}
 
 		} catch (IllegalStateException e) {
@@ -169,6 +173,25 @@ public class Controller extends HttpServlet {
 		}
 		sendObjectWithResponse(machine, message, session, response);
 	}
+	
+	private void addUser(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = null;
+
+		if (machine != null && userIsOwner(session)) {
+			String userIdToAdd = request.getParameter("userToAdd");
+			User userToAdd = UserDB.fetchUserByUUID(userIdToAdd);
+
+			if (userToAdd != null) {
+				message = machine.addAuthorizationByUUID(userIdToAdd);
+			}
+		} else {
+			message = "mustBeOwnerMessage";
+		}
+		machine.fetchAuthorizedUsersFromDB();
+		
+		sendObjectWithResponse(machine, message, session, response);
+	}
 
 	private boolean userIsAuth(HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
@@ -225,6 +248,12 @@ public class Controller extends HttpServlet {
 		session.setAttribute("viewComponent", null);
 		session.setAttribute("selectedImage", null);
 		session.setAttribute("searchedUser", null);
+	}
+	
+	private boolean userIsOwner(HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		User user = (User) session.getAttribute("user");
+		return user.getEmail().equalsIgnoreCase(machine.getInfo().get("owner_email"));
 	}
 
 	/**

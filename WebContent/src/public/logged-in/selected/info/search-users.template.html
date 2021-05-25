@@ -1,0 +1,13 @@
+<div>
+
+	<h4>{{searchUsersCtrl.get('searchUsersHeading');}}</h4>
+
+	<form name="searchUsersForm" novalidate>
+		<input type="email" name="email"
+			placeholder="{{searchUsersCtrl.get('emailPlaceholder');}}" ng-model="searchUsersCtrl.email" required />
+		<button ng-click="searchUsersCtrl.search();"
+					ng-disabled="searchUsersForm.$invalid">{{searchUsersCtrl.get('searchLabel');}}</button>
+					<span ng-if="searchUsersForm.email.$invalid && searchUsersForm.email.$touched">{{searchUsersCtrl.get('emailInvalidMessage');}}</span>
+	</form>
+
+</div>

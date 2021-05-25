@@ -1,10 +1,14 @@
-<h4>{{dataCtrl.get('currentSensorDataHeading');}}</h4>
+<div>
 
-<table class="transparent">
-	<tr class="transparent" ng-repeat="sensor in dataCtrl.machine.sensors">
-		<td class="transparent">{{dataCtrl.get(sensor.name);}}</td>
-		<td class="transparent"> : </td>
-		<td class="transparent">{{dataCtrl.machine.readings[sensor.name]}}
-			{{dataCtrl.machine.sensors[sensor.name].units}}</td>
-	</tr>
-</table>
+	<h4>{{dataCtrl.get('currentSensorDataHeading');}}</h4>
+
+	<table class="transparent">
+		<tr ng-repeat="sensor in dataCtrl.machine.sensors">
+			<td>{{dataCtrl.get(sensor.name);}}</td>
+			<td>:</td>
+			<td>{{dataCtrl.machine.readings[sensor.name]}}
+				{{dataCtrl.machine.sensors[sensor.name].units}}</td>
+		</tr>
+	</table>
+
+</div>

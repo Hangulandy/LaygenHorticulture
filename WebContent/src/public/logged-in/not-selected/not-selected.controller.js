@@ -12,7 +12,6 @@
 
 		notSelectedCtrl.message = "";
 
-		console.log(AppDataService.getUser());
 		if (AppDataService.getUser() !== undefined) {
 			var promise = AppDataService.getAuthorizations();
 			promise.then(function(result) {
@@ -42,11 +41,9 @@
 
 			// Use AppDataService to get the machine info
 			var promise = AppDataService.fetchMachine(sn);
-			promise.then(function(result) {
-				console.log(result);
+			promise.then(function() {
 				var machine = AppDataService.getMachine();
 				// Redirect to either the machine info view page or the machine list page
-				console.log(machine);
 				if (machine !== undefined) {
 					$state.go('public.logged-in.selected.info');
 				} else {

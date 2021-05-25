@@ -111,7 +111,7 @@ tr:nth-child(odd) {
 	background-color: #ebf0f9;
 } 
 
-table.transparent, td.transparent, tr.transparent, th.transparent {
+table.transparent, table.transparent tr, table.transparent td, table.transparent th {
 	background-color: var(--light-color);
 	padding: 0px;
 	color: var(--dark-text);

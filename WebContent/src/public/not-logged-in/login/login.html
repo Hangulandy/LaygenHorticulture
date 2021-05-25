@@ -1,21 +1,31 @@
 <h1>{{loginCtrl.get('login');}}</h1>
 <hr>
-<table class="transparent">
-	<tr class="transparent">
-		<td class="transparent">{{loginCtrl.get('emailLabel');}} :</td>
-		<td class="transparent"><input type="text"
-			placeholder="{{loginCtrl.get('emailPlaceholder');}}" ng-model="loginCtrl.email"></td>
-	</tr>
-	<tr class="transparent">
-		<td class="transparent">{{loginCtrl.get('passwordLabel');}} :</td>
-		<td class="transparent"><input type="password"
-			ng-model="loginCtrl.password"></td>
-	</tr>
-	<tr class="transparent">
-		<td class="transparent"></td>
-		<td class="transparent"><button ng-click="loginCtrl.login();">{{loginCtrl.get('login');}}</button></td>
-	</tr>
-</table>
+<form name="loginForm" novalidate>
+	<table class="transparent">
+		<tr>
+			<td>{{loginCtrl.get('emailLabel');}}</td>
+			<td><input type="email" name="email"
+				placeholder="{{loginCtrl.get('emailPlaceholder');}}"
+				ng-model="loginCtrl.email" required></td>
+			<td><span
+				ng-if="loginForm.email.$invalid && loginForm.email.$touched">{{loginCtrl.get('emailInvalidMessage');}}</span></td>
+		</tr>
+		<tr>
+			<td>{{loginCtrl.get('passwordLabel');}}</td>
+			<td><input type="password" name="password"
+				ng-model="loginCtrl.password" required ng-minlength="8"
+				ng-maxlength="20"></td>
+			<td><span
+				ng-if="loginForm.password.$invalid && loginForm.password.$touched">{{loginCtrl.get('passwordWrongLengthMessage');}}</span></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><button ng-click="loginCtrl.login();"
+					ng-disabled="loginForm.$invalid">{{loginCtrl.get('login');}}</button></td>
+			<td></td>
+		</tr>
+	</table>
+</form>
 
 <h3>{{loginCtrl.getMessage();}}</h3>
 

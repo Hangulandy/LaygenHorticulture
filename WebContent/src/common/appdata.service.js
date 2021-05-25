@@ -120,9 +120,6 @@
 				var data = result.data;
 				if (result.status == 200) {
 					service.setMachine(data.object);
-					console.log(data.object);
-				} else {
-					console.log(result);
 				}
 				return data;
 			}).catch(function(error) {
@@ -177,6 +174,18 @@
 
 		service.get = function(entry) {
 			return service.dict[entry][service.lang];
+		}
+
+		service.setMessage = function(message) {
+			service.message = message;
+		}
+
+		service.getMessage = function() {
+			if (service.message === undefined) {
+				return "null";
+			} else {
+				return service.message;
+			}
 		}
 	}
 

@@ -84,7 +84,11 @@ public class Controller extends HttpServlet {
 				if (action.equalsIgnoreCase("selectMachine")) {
 					selectMachine(request, response, session);
 				}
-				
+
+				if (action.equalsIgnoreCase("searchForUser")) {
+					searchForUser(request, response, session);
+				}
+
 				if (action.equalsIgnoreCase("addUser")) {
 					addUser(request, response, session);
 				}
@@ -147,6 +151,7 @@ public class Controller extends HttpServlet {
 			user = null;
 			logout(session);
 		}
+		session.setAttribute("user", user);
 		sendObjectWithResponse(user, message, session, response);
 	}
 
@@ -173,7 +178,34 @@ public class Controller extends HttpServlet {
 		}
 		sendObjectWithResponse(machine, message, session, response);
 	}
-	
+
+	private void searchForUser(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		// First, get machine and user variables
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = "mustBeOwnerMessage";
+		User searchedUser = null;
+
+		// Make sure user is authorized
+		if (userIsAuth(session)) {
+			if (machine != null) {
+
+				// Get searched user by email
+				String email = (String) request.getParameter("email");
+				String uuid = UserDB.fetchUUIDByEmail(email.trim());
+				if (uuid != null) {
+					searchedUser = UserDB.fetchUserByUUID(uuid);
+				} else {
+					message = "cannotFindUserMessage";
+				}
+			}
+			else {
+				message = "invalidValueMessage";
+			}
+		}
+
+		sendObjectWithResponse(searchedUser, message, session, response);
+	}
+
 	private void addUser(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String message = null;
@@ -189,7 +221,7 @@ public class Controller extends HttpServlet {
 			message = "mustBeOwnerMessage";
 		}
 		machine.fetchAuthorizedUsersFromDB();
-		
+
 		sendObjectWithResponse(machine, message, session, response);
 	}
 
@@ -249,7 +281,7 @@ public class Controller extends HttpServlet {
 		session.setAttribute("selectedImage", null);
 		session.setAttribute("searchedUser", null);
 	}
-	
+
 	private boolean userIsOwner(HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 		User user = (User) session.getAttribute("user");

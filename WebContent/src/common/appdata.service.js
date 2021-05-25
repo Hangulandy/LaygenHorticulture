@@ -86,9 +86,6 @@
 
 		service.getAuthorizations = function() {
 			if (service.getUser() !== undefined) {
-				if (service.getUser().authorizations !== undefined) {
-					return service.getUser().authorizations;
-				}
 				return $http({
 					method: "GET",
 					url: url,
@@ -98,7 +95,7 @@
 				})
 					.then(function(result) {
 						var data = result.data;
-						service.setUser(data);
+						service.setUser(data.user);
 						return data;
 					}).catch(function(error) {
 						console.log("Something went terribly wrong", error);
@@ -123,6 +120,23 @@
 				}
 				return data;
 			}).catch(function(error) {
+				console.log("Something went terribly wrong", error);
+			});
+		}
+
+		service.searchForUserByEmail = function(email){
+			console.log("Inside service.searchForUserByEmail : ", email);
+			return $http({
+				method: "GET",
+				url: url,
+				params: {
+					email: email,
+					action: "searchForUser"
+				}
+			}).then(function(result){
+				var data = result.data;
+				return data;
+			}).catch(function(error){
 				console.log("Something went terribly wrong", error);
 			});
 		}

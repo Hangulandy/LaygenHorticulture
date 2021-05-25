@@ -115,7 +115,10 @@
 		searchUsersCtrl.machine = AppDataService.getMachine();
 		
 		searchUsersCtrl.search = function(){
-			console.log(searchUsersCtrl.email);
+			var promise = AppDataService.searchForUserByEmail(searchUsersCtrl.email);
+			promise.then(function(result){
+				console.log(result);
+			});
 		}
 
 		searchUsersCtrl.get = function(entry) {

@@ -15,6 +15,7 @@
 
 		loginCtrl.login = function() {
 			loginCtrl.message = "";
+			console.log(loginCtrl.email, loginCtrl.password);
 
 			if (loginCtrl.email !== undefined && loginCtrl.password !== undefined) {
 				var promise = AppDataService.login(loginCtrl.email, loginCtrl.password);

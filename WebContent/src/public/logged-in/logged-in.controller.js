@@ -21,6 +21,11 @@
 			AppDataService.resetMachine();
 			$state.go('public.logged-in.not-selected');
 		}
+		
+		loggedInCtrl.getUserName = function(){
+			console.log(AppDataService.getUser());
+			return AppDataService.getUser().name;
+		}
 	}
 
 })();

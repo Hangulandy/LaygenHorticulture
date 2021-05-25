@@ -55,12 +55,7 @@
 				controllerAs: 'infoCtrl',
 				resolve: {
 					machine: ['AppDataService', function(AppDataService) {
-						var machine = AppDataService.getMachine();
-						if (machine !== undefined) {
-							return machine;
-						} else {
-							return undefined;
-						}
+						return AppDataService.getMachine();
 					}]
 				}
 			})

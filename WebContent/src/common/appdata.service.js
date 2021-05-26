@@ -5,8 +5,8 @@
 		.service('AppDataService', AppDataService);
 
 
-	AppDataService.$inject = ['$http'];
-	function AppDataService($http) {
+	AppDataService.$inject = ['$http', '$rootScope'];
+	function AppDataService($http, $rootScope) {
 		var service = this;
 
 		var url = "Controller";
@@ -56,6 +56,7 @@
 			})
 				.then(function(result) {
 					var data = result.data;
+					service.setUser(data.object);
 					return data;
 				}).catch(function(error) {
 					console.log("Something went terribly wrong", error);
@@ -105,7 +106,6 @@
 		}
 
 		service.fetchMachine = function(sn) {
-			service.setMachine(undefined);
 			return $http({
 				method: "GET",
 				url: url,
@@ -124,8 +124,7 @@
 			});
 		}
 
-		service.searchForUserByEmail = function(email){
-			console.log("Inside service.searchForUserByEmail : ", email);
+		service.searchForUserByEmail = function(email) {
 			return $http({
 				method: "GET",
 				url: url,
@@ -133,10 +132,10 @@
 					email: email,
 					action: "searchForUser"
 				}
-			}).then(function(result){
+			}).then(function(result) {
 				var data = result.data;
 				return data;
-			}).catch(function(error){
+			}).catch(function(error) {
 				console.log("Something went terribly wrong", error);
 			});
 		}
@@ -147,6 +146,7 @@
 
 		service.setUser = function(user) {
 			service.setInStorage("user", user);
+			$rootScope.$broadcast('userStatusChanged');
 		}
 
 		service.getMachine = function() {
@@ -155,6 +155,7 @@
 
 		service.setMachine = function(machine) {
 			service.setInStorage("machine", machine);
+			$rootScope.$broadcast('machineStatusChanged');
 		}
 
 		service.resetMachine = function() {

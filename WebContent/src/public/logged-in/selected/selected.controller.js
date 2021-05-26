@@ -9,6 +9,8 @@
 		
 		var selectedCtrl = this;
 		
+		selectedCtrl.machine = AppDataService.getMachine();
+			
 		selectedCtrl.get = function(entry) {
 			return AppDataService.get(entry);
 		}

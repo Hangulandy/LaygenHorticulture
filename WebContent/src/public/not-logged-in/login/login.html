@@ -1,5 +1,7 @@
-<h1>{{loginCtrl.get('login');}}</h1>
+<div class="page">
+<h2>{{loginCtrl.get('login');}}</h2>
 <hr>
+<h3>{{loginCtrl.get('loginPrompt');}}</h3>
 <form name="loginForm" novalidate>
 	<table class="transparent">
 		<tr>
@@ -31,3 +33,5 @@
 
 <div ng-if="loginCtrl.user.name !== undefined">{{loginCtrl.user.name}}</div>
 <div ng-if="loginCtrl.user.username !== undefined">{{loginCtrl.user.username}}</div>
+
+</div>

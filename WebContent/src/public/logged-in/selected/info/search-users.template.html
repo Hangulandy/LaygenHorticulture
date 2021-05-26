@@ -1,13 +1,52 @@
-<div>
+<div class="info-page-tile">
 
-	<h4>{{searchUsersCtrl.get('searchUsersHeading');}}</h4>
+	<div>
+		<h3>{{searchUsersCtrl.get('searchUsersHeading');}}</h3>
 
-	<form name="searchUsersForm" novalidate>
-		<input type="email" name="email"
-			placeholder="{{searchUsersCtrl.get('emailPlaceholder');}}" ng-model="searchUsersCtrl.email" required />
-		<button ng-click="searchUsersCtrl.search();"
-					ng-disabled="searchUsersForm.$invalid">{{searchUsersCtrl.get('searchLabel');}}</button>
-					<span ng-if="searchUsersForm.email.$invalid && searchUsersForm.email.$touched">{{searchUsersCtrl.get('emailInvalidMessage');}}</span>
-	</form>
+		<form name="searchUsersForm" novalidate>
+			<input type="email" name="email"
+				placeholder="{{searchUsersCtrl.get('emailPlaceholder');}}"
+				ng-model="searchUsersCtrl.email" required />
+			<button ng-click="searchUsersCtrl.search();"
+				ng-disabled="searchUsersForm.$invalid">{{searchUsersCtrl.get('searchLabel');}}</button>
+			<br> <span
+				ng-if="searchUsersForm.email.$invalid && searchUsersForm.email.$touched">{{searchUsersCtrl.get('emailInvalidMessage');}}</span>
+		</form>
+	</div>
+
+	<div ng-if="searchUsersCtrl.foundUser !== undefined">
+		<h3>{{searchUsersCtrl.get('addUserHeading');}}</h3>
+		<table class="transparent">
+			<tr>
+				<td>{{searchUsersCtrl.get('nameLabel');}}</td>
+				<td>:</td>
+				<td>{{searchUsersCtrl.foundUser.name}}</td>
+			</tr>
+			<tr>
+				<td>{{searchUsersCtrl.get('organizationLabel');}}</td>
+				<td>:</td>
+				<td>{{searchUsersCtrl.foundUser.organization}}</td>
+			</tr>
+			<tr>
+				<td>{{searchUsersCtrl.get('emailLabel');}}</td>
+				<td>:</td>
+				<td>{{searchUsersCtrl.foundUser.email}}</td>
+			</tr>
+			<tr>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td><button
+						ng-if="searchUsersCtrl.userIsOwner() && !searchUsersCtrl.userIsAuthorized(searchUsersCtrl.foundUser)"
+						ng-click="searchUsersCtrl.addUser()">{{searchUsersCtrl.get('addLabel');}}</button></td>
+			</tr>
+		</table>
+	</div>
+
+	<div
+		ng-if="searchUsersCtrl.foundUser === undefined && searchUsersCtrl.hasSearched == true">
+		<h3>{{searchUsersCtrl.get('cannotFindUserMessage');}}</h3>
+	</div>
 
 </div>

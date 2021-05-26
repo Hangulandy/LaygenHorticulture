@@ -1,71 +1,74 @@
-<h1>{{joinCtrl.get('joinHeading');}}</h1>
-<hr>
-<h3>{{joinCtrl.get('joinPrompt');}}</h3>
-<h3>{{joinCtrl.message}}</h3>
+<div class="page">
 
-<form name="joinForm" novalidate>
-	<table class="transparent">
-		<tr>
-			<td>{{joinCtrl.get('emailLabel');}}*</td>
-			<td><input type="email" name="email" ng-model="joinCtrl.email"
-				required /></td>
-			<td><span
-				ng-if="joinForm.email.$invalid && joinForm.email.$touched">{{joinCtrl.get('emailInvalidMessage');}}</span></td>
-		</tr>
-		<tr>
-			<td>{{joinCtrl.get('nameLabel');}}*</td>
-			<td><input type="text" name="name" ng-model="joinCtrl.name"
-				ng-minlength="2" ng-maxlength="40" required /></td>
-			<td><span
-				ng-if="(joinForm.name.$error.minlength || joinForm.name.$error.maxlength || joinForm.name.$error.required) && joinForm.name.$touched">{{joinCtrl.get('nameInvalidMessage');}}</span>
-			</td>
-		</tr>
-		<tr>
-			<td>{{joinCtrl.get('usernameLabel');}}*</td>
-			<td><input type="text" name="username"
-				ng-model="joinCtrl.username" ng-minlength="2" ng-maxlength="40"
-				required /></td>
-			<td><span
-				ng-if="(joinForm.username.$error.minlength || joinForm.username.$error.maxlength || joinForm.username.$error.required) && joinForm.username.$touched">{{joinCtrl.get('usernameInvalidMessage');}}</span></td>
-		</tr>
-		<tr>
-			<td>{{joinCtrl.get('organizationLabel');}}</td>
-			<td><input type="text" ng-model="joinCtrl.organization" /></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>{{joinCtrl.get('passwordLabel');}}*</td>
-			<td><input type="password" name="pw1" ng-model="joinCtrl.pw1"
-				ng-minlength="8" ng-maxlength="20" required /></td>
-			<td><span
-				ng-if="(joinForm.pw1.$error.minlength || joinForm.pw1.$error.maxlength || joinForm.pw1.$error.required) && joinForm.pw1.$touched">{{joinCtrl.get('passwordWrongLengthMessage');}}</span>
-			</td>
-		</tr>
-		<tr>
-			<td>{{joinCtrl.get('confirmPasswordLabel');}}*</td>
-			<td><input type="password" name="pw2" ng-model="joinCtrl.pw2"
-				ng-minlength="8" ng-maxlength="20" required /></td>
-			<td><span
-				ng-if="(joinForm.pw2.$error.minlength || joinForm.pw2.$error.maxlength || joinForm.pw2.$error.required) && joinForm.pw2.$touched">{{joinCtrl.get('passwordWrongLengthMessage');}}</span>
-			</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td><button ng-disabled="joinForm.$invalid"
-					ng-click="joinCtrl.join();">{{joinCtrl.get('submitLabel');}}</button></td>
-			<td></td>
-		</tr>
-		<tr>
-			<td></td>
-			<td><span
-				ng-if="!(joinCtrl.pw1 == joinCtrl.pw2) && !joinForm.pw1.$invalid && !joinForm.pw2.$invalid">{{joinCtrl.get('passwordsDoNoMatchMessage');}}</span>
-			</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>*{{joinCtrl.get('requiredLabel');}}</td>
-			<td></td>
-		</tr>
-	</table>
-</form>
+	<h1>{{joinCtrl.get('joinHeading');}}</h1>
+	<hr>
+	<h3>{{joinCtrl.get('joinPrompt');}}</h3>
+	<h3>{{joinCtrl.message}}</h3>
+
+	<form name="joinForm" novalidate>
+		<table class="transparent">
+			<tr>
+				<td>{{joinCtrl.get('emailLabel');}}*</td>
+				<td><input type="email" name="email" ng-model="joinCtrl.email"
+					required /></td>
+				<td><span
+					ng-if="joinForm.email.$invalid && joinForm.email.$touched">{{joinCtrl.get('emailInvalidMessage');}}</span></td>
+			</tr>
+			<tr>
+				<td>{{joinCtrl.get('nameLabel');}}*</td>
+				<td><input type="text" name="name" ng-model="joinCtrl.name"
+					ng-minlength="2" ng-maxlength="40" required /></td>
+				<td><span
+					ng-if="(joinForm.name.$error.minlength || joinForm.name.$error.maxlength || joinForm.name.$error.required) && joinForm.name.$touched">{{joinCtrl.get('nameInvalidMessage');}}</span>
+				</td>
+			</tr>
+			<tr>
+				<td>{{joinCtrl.get('usernameLabel');}}*</td>
+				<td><input type="text" name="username"
+					ng-model="joinCtrl.username" ng-minlength="2" ng-maxlength="40"
+					required /></td>
+				<td><span
+					ng-if="(joinForm.username.$error.minlength || joinForm.username.$error.maxlength || joinForm.username.$error.required) && joinForm.username.$touched">{{joinCtrl.get('usernameInvalidMessage');}}</span></td>
+			</tr>
+			<tr>
+				<td>{{joinCtrl.get('organizationLabel');}}</td>
+				<td><input type="text" ng-model="joinCtrl.organization" /></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>{{joinCtrl.get('passwordLabel');}}*</td>
+				<td><input type="password" name="pw1" ng-model="joinCtrl.pw1"
+					ng-minlength="8" ng-maxlength="20" required /></td>
+				<td><span
+					ng-if="(joinForm.pw1.$error.minlength || joinForm.pw1.$error.maxlength || joinForm.pw1.$error.required) && joinForm.pw1.$touched">{{joinCtrl.get('passwordWrongLengthMessage');}}</span>
+				</td>
+			</tr>
+			<tr>
+				<td>{{joinCtrl.get('confirmPasswordLabel');}}*</td>
+				<td><input type="password" name="pw2" ng-model="joinCtrl.pw2"
+					ng-minlength="8" ng-maxlength="20" required /></td>
+				<td><span
+					ng-if="(joinForm.pw2.$error.minlength || joinForm.pw2.$error.maxlength || joinForm.pw2.$error.required) && joinForm.pw2.$touched">{{joinCtrl.get('passwordWrongLengthMessage');}}</span>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><button ng-disabled="joinForm.$invalid"
+						ng-click="joinCtrl.join();">{{joinCtrl.get('submitLabel');}}</button></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><span
+					ng-if="!(joinCtrl.pw1 == joinCtrl.pw2) && !joinForm.pw1.$invalid && !joinForm.pw2.$invalid">{{joinCtrl.get('passwordsDoNoMatchMessage');}}</span>
+				</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>*{{joinCtrl.get('requiredLabel');}}</td>
+				<td></td>
+			</tr>
+		</table>
+	</form>
+</div>

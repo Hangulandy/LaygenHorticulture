@@ -61,7 +61,9 @@
 			})
 			.state('public.logged-in.selected.settings', {
 				url: '/logged-in/settings',
-				templateUrl: 'src/public/logged-in/selected/settings/settings.html'
+				templateUrl: 'src/public/logged-in/selected/settings/settings.html',
+				controller: 'SettingsController',
+				controllerAs: 'settingsCtrl'
 			})
 			.state('public.logged-in.selected.data', {
 				url: '/logged-in/data',

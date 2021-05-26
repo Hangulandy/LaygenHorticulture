@@ -106,23 +106,44 @@
 		};
 		return ddo;
 	}
-	
+
 	SearchUsersController.$inject = ['AppDataService'];
-	function SearchUsersController(AppDataService){
+	function SearchUsersController(AppDataService) {
 
 		var searchUsersCtrl = this;
 
+		searchUsersCtrl.hasSearched = false;
+
 		searchUsersCtrl.machine = AppDataService.getMachine();
-		
-		searchUsersCtrl.search = function(){
+
+		searchUsersCtrl.search = function() {
 			var promise = AppDataService.searchForUserByEmail(searchUsersCtrl.email);
-			promise.then(function(result){
-				console.log(result);
+			promise.then(function(result) {
+				searchUsersCtrl.foundUser = result.object;
+				searchUsersCtrl.hasSearched = true;
 			});
 		}
 
 		searchUsersCtrl.get = function(entry) {
 			return AppDataService.get(entry);
+		}
+
+		searchUsersCtrl.userIsOwner = function() {
+			var user = AppDataService.getUser();
+			return user.email == searchUsersCtrl.machine.info.owner_email;
+		}
+
+		searchUsersCtrl.userIsAuthorized = function(user) {
+			// must have a result variable declared because the lambda expression 
+			// will return a value for each value in the loop otherwise
+			var found = false;
+			searchUsersCtrl.machine.authorizedUsers.forEach(authUser => {
+				if (authUser.id == user.id) {
+					found = true;
+				}
+			});
+			console.log();
+			return found;
 		}
 	}
 

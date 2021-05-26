@@ -5,8 +5,8 @@
 	--visited-text: rgb(211, 215, 207);
 	--table-light-color: #ebf0f9;
 	--main-dark-color: #1f386b; 
-	--banner-height: 100px; 
-	--banner-text-size: calc(var(--banner-height)/2);
+	--banner-text-size: 40px;
+	--banner-height: calc(var(--banner-text-size) + calc(2 * var(--standard-pad)));
 	--button-height: 25px;
 	--flag-width: 30px;
 	--footer-height: 50px;
@@ -25,6 +25,17 @@
 	--standard-border: 0px; 
 	--block-height: calc(100vh - calc(calc(var(--footer-height) + var(--header-height)) + calc(2 * var(--standard-pad)))); 
 	--mobile-block-height: calc(var(--block-height) - var(--head-height));
+	--info-page-tile-height: 365px;
+}
+
+html {
+	position: relative;
+	min-height: 100%;
+}
+
+body {
+	padding-top: calc(var(--header-height) + var(--standard-pad));
+	padding-bottom: var(--footer-height);
 }
 
 * {
@@ -56,10 +67,25 @@ a.download {
 
 h1 {
 	margin: var(--standard-pad) 0px;
+	font-size: var(--banner-text-size);
+	line-height: var(--banner-text-size);
+}
+
+h2 {
+	padding: 0px;
+	margin: 0px;
 }
 
 h3 {
 	margin: var(--standard-pad) 0px;
+}
+
+h4 {
+	margin: 3px 0px;
+}
+
+hr {
+	margin-top: 0px;
 }
 
 input[type=date] {
@@ -93,11 +119,11 @@ table, td, th {
 
 table {
 	margin: var(--standard-pad) 0px;
-	width: 100%;
 }
 
 td {
 	padding: calc(var(--standard-pad) / 2);
+	text-align: left;
 }
 
 th {
@@ -125,14 +151,6 @@ table.transparent {
 	border-spacing: 0px var(--standard-pad);
 }
 
-td.transparent {
-	min-width: var(--standard-pad);
-}
-
-tr.custom-color-row:nth-child(odd) {
-	background-color: var(--light-color);
-}
-
 form.custom-color-adjuster {
 	border: 2px solid red;
 }
@@ -142,10 +160,7 @@ form.custom-color-adjuster {
 }
 
 .banner {
-	font-size: var(--banner-text-size);
 	color: var(--light-text);
-	height: var(--banner-height);
-	line-height: var(--banner-height);
 	text-align: center;
 	overflow: hidden;
 }
@@ -260,14 +275,13 @@ form.custom-color-adjuster {
 	left: 0;
 	width: 100%;
 	z-index: 1;
-	color: var(--light-text);
 	height: var(--footer-height);
+	color: var(--light-text);
 	text-align: center;
 }
 
 .header {
-	border: var(--standard-border) solid var(--dark-text);
-	padding: 0px var(--standard-pad);
+	padding: 0px;
 	background-image: linear-gradient(to right, var(--main-dark-color),
 		var(--dark-text));
 	position: fixed;
@@ -275,6 +289,11 @@ form.custom-color-adjuster {
 	left: 0;
 	width: 100%;
 	z-index: 1;
+	color: var(--light-color);
+}
+
+.header button {
+	color: var(--dark-text);
 }
 
 .img-container {
@@ -284,8 +303,18 @@ form.custom-color-adjuster {
 
 
 .info-page-tile {
-	margin-right: calc(2 * var(--standard-pad));
+	border: 2px solid grey;
+	border-radius: var(--standard-pad);
+	padding: var(--standard-pad);
+	margin-bottom: var(--standard-pad);
+	margin-right: var(--standard-pad);
 	float: left;
+	height: var(--info-page-tile-height);
+	box-shadow: 5px 5px grey;
+}
+
+.info-page-tile h3 {
+	text-decoration: underline;
 }
 
 .left {
@@ -294,15 +323,10 @@ form.custom-color-adjuster {
 }
 
 .left-head, .right-head {
-	margin-bottom: var(--standard-pad);
+	height: var(--head-height);
+	margin-right: calc(2 * var(--standard-pad));
 	float: left;
-	color: var(--light-text);
 	text-align: left;
-}
-
-.left-head {
-	width: var(--left-head-width);
-	margin-right: var(--standard-pad);
 }
 
 .margin-top {
@@ -313,8 +337,8 @@ form.custom-color-adjuster {
 	display: none;
 }
 
-.right-head {
-	width: var(--right-head-width);
+.page {
+	clear: left;
 }
 
 .selector {
@@ -393,6 +417,10 @@ form.custom-color-adjuster {
 /* Mobile */
 @media ( max-width : 768px) {
 	
+	body {
+		padding-top: calc(var(--header-height) + calc(var(--standard-pad) + var(--head-height)));
+	}
+	
 	table {
 		width: 100%;
 	}
@@ -406,13 +434,9 @@ form.custom-color-adjuster {
 	}
 
 	.content {
-	padding: 0px;
+		padding: 0px;
 		width: 100%;
 		height: var(--mobile-block-height);
-	}
-	
-	.header {
-		padding: 0px var(--standard-pad);
 	}
 	
 	.img-container {
@@ -425,6 +449,7 @@ form.custom-color-adjuster {
 		width: 100%;
 		float: left;
 		clear: left;
+		height: auto;
 	}
 	
 	.left-head, .right-head {
@@ -445,10 +470,6 @@ form.custom-color-adjuster {
 		margin: 0px;
 		width: 100%;
 		height: var(--mobile-selector-height);
-	}
-	
-	.under-header {
-		height: calc(var(--header-height) + var(--head-height));
 	}
 	
 	#data-selector {

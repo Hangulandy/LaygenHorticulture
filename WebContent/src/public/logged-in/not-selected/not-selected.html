@@ -1,15 +1,23 @@
-<h3>{{notSelectedCtrl.getMessage();}}</h3>
-<table>
-	<tr>
-		<th>{{notSelectedCtrl.get('serialNumberLabel');}}</th>
-		<th>{{notSelectedCtrl.get('nickname');}}</th>
-		<th>{{notSelectedCtrl.get('owner_email');}}</th>
-		<th></th>
-	</tr>
-	<tr ng-repeat="auth in notSelectedCtrl.authorizations">
-		<td>{{auth.machineSerialNumber}}</td>
-		<td>{{auth.machineNickname}}</td>
-		<td>{{auth.ownerEmail}}</td>
-		<td><button ng-click="notSelectedCtrl.selectMachine($index);">{{notSelectedCtrl.get('select');}}</button></td>
-	</tr>
-</table>
+<div class="page">
+<h2>{{notSelectedCtrl.get('machineListHeading');}}</h2>
+<hr>
+	<h3>{{notSelectedCtrl.getMessage();}}</h3>
+	<table>
+		<thead>
+			<tr>
+				<th>{{notSelectedCtrl.get('serialNumberLabel');}}</th>
+				<th>{{notSelectedCtrl.get('nickname');}}</th>
+				<th>{{notSelectedCtrl.get('owner_email');}}</th>
+				<th>{{notSelectedCtrl.get('optionsLabel');}}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="auth in notSelectedCtrl.authorizations">
+				<td>{{auth.machineSerialNumber}}</td>
+				<td>{{auth.machineNickname}}</td>
+				<td>{{auth.ownerEmail}}</td>
+				<td><button ng-click="notSelectedCtrl.selectMachine($index);">{{notSelectedCtrl.get('select');}}</button></td>
+			</tr>
+		</tbody>
+	</table>
+</div>

@@ -1,20 +1,18 @@
-<div>
+<div class="info-page-tile">
 
-	<h4>{{authUsersCtrl.get('authorizedUsersHeading');}}</h4>
+	<h3>{{authUsersCtrl.get('authorizedUsersHeading');}}</h3>
 
 	<table ng-if="authUsersCtrl.hasUsers()">
 		<tr>
 			<th>{{authUsersCtrl.get('nameLabel');}}</th>
 			<th>{{authUsersCtrl.get('organizationLabel');}}</th>
 			<th>{{authUsersCtrl.get('emailLabel');}}</th>
-			<th>{{authUsersCtrl.get('revokeLabel');}}</th>
-			<th>{{authUsersCtrl.get('makeOwnerLabel');}}</th>
+			<th>{{authUsersCtrl.get('optionsLabel');}}</th>
 		</tr>
 		<tr ng-repeat="user in authUsersCtrl.machine.authorizedUsers">
 			<td>{{user.name}}</td>
 			<td>{{user.organization}}</td>
 			<td>{{user.email}}</td>
-			<td></td>
 			<td></td>
 		</tr>
 	</table>

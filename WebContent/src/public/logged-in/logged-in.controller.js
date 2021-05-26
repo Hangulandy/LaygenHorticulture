@@ -5,26 +5,11 @@
 		.controller('LoggedInController', LoggedInController);
 
 	LoggedInController.$inject = ['AppDataService', '$state'];
-	function LoggedInController(AppDataService, $state) {
+	function LoggedInController(AppDataService) {
 		var loggedInCtrl = this;
 
 		loggedInCtrl.get = function(entry) {
 			return AppDataService.get(entry);
-		}
-
-		loggedInCtrl.logout = function() {
-			AppDataService.logout();
-			$state.go('public.not-logged-in.login');
-		}
-
-		loggedInCtrl.viewMyMachines = function() {
-			AppDataService.resetMachine();
-			$state.go('public.logged-in.not-selected');
-		}
-		
-		loggedInCtrl.getUserName = function(){
-			console.log(AppDataService.getUser());
-			return AppDataService.getUser().name;
 		}
 	}
 

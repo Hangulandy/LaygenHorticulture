@@ -4,40 +4,29 @@
 	angular.module('public')
 		.controller('NotSelectedController', NotSelectedController);
 
-	NotSelectedController.$inject = ['AppDataService', '$state'];
-	function NotSelectedController(AppDataService, $state) {
+	NotSelectedController.$inject = ['AppDataService', '$state', 'data'];
+	function NotSelectedController(AppDataService, $state, data) {
 
 		var notSelectedCtrl = this;
 		notSelectedCtrl.authorizations = undefined;
 
-		notSelectedCtrl.message = "";
-
-		if (AppDataService.getUser() !== undefined) {
-			var promise = AppDataService.getAuthorizations();
-			promise.then(function(result) {
-				notSelectedCtrl.data = result;
-				notSelectedCtrl.message = notSelectedCtrl.data.message;
-				notSelectedCtrl.authorizations = notSelectedCtrl.data.user.authorizations;
-			});
-		} else {
-			$state.go('public.not-logged-in.login');
-		}
+		notSelectedCtrl.data = data;
 
 		notSelectedCtrl.get = function(entry) {
 			return AppDataService.get(entry);
 		}
 
 		notSelectedCtrl.getMessage = function() {
-			if (notSelectedCtrl.message === "") {
-				return notSelectedCtrl.message;
+			if (notSelectedCtrl.data.message === "") {
+				return notSelectedCtrl.data.message;
 			} else {
-				return AppDataService.get(notSelectedCtrl.message);
+				return AppDataService.get(notSelectedCtrl.data.message);
 			}
 		}
 
 		notSelectedCtrl.selectMachine = function(index) {
 			// Use the index to get the sn
-			var sn = notSelectedCtrl.authorizations[index].machineSerialNumber;
+			var sn = notSelectedCtrl.data.user.authorizations[index].machineSerialNumber;
 
 			// Use AppDataService to get the machine info
 			var promise = AppDataService.fetchMachine(sn);
@@ -45,9 +34,9 @@
 				var machine = AppDataService.getMachine();
 				// Redirect to either the machine info view page or the machine list page
 				if (machine !== undefined) {
-					$state.go('public.logged-in.selected.info');
+					$state.go('common.public.logged-in.selected.info');
 				} else {
-					$state.go('public.logged-in.not-selected');
+					$state.go('common.public.logged-in.not-selected');
 				}
 			});
 

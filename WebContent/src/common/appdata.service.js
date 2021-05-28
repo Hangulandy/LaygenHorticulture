@@ -5,8 +5,8 @@
 		.service('AppDataService', AppDataService);
 
 
-	AppDataService.$inject = ['$http', '$rootScope'];
-	function AppDataService($http, $rootScope) {
+	AppDataService.$inject = ['$http', '$rootScope', '$state'];
+	function AppDataService($http, $rootScope, $state) {
 		var service = this;
 
 		var url = "Controller";
@@ -14,20 +14,78 @@
 		service.lang = "ko";
 		service.dict = undefined;
 
-		if (service.dict === undefined) {
-			$http({
-				method: "GET",
-				url: url,
-				params: {
-					action: "getDictionary"
+
+		service.verifyUser = function() {
+			if (!service.userValid()) {
+				service.redirectHome();
+			}
+		}
+
+		service.userValid = function() {
+			if (service.getUser() !== undefined) {
+				return service.getUser().loggedIn;
+			}
+			return false;
+		}
+
+		service.redirectHome = function() {
+			$state.go('common.public.not-logged-in.login');
+		}
+
+		service.machineValid = function() {
+			if (service.getMachine() !== undefined) {
+				return true;
+			}
+			return false;
+		}
+
+		service.userIsAuthorized = function(user) {
+			// must have a result variable declared because the lambda expression 
+			// will return a value for each value in the loop otherwise
+			var found = false;
+			service.getMachine().authorizedUsers.forEach(authUser => {
+				if (authUser.id == user.id) {
+					found = true;
 				}
-			})
-				.then(function(result) {
-					var data = result.data;
-					service.dict = data;
-				}).catch(function(error) {
-					console.log("Something went terribly wrong", error);
-				});
+			});
+			console.log();
+			return found;
+		}
+
+		service.machineSelectionOk = function() {
+			return (service.machineValid() && service.userIsAuthorized(service.getUser()));
+		}
+
+		service.verifyUserAndMachine = function() {
+			if (!service.machineSelectionOk()) {
+				service.redirectToMachinesList();
+			}
+		}
+
+
+
+		service.redirectToMachinesList = function() {
+			$state.go('common.public.logged-in.not-selected');
+		}
+
+		service.getDictionary = function() {
+			if (service.dict === undefined) {
+				return $http({
+					method: "GET",
+					url: url,
+					params: {
+						action: "getDictionary"
+					}
+				})
+					.then(function(result) {
+						var data = result.data;
+						service.dict = data;
+					}).catch(function(error) {
+						console.log("Something went terribly wrong", error);
+					});
+			} else {
+				return service.dict;
+			}
 		}
 
 		service.logout = function() {
@@ -45,6 +103,7 @@
 		}
 
 		service.login = function(email, password) {
+			service.setUser(undefined);
 			return $http({
 				method: "POST",
 				url: url,
@@ -56,7 +115,7 @@
 			})
 				.then(function(result) {
 					var data = result.data;
-					service.setUser(data.object);
+					service.setUser(data.user);
 					return data;
 				}).catch(function(error) {
 					console.log("Something went terribly wrong", error);
@@ -188,20 +247,12 @@
 		}
 
 		service.get = function(entry) {
+			if (entry === undefined) {
+				return undefined;
+			}
 			return service.dict[entry][service.lang];
 		}
 
-		service.setMessage = function(message) {
-			service.message = message;
-		}
-
-		service.getMessage = function() {
-			if (service.message === undefined) {
-				return "null";
-			} else {
-				return service.message;
-			}
-		}
 	}
 
 })();

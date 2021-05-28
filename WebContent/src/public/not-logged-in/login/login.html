@@ -29,9 +29,6 @@
 	</table>
 </form>
 
-<h3>{{loginCtrl.getMessage();}}</h3>
-
-<div ng-if="loginCtrl.user.name !== undefined">{{loginCtrl.user.name}}</div>
-<div ng-if="loginCtrl.user.username !== undefined">{{loginCtrl.user.username}}</div>
+<h3>{{loginCtrl.get(loginCtrl.data.message);}}</h3>
 
 </div>

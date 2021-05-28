@@ -1,0 +1,48 @@
+<div class="info-page-tile">
+	<h3>{{waterCtrl.get('waterSettingsHeading');}}</h3>
+	<form name="waterSettingsForm" novalidate>
+		<table>
+			<thead>
+				<tr>
+					<th>{{waterCtrl.get('itemLabel');}}</th>
+					<th>{{waterCtrl.get('valueLabel');}}</th>
+					<th>{{waterCtrl.get('adjustLabel');}}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{waterCtrl.get('water_in_valve_on')}}</td>
+					<td>{{waterCtrl.get(waterCtrl.getOpenedOrClosed('water_in_valve_on'))}}</td>
+					<td><label><input type="radio"
+							name="water_in_valve_on" ng-model="waterCtrl.waterInValveOn"
+							value="1" /> {{waterCtrl.get('open');}}</label> <label><input
+							type="radio" name="water_in_valve_on"
+							ng-model="waterCtrl.waterInValveOn" value="0" />
+							{{waterCtrl.get('close');}}</label></td>
+				</tr>
+				<tr>
+					<td>{{waterCtrl.get('water_cycle_on')}}</td>
+					<td>{{waterCtrl.get(waterCtrl.getOnOrOffLabel('water_cycle_on'))}}</td>
+					<td><label><input type="radio" name="water_cycle_on"
+							ng-model="waterCtrl.waterCycleOn" value="1" />
+							{{waterCtrl.get('onLabel');}}</label> <label><input type="radio"
+							name="water_cycle_on" ng-model="waterCtrl.waterCycleOn" value="0" />
+							{{waterCtrl.get('offLabel');}}</label></td>
+				</tr>
+
+				<tr>
+					<td>{{waterCtrl.get('water_cycle_duration')}}</td>
+					<td>{{waterCtrl.machine.settings.water_cycle_duration}}</td>
+					<td><input type="number" name="water_cycle_duration" step="1"
+						min="0" max="3600" ng-model="waterCtrl.waterCycleDuration"></td>
+				</tr>
+				<tr>
+					<td>{{waterCtrl.get('water_cycle_period')}}</td>
+					<td>{{waterCtrl.machine.settings.water_cycle_period}}</td>
+					<td><input type="number" name="water_cycle_period" step="1"
+						min="0" max="10000000" ng-model="waterCtrl.waterCyclePeriod"></td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+</div>

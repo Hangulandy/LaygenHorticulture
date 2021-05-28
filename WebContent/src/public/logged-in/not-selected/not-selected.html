@@ -2,7 +2,7 @@
 <h2>{{notSelectedCtrl.get('machineListHeading');}}</h2>
 <hr>
 	<h3>{{notSelectedCtrl.getMessage();}}</h3>
-	<table>
+	<table ng-if="notSelectedCtrl.data.user.authorizations !== undefined">
 		<thead>
 			<tr>
 				<th>{{notSelectedCtrl.get('serialNumberLabel');}}</th>
@@ -12,7 +12,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="auth in notSelectedCtrl.authorizations">
+			<tr ng-repeat="auth in notSelectedCtrl.data.user.authorizations">
 				<td>{{auth.machineSerialNumber}}</td>
 				<td>{{auth.machineNickname}}</td>
 				<td>{{auth.ownerEmail}}</td>
@@ -20,4 +20,5 @@
 			</tr>
 		</tbody>
 	</table>
+	<h4 ng-if="notSelectedCtrl.data.user.authorizations === undefined">{{notSelectedCtrl.get('noAuthorizedMachines');}}</h4>
 </div>

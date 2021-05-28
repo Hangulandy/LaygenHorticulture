@@ -65,6 +65,10 @@ a.download {
 	text-decoration: none;
 }
 
+button {
+	padding: 0px var(--standard-pad);
+}
+
 h1 {
 	margin: var(--standard-pad) 0px;
 	font-size: var(--banner-text-size);
@@ -118,7 +122,11 @@ table, td, th {
 }
 
 table {
+	border: 1px solid black;
 	margin: var(--standard-pad) 0px;
+	border-radius: var(--standard-pad);
+	overflow: hidden;
+	box-shadow: 0px 0px 5px black;
 }
 
 td {
@@ -145,10 +153,12 @@ table.transparent, table.transparent tr, table.transparent td, table.transparent
 	text-align: left;
 	margin: 0px;
 	width: auto;
+	box-shadow: none;
 }
 
 table.transparent {
 	border-spacing: 0px var(--standard-pad);
+	border-radius: 0px;
 }
 
 form.custom-color-adjuster {

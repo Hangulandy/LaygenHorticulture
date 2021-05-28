@@ -123,7 +123,7 @@ public class Machine {
 		this.authorizedUsers = authorizedUsers;
 	}
 
-	public String sendMachineSettngs(TreeMap<String, String> newSettings, String lang) {
+	public String sendMachineSettngs(TreeMap<String, String> newSettings) {
 		try {
 			int port = Integer.parseInt(this.getInfo().get("port"));
 			try (Socket socket = new Socket(this.getInfo().get("ip"), port)) {
@@ -341,7 +341,7 @@ public class Machine {
 		this.lightColors = lightColors;
 	}
 
-	public String[] setWaterInValve(String value, String lang) {
+	public String[] setWaterInValve(String value) {
 
 		String[] output = new String[2];
 		output[0] = "0";

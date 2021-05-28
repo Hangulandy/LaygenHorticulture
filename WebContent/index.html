@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="HorticultureApp">
+<html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,54 +10,8 @@
 <title>Horticulture by Laygen</title>
 </head>
 
-<body ng-controller="CommonController as commonCtrl">
-	<div class="header">
-		<div class="container-fluid">
-			<div class="row">
-				<div class="col-xs-12 banner">
-					<h1>{{commonCtrl.get('bannerText')}}</h1>
-				</div>
-				<div class="col-xs-12">
-					<div ng-if="commonCtrl.user === undefined" class="left-head">
-						<h4>{{commonCtrl.get('notLoggedIn');}}</h4>
-						<button ui-sref="public.not-logged-in.login">{{commonCtrl.get('login');}}</button>
-						<button ui-sref="public.not-logged-in.join">{{commonCtrl.get('join');}}</button>
-					</div>
-					<div ng-if="!(commonCtrl.user === undefined)" class="left-head">
-						<h4>{{commonCtrl.get('hello');}},
-							{{commonCtrl.getUserName();}}</h4>
-						<div>
-							<button ng-click="commonCtrl.logout()">{{commonCtrl.get('logout');}}</button>
-							<button ng-click="commonCtrl.viewMyMachines()">{{commonCtrl.get('myMachines');}}</button>
-						</div>
-					</div>
-					<div
-						ng-if="!(commonCtrl.user === undefined) && !(commonCtrl.machine === undefined)">
-						<div class="right-head">
-							<h4>{{commonCtrl.get('selectedMachineLabel');}} :
-								{{commonCtrl.machine.info.nickname}}</h4>
-
-							<div>
-								<button ui-sref="public.logged-in.selected.info">{{
-									commonCtrl.get('info'); }}</button>
-								<button ui-sref="public.logged-in.selected.settings">{{
-									commonCtrl.get('settings'); }}</button>
-								<button ui-sref="public.logged-in.selected.data">{{
-									commonCtrl.get('data'); }}</button>
-								<button ui-sref="public.logged-in.selected.camera">{{
-									commonCtrl.get('camera'); }}</button>
-							</div>
-
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="container-fluid">
-		<ui-view></ui-view>
-	</div>
+<body ng-app="HorticultureApp">
+	<ui-view></ui-view>
 
 	<!-- Libraries -->
 	<script src="lib/jquery-2.1.4.min.js"></script>
@@ -78,29 +32,38 @@
 		src="src/public/logged-in/not-selected/not-selected.controller.js"></script>
 	<script src="src/public/logged-in/selected/selected.controller.js"></script>
 	<script src="src/public/logged-in/selected/info/info.controller.js"></script>
-	<script src="src/public/logged-in/selected/settings/settings.controller.js"></script>
 
+	<!-- Info Page Quick View Components Controllers -->
+	<script
+		src="src/public/logged-in/selected/info/settings-quick-view-component.controller.js"></script>
+	<script
+		src="src/public/logged-in/selected/info/data-quick-view-component.controller.js"></script>
+	<script
+		src="src/public/logged-in/selected/info/general-info-view-component.controller.js"></script>
+	<script
+		src="src/public/logged-in/selected/info/authorized-users-view-component.controller.js"></script>
+	<script
+		src="src/public/logged-in/selected/info/search-users-component.controller.js"></script>
+
+
+	<!-- Settings Components Controllers -->
+	<script
+		src="src/public/logged-in/selected/settings/settings.controller.js"></script>
+	<script
+		src="src/public/logged-in/selected/settings/grow-settings-component.controller.js"></script>
+	<script
+		src="src/public/logged-in/selected/settings/water-settings-component.controller.js"></script>
+	<script
+		src="src/public/logged-in/selected/settings/light-settings-component.controller.js"></script>
+	<script
+		src="src/public/logged-in/selected/settings/air-settings-component.controller.js"></script>
+	<script
+		src="src/public/logged-in/selected/settings/camera-settings-component.controller.js"></script>
 
 	<!-- Common Module -->
 	<script src="src/common/common.module.js"></script>
 	<script src="src/common/common.controller.js"></script>
 	<script src="src/common/appdata.service.js"></script>
 	<div class="under-footer"></div>
-
-	</div>
-	<div class="footer">
-		<div class="container-fluid">
-			<a ng-click="commonCtrl.setLang('en')"><img class="flag"
-				src="img/united-kingdom.png" /></a> <a
-				ng-click="commonCtrl.setLang('ko')"><img class="flag"
-				src="img/south-korea.png" /></a><br>
-			<p class="small-print">
-				Flag icons made by <a class="footer-link"
-					href="https://www.freepik.com" title="Freepik">Freepik</a> from <a
-					class="footer-link" href="https://www.flaticon.com/"
-					title="Flaticon">www.flaticon.com</a>
-			</p>
-		</div>
-	</div>
 </body>
 </html>

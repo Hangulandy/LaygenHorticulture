@@ -166,6 +166,7 @@ public class User implements Comparable<User> {
 		System.out.println("Username on file : " + this.username);
 		System.out.println("Organization on file : " + this.organization);
 		System.out.println("Password on file : " + this.password);
+		System.out.printf("User is%slogged in\n", this.isLoggedIn() ? " " : " NOT ");
 	}
 
 	public void fetchAuthorizations() {

@@ -55,7 +55,7 @@ public class UserDB {
 		User userFromDB = null;
 		// First, get the ID using email
 		String uuid = fetchUUIDByEmail(user.getEmail());
-
+		
 		// If a uuid comes back (i.e. email is in the db), get the user data by uuid
 		if (uuid != null) {
 			userFromDB = fetchCompleteUserByUUID(uuid);
@@ -63,6 +63,7 @@ public class UserDB {
 			if (userFromDB != null) {
 				if (userFromDB.getPassword().equalsIgnoreCase(user.getPassword())) {
 					userFromDB.setLoggedIn(true);
+					message = "null";
 				} else {
 					message = "wrongPassword";
 					userFromDB.setLoggedIn(false);
@@ -74,6 +75,7 @@ public class UserDB {
 			user.setName(userFromDB.getName());
 			user.setUsername(userFromDB.getUsername());
 			user.setOrganization(userFromDB.getOrganization());
+			user.setLoggedIn(userFromDB.isLoggedIn());
 			user.setPassword(null);
 		} else {
 			user = null;

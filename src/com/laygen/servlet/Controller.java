@@ -3,7 +3,9 @@ package com.laygen.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -92,6 +94,10 @@ public class Controller extends HttpServlet {
 				if (action.equalsIgnoreCase("addUser")) {
 					addUser(request, response, session);
 				}
+
+				if (action.equalsIgnoreCase("updateGrowSettings")) {
+					updateGrowSettings(request, response, session);
+				}
 			}
 
 		} catch (IllegalStateException e) {
@@ -123,6 +129,7 @@ public class Controller extends HttpServlet {
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
 		User user = new User();
+		
 		String message = user.login(email, password);
 
 		session.setAttribute("user", user);
@@ -142,7 +149,7 @@ public class Controller extends HttpServlet {
 
 	private void getAuthorizations(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		User user = (User) session.getAttribute("user");
-		String message = "null";
+		String message = null;
 
 		if (user != null && user.getId() != null) {
 			user.fetchAuthorizations();
@@ -197,8 +204,7 @@ public class Controller extends HttpServlet {
 				} else {
 					message = "cannotFindUserMessage";
 				}
-			}
-			else {
+			} else {
 				message = "invalidValueMessage";
 			}
 		}
@@ -225,6 +231,36 @@ public class Controller extends HttpServlet {
 		sendObjectWithResponse(machine, message, session, response);
 	}
 
+	private void updateGrowSettings(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = "invalidUserMessage";
+		User user = getLoggedInUser(session);
+
+		if (user != null) {
+			if (userIsAuth(session)) {
+				if (machine != null && machine.getSerialNumber() != null) {
+					TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
+					newSettings.put("plant_date", request.getParameter("plant_date"));
+					message = machine.sendMachineSettngs(newSettings);
+				} else {
+					message = "unableToUpdate";
+				}
+			} else {
+				message = "userNotAuthorized";
+			}
+		}
+		
+		sendObjectWithResponse(user, message, session, response);
+	}
+
+	private User getLoggedInUser(HttpSession session) {
+		User user = (User)session.getAttribute("user");
+		if (user != null && user.isLoggedIn()) {
+			return user;
+		}
+		return null;
+	}
+
 	private boolean userIsAuth(HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 		User user = (User) session.getAttribute("user");
@@ -234,6 +270,11 @@ public class Controller extends HttpServlet {
 	private void sendObjectWithResponse(Object obj, String message, HttpSession session, HttpServletResponse response) {
 
 		User user = (User) session.getAttribute("user");
+		
+		if (!user.isLoggedIn()) {
+			user = null;
+			obj = null;
+		}
 
 		MyResponse resp = new MyResponse();
 		resp.setUser(user);

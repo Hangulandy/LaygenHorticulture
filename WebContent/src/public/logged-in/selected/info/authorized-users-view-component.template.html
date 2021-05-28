@@ -13,7 +13,10 @@
 			<td>{{user.name}}</td>
 			<td>{{user.organization}}</td>
 			<td>{{user.email}}</td>
-			<td></td>
+			<td><button ng-if="authUsersCtrl.canRevoke(user);"
+					ng-click="authUsersCtrl.revoke(user);">{{authUsersCtrl.get('revokeLabel');}}</button>
+				<button ng-if="authUsersCtrl.canMakeOwner(user);"
+					ng-click="authUsersCtrl.transfer(user);">{{authUsersCtrl.get('transferLabel');}}</button></td>
 		</tr>
 	</table>
 

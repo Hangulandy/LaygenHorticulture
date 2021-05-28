@@ -7,7 +7,7 @@
 	CommonController.$inject = ['AppDataService', '$rootScope', '$state'];
 	function CommonController(AppDataService, $rootScope, $state) {
 		var commonCtrl = this;
-
+				
 		$rootScope.$on('userStatusChanged', function(event) {
 			commonCtrl.refreshUser();
 		});
@@ -38,12 +38,12 @@
 
 		commonCtrl.logout = function() {
 			AppDataService.logout();
-			$state.go('public.not-logged-in.login');
+			$state.go('common.public.not-logged-in.login');
 		}
 
 		commonCtrl.viewMyMachines = function() {
 			AppDataService.resetMachine();
-			$state.go('public.logged-in.not-selected');
+			$state.go('common.public.logged-in.not-selected');
 		}
 
 		commonCtrl.getUserName = function() {

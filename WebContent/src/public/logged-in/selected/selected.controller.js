@@ -4,16 +4,18 @@
 	angular.module('public')
 		.controller('SelectedController', SelectedController);
 
-	SelectedController.$inject = ['AppDataService'];
-	function SelectedController(AppDataService) {
-		
+	SelectedController.$inject = ['AppDataService', 'machine'];
+	function SelectedController(AppDataService, machine) {
+
 		var selectedCtrl = this;
-		
-		selectedCtrl.machine = AppDataService.getMachine();
-			
+
+		selectedCtrl.machine = machine;
+
 		selectedCtrl.get = function(entry) {
 			return AppDataService.get(entry);
 		}
+		
+		AppDataService.verifyUserAndMachine();
 
 	}
 

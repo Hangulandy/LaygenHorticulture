@@ -194,4 +194,8 @@ public class User implements Comparable<User> {
 		return UserDB.login(this);
 	}
 
+	public void refreshAuthorizations() {
+		this.fetchAuthorizations();
+	}
+
 }

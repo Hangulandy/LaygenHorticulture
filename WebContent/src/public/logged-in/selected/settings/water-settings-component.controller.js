@@ -7,10 +7,6 @@
 	WaterSettingsComponentController.$inject = ['AppDataService'];
 	function WaterSettingsComponentController(AppDataService) {
 		var waterCtrl = this;
-
-		waterCtrl.machine = AppDataService.getMachine();
-		
-		console.log(waterCtrl.machine);
 		
 		waterCtrl.waterInValveOn = waterCtrl.machine.settings.water_in_valve_on;
 		waterCtrl.waterCycleOn = waterCtrl.machine.settings.water_cycle_on;

@@ -4,20 +4,24 @@
 	angular.module('public')
 		.controller('SearchUsersComponentController', SearchUsersComponentController);
 
-	SearchUsersComponentController.$inject = ['AppDataService'];
-	function SearchUsersComponentController(AppDataService) {
+	SearchUsersComponentController.$inject = ['AppDataService', '$rootScope'];
+	function SearchUsersComponentController(AppDataService, $rootScope) {
+
+		/* Declare controller */
 
 		var searchUsersCtrl = this;
 
-		searchUsersCtrl.hasSearched = false;
-
-		searchUsersCtrl.machine = AppDataService.getMachine();
+		/* Declare functions */
+		
+		$rootScope.$on('userRemoved', function(){
+			searchUsersCtrl.resetMessage();
+		})
 
 		searchUsersCtrl.search = function() {
 			var promise = AppDataService.searchForUserByEmail(searchUsersCtrl.email);
 			promise.then(function(result) {
 				searchUsersCtrl.foundUser = result.object;
-				searchUsersCtrl.hasSearched = true;
+				searchUsersCtrl.message = result.message;
 			});
 		}
 
@@ -33,10 +37,30 @@
 		searchUsersCtrl.userIsAuthorized = function(user) {
 			return AppDataService.userIsAuthorized(user);
 		}
-		
-		searchUsersCtrl.addUser = function(){
-			console.log("User to add : ", searchUsersCtrl.foundUser);
+
+		searchUsersCtrl.addUser = function() {
+			var user = searchUsersCtrl.foundUser;
+			searchUsersCtrl.resetMessage();
+			var promise = AppDataService.addUser(user);
+			promise.then(function(result) {
+				searchUsersCtrl.message = result.message;
+				searchUsersCtrl.machine = AppDataService.getMachine();
+				AppDataService.verifyUserAndMachine();
+			});
 		}
+		
+		searchUsersCtrl.clearResults = function(){
+			searchUsersCtrl.foundUser = undefined;
+		}
+
+		searchUsersCtrl.resetMessage = function() {
+			searchUsersCtrl.message = "null";
+		}
+
+		/* Run init code */
+
+		searchUsersCtrl.machine = AppDataService.getMachine();
+		searchUsersCtrl.resetMessage();
 	}
 
 })();

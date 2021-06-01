@@ -95,6 +95,18 @@ public class Controller extends HttpServlet {
 					addUser(request, response, session);
 				}
 
+				if (action.equalsIgnoreCase("removeUser")) {
+					removeUser(request, response, session);
+				}
+
+				if (action.equalsIgnoreCase("transferOwnership")) {
+					transferOwnership(request, response, session);
+				}
+				
+				if (action.equalsIgnoreCase("refreshMachineInfo")){
+					refreshMachineInfo(request, response, session);
+				}
+
 				if (action.equalsIgnoreCase("updateGrowSettings")) {
 					updateGrowSettings(request, response, session);
 				}
@@ -129,7 +141,7 @@ public class Controller extends HttpServlet {
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
 		User user = new User();
-		
+
 		String message = user.login(email, password);
 
 		session.setAttribute("user", user);
@@ -189,7 +201,7 @@ public class Controller extends HttpServlet {
 	private void searchForUser(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		// First, get machine and user variables
 		Machine machine = (Machine) session.getAttribute("machine");
-		String message = "mustBeOwnerMessage";
+		String message = "null";
 		User searchedUser = null;
 
 		// Make sure user is authorized
@@ -207,6 +219,8 @@ public class Controller extends HttpServlet {
 			} else {
 				message = "invalidValueMessage";
 			}
+		} else {
+			message = "mustBeOwnerMessage";
 		}
 
 		sendObjectWithResponse(searchedUser, message, session, response);
@@ -231,6 +245,64 @@ public class Controller extends HttpServlet {
 		sendObjectWithResponse(machine, message, session, response);
 	}
 
+	private void removeUser(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = null;
+		String userIdToRemove = request.getParameter("userToRemove");
+		User owner = (User) session.getAttribute("user");
+
+		if (machine != null && userIsOwner(session) && machine.userIsAuthorized(userIdToRemove)) {
+			if (!owner.getId().equalsIgnoreCase(userIdToRemove)) {
+				message = machine.removeAuthorizationByUUID(userIdToRemove);
+			} else {
+				message = "cannotRemoveOwnerMessage";
+			}
+		} else {
+			message = "mustBeOwnerMessage";
+		}
+		machine.fetchAuthorizedUsersFromDB();
+
+		sendObjectWithResponse(machine, message, session, response);
+	}
+
+	private void transferOwnership(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String newOwnerId = request.getParameter("newOwnerId");
+		User user = (User) session.getAttribute("user");
+		String message = "null";
+
+		// Check that session user is owner
+		if (user.getEmail().equalsIgnoreCase(machine.getOwnerEmail())) {
+			// if so, he can do the operation
+			message = machine.transferOwnership(newOwnerId);
+			user.refreshAuthorizations();
+		} else {
+			// otherwise, he cannot
+			message = "mustBeOwnerMessage";
+		}
+		
+		sendObjectWithResponse(machine, message, session, response);
+	}
+
+	private void refreshMachineInfo(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = "null";
+		User user = getLoggedInUser(session);
+		
+		if (user != null) {
+			if (userIsAuth(session)) {
+				if (machine != null && machine.getSerialNumber() != null) {
+					machine.fetchAllFromDB();
+				}
+				// TODO - decide which error message to send in this case
+			} else {
+				message = "userNotAuthorized";
+			}
+		}
+		
+		sendObjectWithResponse(machine, message, session, response);
+	}
+
 	private void updateGrowSettings(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String message = "invalidUserMessage";
@@ -249,12 +321,12 @@ public class Controller extends HttpServlet {
 				message = "userNotAuthorized";
 			}
 		}
-		
-		sendObjectWithResponse(user, message, session, response);
+
+		sendObjectWithResponse(machine, message, session, response);
 	}
 
 	private User getLoggedInUser(HttpSession session) {
-		User user = (User)session.getAttribute("user");
+		User user = (User) session.getAttribute("user");
 		if (user != null && user.isLoggedIn()) {
 			return user;
 		}
@@ -270,7 +342,7 @@ public class Controller extends HttpServlet {
 	private void sendObjectWithResponse(Object obj, String message, HttpSession session, HttpServletResponse response) {
 
 		User user = (User) session.getAttribute("user");
-		
+
 		if (!user.isLoggedIn()) {
 			user = null;
 			obj = null;
@@ -280,6 +352,8 @@ public class Controller extends HttpServlet {
 		resp.setUser(user);
 		resp.setObject(user == null ? null : obj);
 		resp.setMessage(message);
+		
+		resp.printIt();
 
 		try {
 			PrintWriter out = response.getWriter();

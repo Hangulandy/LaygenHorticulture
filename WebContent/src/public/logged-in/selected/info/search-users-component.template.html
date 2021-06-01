@@ -37,16 +37,17 @@
 			<tr>
 				<td></td>
 				<td></td>
-				<td><button
-						ng-if="searchUsersCtrl.userIsOwner() && !searchUsersCtrl.userIsAuthorized(searchUsersCtrl.foundUser)"
-						ng-click="searchUsersCtrl.addUser()">{{searchUsersCtrl.get('addLabel');}}</button></td>
+				<td><div
+						ng-if="searchUsersCtrl.userIsOwner() && !searchUsersCtrl.userIsAuthorized(searchUsersCtrl.foundUser)">
+						<button ng-click="searchUsersCtrl.addUser()">{{searchUsersCtrl.get('addLabel');}}</button>
+						<button ng-click="searchUsersCtrl.clearResults()">{{searchUsersCtrl.get('reset');}}</button></td>
+				</div>
 			</tr>
 		</table>
 	</div>
 
-	<div
-		ng-if="searchUsersCtrl.foundUser === undefined && searchUsersCtrl.hasSearched == true">
-		<h3>{{searchUsersCtrl.get('cannotFindUserMessage');}}</h3>
+	<div>
+		<h4>{{searchUsersCtrl.get(searchUsersCtrl.message);}}</h4>
 	</div>
 
 </div>

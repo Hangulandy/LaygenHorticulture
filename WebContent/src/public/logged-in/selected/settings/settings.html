@@ -1,11 +1,12 @@
 <div class="page">
-	<h2>{{settingsCtrl.get('machineSettingsHeading');}}</h2>
+	<h2 class="sideBySide">{{settingsCtrl.get('machineSettingsHeading');}}</h2>
+	<button class="sideBySide" ng-click="settingsCtrl.refreshSettings()">{{settingsCtrl.get('refresh');}}</button>
 	<hr>
 	<div>
-		<grow-settings></grow-settings>
-		<water-settings></water-settings>
-		<light-settings></light-settings>
-		<air-settings></air-settings>
-		<camera-settings></camera-settings>
+		<grow-settings machine="settingsCtrl.machine"></grow-settings>
+		<water-settings machine="settingsCtrl.machine"></water-settings>
+		<light-settings machine="settingsCtrl.machine"></light-settings>
+		<air-settings machine="settingsCtrl.machine"></air-settings>
+		<camera-settings machine="settingsCtrl.machine"></camera-settings>
 	</div>
 </div>

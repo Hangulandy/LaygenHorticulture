@@ -13,7 +13,6 @@
 		}
 		
 		AppDataService.verifyUser();
-
 	}
 
 })();

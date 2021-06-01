@@ -4,32 +4,24 @@
 	angular.module('public')
 		.controller('GrowSettingsComponentController', GrowSettingsComponentController);
 
-	GrowSettingsComponentController.$inject = ['AppDataService'];
-	function GrowSettingsComponentController(AppDataService) {
+	GrowSettingsComponentController.$inject = ['AppDataService', '$scope'];
+	function GrowSettingsComponentController(AppDataService, $scope) {
 		var growCtrl = this;
-		const datePicker = document.getElementById('plant_date');
-		datePicker.addEventListener('change', growCtrl.doSomething);
-
-		growCtrl.doSomething = function(event) {
-			console.log(event);
-		}
-
-		growCtrl.machine = AppDataService.getMachine();
-		growCtrl.message = "";
-
+		
+		$scope.$on('clearMessages', function(){
+			growCtrl.resetMessage();
+		})
+		
 		growCtrl.get = function(entry) {
 			return AppDataService.get(entry);
 		}
 
 		growCtrl.submitChanges = function() {
 			var dateAsString = growCtrl.plant_date.toISOString().substring(0, 10);
-			console.log(dateAsString);
-		}
-
-		growCtrl.clearChanges = function() {
-			var picker = document.getElementById('plant_date');
-			picker.value = growCtrl.machine.settings.plant_date;
-			growCtrl.plant_date = new Date(growCtrl.machine.settings.plant_date);
+			var promise = AppDataService.submitGrowSettings(dateAsString);
+			promise.then(function(result){
+				growCtrl.message = result.message;
+			})
 		}
 
 		growCtrl.datesDifferent = function() {
@@ -39,6 +31,17 @@
 			return (!match);
 		}
 
+		growCtrl.clearChanges = function() {
+			var picker = document.getElementById('plant_date');
+			picker.value = growCtrl.machine.settings.plant_date;
+			growCtrl.plant_date = new Date(growCtrl.machine.settings.plant_date);
+		}
+		
+		growCtrl.resetMessage = function(){
+			growCtrl.message = "";
+		}
+
+		growCtrl.resetMessage();
 		growCtrl.clearChanges();
 	}
 

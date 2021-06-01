@@ -117,20 +117,20 @@ select {
 }
 
 table, td, th {
-	border: 1px solid var(--dark-text);
+	border: 1px solid lightgray;
 	text-align: center;
 }
 
 table {
-	border: 1px solid black;
+	border-collapse: separate;
 	margin: var(--standard-pad) 0px;
 	border-radius: var(--standard-pad);
 	overflow: hidden;
-	box-shadow: 0px 0px 5px black;
+	box-shadow: 0px 0px calc(var(--standard-pad) / 3) black;
 }
 
 td {
-	padding: calc(var(--standard-pad) / 2);
+	padding: calc(var(--standard-pad) / 3);
 	text-align: left;
 }
 
@@ -145,19 +145,19 @@ tr:nth-child(odd) {
 	background-color: #ebf0f9;
 } 
 
-table.transparent, table.transparent tr, table.transparent td, table.transparent th {
+.transparent, table.transparent tr, table.transparent td, table.transparent th {
 	background-color: var(--light-color);
 	padding: 0px;
 	color: var(--dark-text);
 	border: none;
+	border-spacing: var(--standard-pad) calc(var(--standard-pad) / 3);
 	text-align: left;
-	margin: 0px;
+	margin: 0px calc(-1 * var(--standard-pad));
 	width: auto;
 	box-shadow: none;
 }
 
-table.transparent {
-	border-spacing: 0px var(--standard-pad);
+.transparent {
 	border-radius: 0px;
 }
 

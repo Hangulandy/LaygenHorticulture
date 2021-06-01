@@ -62,10 +62,28 @@
 			}
 		}
 
-
-
 		service.redirectToMachinesList = function() {
 			$state.go('common.public.logged-in.not-selected');
+		}
+
+		service.getDictionary = function() {
+			if (service.dict === undefined) {
+				return $http({
+					method: "GET",
+					url: url,
+					params: {
+						action: "getDictionary"
+					}
+				})
+					.then(function(result) {
+						var data = result.data;
+						service.dict = data;
+					}).catch(function(error) {
+						console.log("Something went terribly wrong", error);
+					});
+			} else {
+				return service.dict;
+			}
 		}
 
 		service.getDictionary = function() {
@@ -199,6 +217,95 @@
 			});
 		}
 
+		service.addUser = function(user) {
+			return $http({
+				method: "GET",
+				url: url,
+				params: {
+					userToAdd: user.id,
+					action: "addUser"
+				}
+			}).then(function(result) {
+				var data = result.data;
+				service.setMachine(data.object);
+				$rootScope.$broadcast('userAdded');
+				return data;
+			}).catch(function(error) {
+				console.log("Something went terribly wrong", error);
+			});
+		}
+
+		service.removeUser = function(user) {
+			return $http({
+				method: "GET",
+				url: url,
+				params: {
+					userToRemove: user.id,
+					action: "removeUser"
+				}
+			}).then(function(result) {
+				var data = result.data;
+				service.setMachine(data.object);
+				$rootScope.$broadcast('userRemoved');
+				return data;
+			}).catch(function(error) {
+				console.log("Something went terribly wrong", error);
+			});
+		}
+
+		service.transferOwnership = function(user) {
+			return $http({
+				method: "GET",
+				url: url,
+				params: {
+					newOwnerId: user.id,
+					action: "transferOwnership"
+				}
+			}).then(function(result) {
+				var data = result.data;
+				service.setMachine(data.object);
+				service.setUser(data.user);
+				return data;
+			}).catch(function(error) {
+				console.log("Something went terribly wrong", error);
+			});
+		}
+		
+		service.refreshMachineInfo = function(){
+			return $http({
+				method: "GET",
+				url: url,
+				params: {
+					action: "refreshMachineInfo"
+				}
+			}).then(function(result) {
+				var data = result.data;
+				service.setMachine(data.object);
+				service.setUser(data.user);
+				return data;
+			}).catch(function(error) {
+				console.log("Something went terribly wrong", error);
+			});
+		}
+		
+		service.submitGrowSettings = function(dateAsString){
+			return $http({
+				method: "GET",
+				url: url,
+				params: {
+					plant_date: dateAsString,
+					action: "updateGrowSettings"
+				}
+			}).then(function(result){
+				var data = result.data;
+				service.setMachine(data.object);
+				service.setUser(data.user);
+				return data;
+			}).catch(function(error){
+				console.log("Something went terribly wrong", error);
+			});
+		}
+
 		service.getUser = function() {
 			return service.getFromStorage("user");
 		}
@@ -251,6 +358,10 @@
 				return undefined;
 			}
 			return service.dict[entry][service.lang];
+		}
+
+		service.clearMessagesExcept = function(exclude) {
+			$rootScope.$broadcast('clearMessages', { exclude: exclude });
 		}
 
 	}

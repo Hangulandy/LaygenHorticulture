@@ -55,10 +55,10 @@
 
 		settingsCtrl.refreshSettings = function() {
 			var promise = AppDataService.refreshMachineInfo();
-			promise.then(function(result){
+			promise.then(function(result) {
 				settingsCtrl.machine = result.object;
+				$scope.$broadcast('clearMessages');
 			});
-			$scope.$broadcast('clearMessages');
 		}
 
 		settingsCtrl.getMachine = function() {
@@ -66,7 +66,6 @@
 		}
 
 		settingsCtrl.getMachine();
-
 	}
 
 

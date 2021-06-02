@@ -32,17 +32,28 @@
 
 				<tr>
 					<td>{{waterCtrl.get('water_cycle_duration')}}</td>
-					<td>{{waterCtrl.machine.settings.water_cycle_duration}}</td>
+					<td>{{waterCtrl.machine.settings.water_cycle_duration}}{{waterCtrl.get('secondsShortLabel');}}</td>
 					<td><input type="number" name="water_cycle_duration" step="1"
-						min="0" max="3600" ng-model="waterCtrl.waterCycleDuration"></td>
+						min="0" max="3600" ng-model="waterCtrl.waterCycleDuration">{{waterCtrl.get('secondsShortLabel');}}</td>
 				</tr>
 				<tr>
 					<td>{{waterCtrl.get('water_cycle_period')}}</td>
-					<td>{{waterCtrl.machine.settings.water_cycle_period}}</td>
+					<td>{{waterCtrl.currentCycleHours}}{{waterCtrl.get('hoursShortLabel');}}
+						:
+						{{waterCtrl.currentCycleMinutes}}{{waterCtrl.get('minutesShortLabel');}}</td>
 					<td><input type="number" name="water_cycle_period" step="1"
-						min="0" max="10000000" ng-model="waterCtrl.waterCyclePeriod"></td>
+						min="0" max="100" ng-model="waterCtrl.newCycleHours">{{waterCtrl.get('hoursShortLabel');}}
+						<input type="number" name="water_cycle_period" step="1" min="0"
+						max="59" ng-model="waterCtrl.newCycleMinutes">{{waterCtrl.get('minutesShortLabel');}}
+					</td>
 				</tr>
 			</tbody>
 		</table>
+		<div ng-if="waterCtrl.changesDetected()">
+			<h4 class="sideBySide">{{waterCtrl.get('submitChangesPrompt');}}</h4>
+			<button ng-click="waterCtrl.submitChanges()">{{waterCtrl.get('send');}}</button>
+			<button ng-click="waterCtrl.clearChanges()">{{waterCtrl.get('reset');}}</button>
+		</div>
+		<p>{{waterCtrl.get(waterCtrl.message);}}</p>
 	</form>
 </div>

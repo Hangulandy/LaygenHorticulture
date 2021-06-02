@@ -4,8 +4,8 @@
 	angular.module('public')
 		.controller('SelectedController', SelectedController);
 
-	SelectedController.$inject = ['AppDataService', 'machine'];
-	function SelectedController(AppDataService, machine) {
+	SelectedController.$inject = ['AppDataService', 'machine', '$rootScope'];
+	function SelectedController(AppDataService, machine, $rootScope) {
 
 		var selectedCtrl = this;
 
@@ -14,6 +14,10 @@
 		selectedCtrl.get = function(entry) {
 			return AppDataService.get(entry);
 		}
+		
+		$rootScope.$on('machineStatusUpdated', function(){
+			AppDataService.verifyUserAndMachine();
+		})
 		
 		AppDataService.verifyUserAndMachine();
 	}

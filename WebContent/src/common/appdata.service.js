@@ -288,20 +288,18 @@
 			});
 		}
 		
-		service.submitGrowSettings = function(dateAsString){
+		service.submitSettings = function(params){
 			return $http({
 				method: "GET",
 				url: url,
-				params: {
-					plant_date: dateAsString,
-					action: "updateGrowSettings"
-				}
+				params: params
 			}).then(function(result){
 				var data = result.data;
 				service.setMachine(data.object);
 				service.setUser(data.user);
 				return data;
-			}).catch(function(error){
+			})
+			.catch(function(error){
 				console.log("Something went terribly wrong", error);
 			});
 		}

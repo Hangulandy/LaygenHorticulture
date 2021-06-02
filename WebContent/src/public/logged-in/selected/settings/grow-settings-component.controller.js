@@ -4,27 +4,42 @@
 	angular.module('public')
 		.controller('GrowSettingsComponentController', GrowSettingsComponentController);
 
-	GrowSettingsComponentController.$inject = ['AppDataService', '$scope'];
-	function GrowSettingsComponentController(AppDataService, $scope) {
+	GrowSettingsComponentController.$inject = ['AppDataService', '$scope', '$rootScope'];
+	function GrowSettingsComponentController(AppDataService, $scope, $rootScope) {
 		var growCtrl = this;
-		
-		$scope.$on('clearMessages', function(){
+
+		$rootScope.$on('machineStatusChanged', function() {
+			growCtrl.machine = AppDataService.getMachine();
+			growCtrl.clearChanges();
+		})
+
+		$scope.$watch('machine', function() {
+			growCtrl.clearChanges();
+		});
+
+		$scope.$on('clearMessages', function() {
 			growCtrl.resetMessage();
 		})
-		
+
 		growCtrl.get = function(entry) {
 			return AppDataService.get(entry);
 		}
 
 		growCtrl.submitChanges = function() {
 			var dateAsString = growCtrl.plant_date.toISOString().substring(0, 10);
-			var promise = AppDataService.submitGrowSettings(dateAsString);
-			promise.then(function(result){
+
+			var params = {
+				plant_date: dateAsString,
+				action: "updateGrowSettings"
+			}
+
+			var promise = AppDataService.submitSettings(params);
+			promise.then(function(result) {
 				growCtrl.message = result.message;
 			})
 		}
 
-		growCtrl.datesDifferent = function() {
+		growCtrl.changesDetected = function() {
 			var newDateString = growCtrl.plant_date.toISOString().substring(0, 10);
 			var oldDateString = growCtrl.machine.settings.plant_date;
 			var match = newDateString.trim() == oldDateString.trim();
@@ -36,8 +51,8 @@
 			picker.value = growCtrl.machine.settings.plant_date;
 			growCtrl.plant_date = new Date(growCtrl.machine.settings.plant_date);
 		}
-		
-		growCtrl.resetMessage = function(){
+
+		growCtrl.resetMessage = function() {
 			growCtrl.message = "";
 		}
 

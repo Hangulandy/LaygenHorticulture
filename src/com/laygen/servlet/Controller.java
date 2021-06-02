@@ -102,14 +102,34 @@ public class Controller extends HttpServlet {
 				if (action.equalsIgnoreCase("transferOwnership")) {
 					transferOwnership(request, response, session);
 				}
-				
-				if (action.equalsIgnoreCase("refreshMachineInfo")){
+
+				if (action.equalsIgnoreCase("refreshMachineInfo")) {
 					refreshMachineInfo(request, response, session);
 				}
 
 				if (action.equalsIgnoreCase("updateGrowSettings")) {
 					updateGrowSettings(request, response, session);
 				}
+
+				if (action.equalsIgnoreCase("updateWaterSettings")) {
+					updateWaterSettings(request, response, session);
+				}
+
+				if (action.equalsIgnoreCase("updateLightSettings")) {
+					updateLightSettings(request, response, session);
+				}
+
+				if (action.equalsIgnoreCase("updateCustomColor")) {
+					updateCustomColor(request, response, session);
+				}
+
+				if (action.equalsIgnoreCase("updateAirSettings")) {
+					updateAirSettings(request, response, session);
+				}
+
+//				if (action.equalsIgnoreCase("updateCameraSettings")) {
+//					updateCameraSettings(request, response, session);
+//				}
 			}
 
 		} catch (IllegalStateException e) {
@@ -280,7 +300,7 @@ public class Controller extends HttpServlet {
 			// otherwise, he cannot
 			message = "mustBeOwnerMessage";
 		}
-		
+
 		sendObjectWithResponse(machine, message, session, response);
 	}
 
@@ -288,7 +308,7 @@ public class Controller extends HttpServlet {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String message = "null";
 		User user = getLoggedInUser(session);
-		
+
 		if (user != null) {
 			if (userIsAuth(session)) {
 				if (machine != null && machine.getSerialNumber() != null) {
@@ -299,7 +319,7 @@ public class Controller extends HttpServlet {
 				message = "userNotAuthorized";
 			}
 		}
-		
+
 		sendObjectWithResponse(machine, message, session, response);
 	}
 
@@ -325,6 +345,169 @@ public class Controller extends HttpServlet {
 		sendObjectWithResponse(machine, message, session, response);
 	}
 
+	private void updateWaterSettings(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = "invalidUserMessage";
+		User user = getLoggedInUser(session);
+
+		if (user != null) {
+			if (userIsAuth(session)) {
+				if (machine != null && machine.getSerialNumber() != null) {
+
+					String[] messages = machine.setWaterInValve(request.getParameter("water_in_valve_on"));
+					message = messages[1];
+
+					if (message.equalsIgnoreCase("null")) {
+						// everything is good so far
+						TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
+
+						int period = getIntFromString(request.getParameter("water_cycle_period"));
+						int duration = getIntFromString(request.getParameter("water_cycle_duration"));
+						int max = 60 * 60 * 24 * 50; // limit to 50 days * 24 hr * 60 min * 60 sec
+						duration = duration > max ? max : duration;
+
+						period = period > duration ? period : duration;
+
+						newSettings.put("water_cycle_on", request.getParameter("water_cycle_on"));
+						newSettings.put("water_cycle_duration", String.valueOf(duration));
+						newSettings.put("water_cycle_period", String.valueOf(period));
+						newSettings.put("water_in_valve_on", messages[0]);
+
+						message = machine.sendMachineSettngs(newSettings);
+					}
+				} else {
+					message = "unableToUpdate";
+				}
+			} else {
+				message = "userNotAuthorized";
+			}
+		}
+
+		sendObjectWithResponse(machine, message, session, response);
+	}
+
+	private void updateLightSettings(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = "invalidUserMessage";
+		User user = getLoggedInUser(session);
+
+		if (user != null) {
+			if (userIsAuth(session)) {
+				if (machine != null && machine.getSerialNumber() != null) {
+					// everything is good so far
+					TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
+
+					String lightColorString = request.getParameter("light_color");
+					if (lightColorString == null) {
+						lightColorString = machine.getLightColors().firstKey();
+					}
+					String lightColorName = lightColorString.split("-")[0];
+
+					newSettings.put("brightness", request.getParameter("brightness"));
+					newSettings.put("light_on", request.getParameter("light_on"));
+					newSettings.put("light_color", lightColorName);
+
+					message = machine.sendMachineSettngs(newSettings);
+				}
+			} else {
+				message = "unableToUpdate";
+			}
+		} else {
+			message = "userNotAuthorized";
+		}
+
+		sendObjectWithResponse(machine, message, session, response);
+	}
+
+	private void updateCustomColor(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = "invalidUserMessage";
+		User user = getLoggedInUser(session);
+
+		String lightColor = request.getParameter("light_color");
+		String redString = request.getParameter("redValue");
+		String greenString = request.getParameter("greenValue");
+		String blueString = request.getParameter("blueValue");
+
+		if (user != null) {
+			if (userIsAuth(session)) {
+				if (machine != null && userIsAuth(session) && machine.getLightColors() != null
+						&& machine.getLightColors().get(lightColor) != null) {
+					// everything is good so far
+					int redValue = 0;
+					int greenValue = 0;
+					int blueValue = 0;
+					try {
+						redValue = Integer.parseInt(redString);
+						greenValue = Integer.parseInt(greenString);
+						blueValue = Integer.parseInt(blueString);
+					} catch (Exception e) {
+						// do nothing since these will be 0 if they fail to parse
+					}
+					int value = redValue * 1000000 + greenValue * 1000 + blueValue;
+					String messageToMachine = String.format("%d#light_%s", value, lightColor);
+					message = machine.sendCommandToMachine(messageToMachine);
+				} else {
+					message = "unableToUpdate";
+				}
+			} else {
+				message = "userNotAuthorized";
+			}
+		}
+
+		sendObjectWithResponse(machine, message, session, response);
+	}
+
+	private void updateAirSettings(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = "invalidUserMessage";
+		User user = getLoggedInUser(session);
+
+		if (user != null) {
+			if (userIsAuth(session)) {
+				if (machine != null && machine.getSerialNumber() != null) {
+					// everything is good so far
+					TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
+
+					// newSettings.put("heater_on", request.getParameter("heater_on"));
+					newSettings.put("fan_on", request.getParameter("fan_on"));
+					newSettings.put("fan_auto", request.getParameter("fan_auto"));
+					newSettings.put("fan_humidity", request.getParameter("fan_humidity"));
+
+					message = machine.sendMachineSettngs(newSettings);
+				}
+			} else {
+				message = "unableToUpdate";
+			}
+		} else {
+			message = "userNotAuthorized";
+		}
+
+		sendObjectWithResponse(machine, message, session, response);
+	}
+
+//	private void updateCameraSettings(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+//		Machine machine = (Machine) session.getAttribute("machine");
+//
+//		if (machine != null && userIsAuth(session) && machine.getSerialNumber() != null) {
+//			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
+//
+//			String cameraCyclePeriodHours = request.getParameter("camera_cycle_period_hours");
+//			String cameraCyclePeriodMinutes = request.getParameter("camera_cycle_period_minutes");
+//
+//			int totalCameraCycle = getTotalFromHoursMinutes(cameraCyclePeriodHours, cameraCyclePeriodMinutes);
+//
+//			newSettings.put("camera_cycle_on", request.getParameter("camera_cycle_on"));
+//			newSettings.put("camera_cycle_period", String.valueOf(totalCameraCycle));
+//
+//			session.setAttribute("message",
+//					machine.sendMachineSettngs(newSettings, (String) session.getAttribute("lang")));
+//			session.setAttribute("viewComponent", "machineSettings");
+//		} else {
+//			viewMyMachines(session);
+//		}
+//	}
+
 	private User getLoggedInUser(HttpSession session) {
 		User user = (User) session.getAttribute("user");
 		if (user != null && user.isLoggedIn()) {
@@ -334,16 +517,21 @@ public class Controller extends HttpServlet {
 	}
 
 	private boolean userIsAuth(HttpSession session) {
+		boolean outcome = false;
 		Machine machine = (Machine) session.getAttribute("machine");
 		User user = (User) session.getAttribute("user");
-		return machine.userIsAuthorized(user);
+		if (machine != null) {
+			outcome = machine.userIsAuthorized(user);
+		}
+		return outcome;
 	}
 
 	private void sendObjectWithResponse(Object obj, String message, HttpSession session, HttpServletResponse response) {
 
 		User user = (User) session.getAttribute("user");
 
-		if (!user.isLoggedIn()) {
+		if (user == null || !user.isLoggedIn()) {
+			message = "invalidUserMessage";
 			user = null;
 			obj = null;
 		}
@@ -352,7 +540,7 @@ public class Controller extends HttpServlet {
 		resp.setUser(user);
 		resp.setObject(user == null ? null : obj);
 		resp.setMessage(message);
-		
+
 		resp.printIt();
 
 		try {
@@ -382,6 +570,16 @@ public class Controller extends HttpServlet {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private int getIntFromString(String string) {
+		int output = 0;
+		try {
+			output = Integer.parseInt(string);
+		} catch (Exception e) {
+			// do nothing
+		}
+		return output;
 	}
 
 	private void getDictionary(HttpServletRequest request, HttpServletResponse response, HttpSession session) {

@@ -33,8 +33,8 @@ public class MyResponse {
 	public void printIt() {
 		// TODO Auto-generated method stub
 		System.out.println("Response to send:");
-		System.out.printf("User : %s\n", user.getName());
-		System.out.printf("Object : %s\n", object);
+		System.out.printf("User : %s\n", user != null ? user.getName() : null);
+		System.out.printf("Object : %s\n", object != null ? object : null);
 		System.out.printf("Message : %s\n", message);
 	}
 

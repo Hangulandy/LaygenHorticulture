@@ -1,19 +1,50 @@
 <div class="info-page-tile">
 	<h3>{{airCtrl.get('airSettingsHeading');}}</h3>
-	<table>
-		<thead>
-			<tr>
-				<th>{{airCtrl.get('itemLabel');}}</th>
-				<th>{{airCtrl.get('valueLabel');}}</th>
-				<th>{{airCtrl.get('adjustLabel');}}</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-		</tbody>
-	</table>
+	<form name="airSettingsForm" novalidate>
+		<table>
+			<thead>
+				<tr>
+					<th>{{airCtrl.get('itemLabel');}}</th>
+					<th>{{airCtrl.get('valueLabel');}}</th>
+					<th>{{airCtrl.get('adjustLabel');}}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{airCtrl.get('fan_on');}}</td>
+					<td>{{airCtrl.get(airCtrl.getOnOrOffLabel('fan_on'));}}</td>
+					<td><label><input type="radio" name="fan_on"
+							ng-model="airCtrl.fanOn" value="1" />
+							{{airCtrl.get('onLabel');}}</label> <label><input type="radio"
+							name="fan_on" ng-model="airCtrl.fanOn" value="0" />
+							{{airCtrl.get('offLabel');}}</label></td>
+				</tr>
+				<tr>
+					<td>{{airCtrl.get('fan_auto');}}</td>
+					<td>{{airCtrl.get(airCtrl.getAutoOrContinuousLabel('fan_auto'));}}</td>
+					<td><label><input type="radio" name="fan_auto"
+							ng-model="airCtrl.fanAuto" value="1" /> {{airCtrl.get('auto');}}</label>
+						<label><input type="radio" name="fan_auto"
+							ng-model="airCtrl.fanAuto" value="0" /> {{airCtrl.get('cont');}}</label></td>
+				</tr>
+				<tr>
+					<td>{{airCtrl.get('fan_humidity');}}</td>
+					<td>{{airCtrl.machine.settings.fan_humidity}}</td>
+					<td><input type="number" id="humidity" name="humidity"
+						step="5" min="0" max="100" ng-model="airCtrl.fanHumidity"><br
+						class="mobile-only"> <br class="mobile-only"> <input
+						type="range" step="5" min="0" max="100"
+						ng-model="airCtrl.fanHumidity"
+						ng-change="airCtrl.humiditySliderChanged()"
+						id="humiditySlider"></td>
+				</tr>
+			</tbody>
+		</table>
+		<div ng-if="airCtrl.changesDetected()">
+			<h4 class="sideBySide">{{airCtrl.get('submitChangesPrompt');}}</h4>
+			<button ng-click="airCtrl.submitChanges()">{{airCtrl.get('send');}}</button>
+			<button ng-click="airCtrl.clearChanges()">{{airCtrl.get('reset');}}</button>
+		</div>
+		<p>{{airCtrl.get(airCtrl.message);}}</p>
+	</form>
 </div>

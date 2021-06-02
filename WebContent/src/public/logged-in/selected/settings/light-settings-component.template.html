@@ -1,19 +1,104 @@
 <div class="info-page-tile">
 	<h3>{{lightCtrl.get('lightSettingsHeading');}}</h3>
-	<table>
-		<thead>
-			<tr>
-				<th>{{lightCtrl.get('itemLabel');}}</th>
-				<th>{{lightCtrl.get('valueLabel');}}</th>
-				<th>{{lightCtrl.get('adjustLabel');}}</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-		</tbody>
-	</table>
+
+	<form name="lightSettingsForm" novalidate>
+		<table>
+			<thead>
+				<tr>
+					<th>{{lightCtrl.get('itemLabel');}}</th>
+					<th>{{lightCtrl.get('valueLabel');}}</th>
+					<th>{{lightCtrl.get('adjustLabel');}}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{lightCtrl.get('light_on');}}</td>
+					<td>{{lightCtrl.get(lightCtrl.getOnOrOffLabel('light_on'));}}</td>
+					<td><label><input type="radio" name="light_on"
+							ng-model="lightCtrl.lightOn" value="1" />
+							{{lightCtrl.get('onLabel');}}</label> <label><input type="radio"
+							name="light_on" ng-model="lightCtrl.lightOn" value="0" />
+							{{lightCtrl.get('offLabel');}}</label></td>
+				</tr>
+				<tr>
+					<td>{{lightCtrl.get('brightness');}}</td>
+					<td>{{lightCtrl.machine.settings.brightness}}</td>
+					<td><input type="number" id="brightness" name="brightness"
+						step="5" min="0" max="100" ng-model="lightCtrl.brightness"><br
+						class="mobile-only"> <br class="mobile-only"> <input
+						type="range" step="5" min="0" max="100"
+						ng-model="lightCtrl.brightness"
+						ng-change="lightCtrl.brightnessSliderChanged()"
+						id="brightnessSlider"></td>
+				</tr>
+				<tr>
+					<td>{{lightCtrl.get('light_color');}}</td>
+					<td>{{lightCtrl.get(lightCtrl.machine.settings.light_color);}}</td>
+					<td>
+						<p ng-repeat="(k, v) in lightCtrl.orderedColors">
+							<input type="radio" name="lightColor"
+								ng-model="lightCtrl.lightColor" value="{{k}}"
+								ng-click="lightCtrl.checkColor()" /> {{lightCtrl.get(k);}}
+						</p>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div ng-if="lightCtrl.changesDetected()">
+			<h4 class="sideBySide">{{lightCtrl.get('submitChangesPrompt');}}</h4>
+			<button ng-click="lightCtrl.submitChanges()">{{lightCtrl.get('send');}}</button>
+			<button ng-click="lightCtrl.clearChanges()">{{lightCtrl.get('reset');}}</button>
+		</div>
+	</form>
+
+	<div ng-if="lightCtrl.isCustom()">
+		<h3>{{lightCtrl.get('customColorAdjusterHeading');}}</h3>
+		<form name="customLightColorForm" novalidate>
+			<table id="custom-color-adjuster-table">
+				<thead>
+					<tr>
+						<th>{{lightCtrl.get('itemLabel');}}</th>
+						<th>{{lightCtrl.get('adjustLabel');}}</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-if="lightCtrl.lightColor != 'custom3'" class="custom-color-row">
+						<td>{{lightCtrl.get('red');}}</td>
+						<td><input type="number" id="redInput" name="redValue"
+							step="5" min="0" max="100" ng-model="lightCtrl.newRedValue"><br
+							class="mobile-only"> <br class="mobile-only"> <input
+							type="range" step="5" min="0" max="100"
+							ng-model="lightCtrl.newRedValue"
+							ng-change="lightCtrl.redSliderChanged()" id="redSlider"></td>
+					</tr>
+					<tr ng-if="lightCtrl.lightColor != 'custom2'" class="custom-color-row">
+						<td>{{lightCtrl.get('green');}}</td>
+						<td><input type="number" id="greenInput" name="greenValue"
+							step="5" min="0" max="100" ng-model="lightCtrl.newGreenValue"><br
+							class="mobile-only"> <br class="mobile-only"> <input
+							type="range" step="5" min="0" max="100"
+							ng-model="lightCtrl.newGreenValue"
+							ng-change="lightCtrl.greenSliderChanged()" id="greenSlider"></td>
+					</tr>
+					<tr ng-if="lightCtrl.lightColor != 'custom1'" class="custom-color-row">
+						<td>{{lightCtrl.get('blue');}}</td>
+						<td><input type="number" id="blueInput" name="blueValue"
+							step="5" min="0" max="100" ng-model="lightCtrl.newBlueValue"><br
+							class="mobile-only"> <br class="mobile-only"> <input
+							type="range" step="5" min="0" max="100"
+							ng-model="lightCtrl.newBlueValue"
+							ng-change="lightCtrl.blueSliderChanged()" id="blueSlider"></td>
+					</tr>
+				</tbody>
+			</table>
+			<div ng-if="lightCtrl.customColorChangesDetected()">
+				<h4 class="sideBySide">{{lightCtrl.get('submitChangesPrompt');}}</h4>
+				<button ng-click="lightCtrl.submitCustomColorChanges()">{{lightCtrl.get('send');}}</button>
+				<button ng-click="lightCtrl.clearCustomColorChanges()">{{lightCtrl.get('reset');}}</button>
+			</div>
+		</form>
+	</div>
+	<p>{{lightCtrl.get(lightCtrl.message);}}</p>
+
+
 </div>

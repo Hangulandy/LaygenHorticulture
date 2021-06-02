@@ -3,9 +3,9 @@
 	<button class="sideBySide" ng-click="settingsCtrl.refreshSettings()">{{settingsCtrl.get('refresh');}}</button>
 	<hr>
 	<div>
+		<light-settings machine="settingsCtrl.machine"></light-settings>
 		<grow-settings machine="settingsCtrl.machine"></grow-settings>
 		<water-settings machine="settingsCtrl.machine"></water-settings>
-		<light-settings machine="settingsCtrl.machine"></light-settings>
 		<air-settings machine="settingsCtrl.machine"></air-settings>
 		<camera-settings machine="settingsCtrl.machine"></camera-settings>
 	</div>

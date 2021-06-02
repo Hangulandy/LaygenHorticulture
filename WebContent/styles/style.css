@@ -20,7 +20,8 @@
 	--chart-container-width: 335px;
 	--content-width: calc(100vw - calc(var(--left-head-width) + calc(4 * var(--standard-pad))));
 	--selector-width: 250px; 
-	--selector-height: 300px; 
+	--selector-height: 300px;
+	--button-height: 22px;
 	--mobile-selector-height: 200px; 
 	--standard-border: 0px; 
 	--block-height: calc(100vh - calc(calc(var(--footer-height) + var(--header-height)) + calc(2 * var(--standard-pad)))); 
@@ -67,12 +68,16 @@ a.download {
 
 button {
 	padding: 0px var(--standard-pad);
+	height: var(--button-height);
+	line-height: 0px;
 }
 
 h1 {
+	position: relative;
 	margin: var(--standard-pad) 0px;
 	font-size: var(--banner-text-size);
-	line-height: var(--banner-text-size);
+	overflow-wrap: break-word;
+	overflow: hidden;
 }
 
 h2 {
@@ -94,6 +99,10 @@ hr {
 
 input[type=date] {
 	width: 130px;
+}
+
+input[type=number]::-webkit-inner-spin-button {
+	opacity: 1;
 }
 
 input[type=text] {
@@ -144,6 +153,10 @@ th {
 tr:nth-child(odd) {
 	background-color: #ebf0f9;
 } 
+
+tr.custom-color-row:nth-child(odd) {
+	background-color: var(--light-color);
+}
 
 .transparent, table.transparent tr, table.transparent td, table.transparent th {
 	background-color: var(--light-color);
@@ -319,7 +332,7 @@ form.custom-color-adjuster {
 	margin-bottom: var(--standard-pad);
 	margin-right: var(--standard-pad);
 	float: left;
-	height: var(--info-page-tile-height);
+	min-height: var(--info-page-tile-height);
 	box-shadow: 5px 5px grey;
 }
 
@@ -459,6 +472,7 @@ form.custom-color-adjuster {
 		width: 100%;
 		float: left;
 		clear: left;
+		min-height: 0px;
 		height: auto;
 	}
 	

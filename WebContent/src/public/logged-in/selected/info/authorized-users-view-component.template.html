@@ -5,13 +5,13 @@
 	<table ng-if="authUsersCtrl.hasUsers()">
 		<tr>
 			<th>{{authUsersCtrl.get('nameLabel');}}</th>
-			<th>{{authUsersCtrl.get('organizationLabel');}}</th>
+			<th class="not-mobile">{{authUsersCtrl.get('organizationLabel');}}</th>
 			<th>{{authUsersCtrl.get('emailLabel');}}</th>
 			<th>{{authUsersCtrl.get('optionsLabel');}}</th>
 		</tr>
 		<tr ng-repeat="user in authUsersCtrl.machine.authorizedUsers">
 			<td>{{user.name}}</td>
-			<td>{{user.organization}}</td>
+			<td class="not-mobile">{{user.organization}}</td>
 			<td>{{user.email}}</td>
 			<td><button ng-if="authUsersCtrl.canRevoke(user);"
 					ng-click="authUsersCtrl.revoke(user);">{{authUsersCtrl.get('revokeLabel');}}</button>

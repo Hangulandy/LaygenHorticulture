@@ -13,10 +13,10 @@
 		</thead>
 		<tbody>
 			<tr ng-repeat="auth in notSelectedCtrl.data.user.authorizations">
-				<td>{{auth.machineSerialNumber}}</td>
-				<td>{{auth.machineNickname}}</td>
-				<td class="not-mobile">{{auth.ownerEmail}}</td>
-				<td><button ng-click="notSelectedCtrl.selectMachine($index);">{{notSelectedCtrl.get('select');}}</button></td>
+				<td class="left">{{auth.machineSerialNumber}}</td>
+				<td class="left">{{auth.machineNickname}}</td>
+				<td class="not-mobile left">{{auth.ownerEmail}}</td>
+				<td class="left"><button ng-click="notSelectedCtrl.selectMachine($index);">{{notSelectedCtrl.get('select');}}</button></td>
 			</tr>
 		</tbody>
 	</table>

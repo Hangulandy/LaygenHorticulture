@@ -18,10 +18,6 @@
 		.component('authorizedUsersView', {
 			templateUrl: 'src/public/logged-in/selected/info/authorized-users-view-component.template.html',
 			controller: 'AuthorizedUsersViewComponentController as authUsersCtrl'
-		})
-		.component('searchUsers', {
-			templateUrl: 'src/public/logged-in/selected/info/search-users-component.template.html',
-			controller: 'SearchUsersComponentController as searchUsersCtrl'
 		});
 
 	InfoController.$inject = ['AppDataService', 'machine'];

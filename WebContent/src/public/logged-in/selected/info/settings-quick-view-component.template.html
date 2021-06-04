@@ -3,11 +3,68 @@
 	<h3>{{settingsCtrl.get('currentSettingsHeading');}}</h3>
 
 	<table class="transparent">
+		<!-- 
 		<tr ng-repeat="(k, v) in settingsCtrl.machine.settings">
 			<td>{{settingsCtrl.get(k);}}</td>
 			<td>:</td>
 			<td>{{v}}</td>
 		</tr>
+	 -->
+		<tr>
+			<td>{{settingsCtrl.get('plant_date');}}</td>
+			<td>:</td>
+			<td>{{settingsCtrl.machine.settings.plant_date}}</td>
+		</tr>
+		<tr>
+			<td>{{settingsCtrl.get('light_on');}}</td>
+			<td>:</td>
+			<td>{{settingsCtrl.get(settingsCtrl.getOnOrOffLabel('light_on'));}}</td>
+		</tr>
+		<tr>
+			<td>{{settingsCtrl.get('light_color');}}</td>
+			<td>:</td>
+			<td>{{settingsCtrl.get(settingsCtrl.machine.settings.light_color);}}</td>
+		</tr>
+		<tr>
+			<td>{{settingsCtrl.get('brightness');}}</td>
+			<td>:</td>
+			<td>{{settingsCtrl.machine.settings.brightness}} %</td>
+		</tr>
+		<tr>
+			<td>{{settingsCtrl.get('water_cycle_on')}}</td>
+			<td>:</td>
+			<td>{{settingsCtrl.get(settingsCtrl.getOnOrOffLabel('water_cycle_on'))}}</td>
+		</tr>
+		<tr>
+			<td>{{settingsCtrl.get('water_cycle_duration')}}</td>
+			<td>:</td>
+			<td>{{settingsCtrl.machine.settings.water_cycle_duration}}{{settingsCtrl.get('secondsShortLabel');}}</td>
+		</tr>
+		<tr>
+			<td>{{settingsCtrl.get('water_cycle_period')}}</td>
+			<td>:</td>
+			<td>{{settingsCtrl.currentCycleHours}}{{settingsCtrl.get('hoursShortLabel');}}
+				{{settingsCtrl.currentCycleMinutes}}{{settingsCtrl.get('minutesShortLabel');}}</td>
+		</tr>
+
+		<tr>
+			<td>{{settingsCtrl.get('fan_on');}}</td>
+			<td>:</td>
+			<td>{{settingsCtrl.get(settingsCtrl.getOnOrOffLabel('fan_on'));}}</td>
+		</tr>
+
+		<tr>
+			<td>{{settingsCtrl.get('fan_auto');}}</td>
+			<td>:</td>
+			<td>{{settingsCtrl.get(settingsCtrl.getAutoOrContinuousLabel('fan_auto'));}}</td>
+		</tr>
+
+		<tr>
+			<td>{{settingsCtrl.get('fan_humidity');}}</td>
+			<td>:</td>
+			<td>{{settingsCtrl.machine.settings.fan_humidity}} %</td>
+		</tr>
+
 	</table>
 
 </div>

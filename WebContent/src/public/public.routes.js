@@ -83,7 +83,9 @@
 			})
 			.state('common.public.logged-in.selected.data', {
 				url: '/logged-in/data',
-				templateUrl: 'src/public/logged-in/selected/data/data.html'
+				templateUrl: 'src/public/logged-in/selected/data/data.html',
+				controller: 'DataController',
+				controllerAs: 'dataCtrl'
 			})
 			.state('common.public.logged-in.selected.camera', {
 				url: '/logged-in/camera',

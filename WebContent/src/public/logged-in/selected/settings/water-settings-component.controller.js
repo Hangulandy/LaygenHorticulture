@@ -9,12 +9,11 @@
 		var waterCtrl = this;
 
 		$rootScope.$on('machineStatusChanged', function() {
-			waterCtrl.machine = AppDataService.getMachine();
-			waterCtrl.clearChanges();
+			waterCtrl.refresh();
 		})
 
 		$scope.$watch('machine', function() {
-			waterCtrl.clearChanges();
+			waterCtrl.refresh();
 		});
 
 		$scope.$on('clearMessages', function() {
@@ -83,7 +82,8 @@
 			})
 		}
 
-		waterCtrl.clearChanges = function() {
+		waterCtrl.refresh = function() {
+			waterCtrl.machine = AppDataService.getMachine();
 			waterCtrl.waterInValveOn = waterCtrl.machine.settings.water_in_valve_on;
 			waterCtrl.waterCycleOn = waterCtrl.machine.settings.water_cycle_on;
 			waterCtrl.waterCycleDuration = parseInt(waterCtrl.machine.settings.water_cycle_duration);
@@ -95,6 +95,8 @@
 			tempTime = tempTime % 3600; // remove whole hours
 			waterCtrl.newCycleMinutes = waterCtrl.currentCycleMinutes = Math.floor(tempTime / 60);
 		}
+		
+		waterCtrl.refresh();
 
 	}
 

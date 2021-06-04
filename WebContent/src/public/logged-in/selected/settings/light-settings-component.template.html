@@ -12,7 +12,7 @@
 			</thead>
 			<tbody>
 				<tr>
-					<td>{{lightCtrl.get('light_on');}}</td>
+					<td class="left">{{lightCtrl.get('light_on');}}</td>
 					<td>{{lightCtrl.get(lightCtrl.getOnOrOffLabel('light_on'));}}</td>
 					<td><label><input type="radio" name="light_on"
 							ng-model="lightCtrl.lightOn" value="1" />
@@ -21,7 +21,7 @@
 							{{lightCtrl.get('offLabel');}}</label></td>
 				</tr>
 				<tr>
-					<td>{{lightCtrl.get('brightness');}}</td>
+					<td class="left">{{lightCtrl.get('brightness');}}</td>
 					<td>{{lightCtrl.machine.settings.brightness}}</td>
 					<td><input type="number" id="brightness" name="brightness"
 						step="5" min="0" max="100" ng-model="lightCtrl.brightness"><br
@@ -32,9 +32,9 @@
 						id="brightnessSlider"></td>
 				</tr>
 				<tr>
-					<td>{{lightCtrl.get('light_color');}}</td>
+					<td class="left">{{lightCtrl.get('light_color');}}</td>
 					<td>{{lightCtrl.get(lightCtrl.machine.settings.light_color);}}</td>
-					<td>
+					<td class="left">
 						<p ng-repeat="(k, v) in lightCtrl.orderedColors">
 							<input type="radio" name="lightColor"
 								ng-model="lightCtrl.lightColor" value="{{k}}"

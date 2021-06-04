@@ -1,19 +1,42 @@
 <div class="info-page-tile">
 	<h3>{{cameraCtrl.get('cameraSettingsHeading');}}</h3>
+	<form name="cameraSettingsForm" novalidate>
 		<table>
-		<thead>
-			<tr>
-				<th>{{cameraCtrl.get('itemLabel');}}</th>
-				<th>{{cameraCtrl.get('valueLabel');}}</th>
-				<th>{{cameraCtrl.get('adjustLabel');}}</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-		</tbody>
-	</table>
+			<thead>
+				<tr>
+					<th>{{cameraCtrl.get('itemLabel');}}</th>
+					<th>{{cameraCtrl.get('valueLabel');}}</th>
+					<th>{{cameraCtrl.get('adjustLabel');}}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="left">{{cameraCtrl.get('camera_cycle_on')}}</td>
+					<td>{{cameraCtrl.get(cameraCtrl.getOnOrOffLabel('camera_cycle_on'))}}</td>
+					<td><label><input type="radio" name="camera_cycle_on"
+							ng-model="cameraCtrl.cameraCycleOn" value="1" />
+							{{cameraCtrl.get('onLabel');}}</label> <label><input type="radio"
+							name="camera_cycle_on" ng-model="cameraCtrl.cameraCycleOn"
+							value="0" /> {{cameraCtrl.get('offLabel');}}</label></td>
+				</tr>
+				<tr>
+					<td class="left">{{cameraCtrl.get('camera_cycle_period')}}</td>
+					<td>{{cameraCtrl.currentCycleHours}}{{cameraCtrl.get('hoursShortLabel');}}
+						:
+						{{cameraCtrl.currentCycleMinutes}}{{cameraCtrl.get('minutesShortLabel');}}</td>
+					<td><input type="number" name="camera_cycle_period" step="1"
+						min="0" max="100" ng-model="cameraCtrl.newCycleHours">{{cameraCtrl.get('hoursShortLabel');}}
+						<input type="number" name="camera_cycle_period" step="1" min="0"
+						max="59" ng-model="cameraCtrl.newCycleMinutes">{{cameraCtrl.get('minutesShortLabel');}}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div ng-if="cameraCtrl.changesDetected()">
+			<h4 class="sideBySide">{{cameraCtrl.get('submitChangesPrompt');}}</h4>
+			<button ng-click="cameraCtrl.submitChanges()">{{cameraCtrl.get('send');}}</button>
+			<button ng-click="cameraCtrl.refresh()">{{cameraCtrl.get('reset');}}</button>
+		</div>
+		<p>{{cameraCtrl.get(cameraCtrl.message);}}</p>
+	</form>
 </div>

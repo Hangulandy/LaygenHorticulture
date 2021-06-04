@@ -8,6 +8,7 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -436,6 +437,33 @@ public class Machine {
 			return this.getInfo().get("owner_email");
 		}
 		return null;
+	}
+
+	public void reduceReadings(int max) {
+		int count = 0;
+		if (this.getSensors() != null && this.getSensors().size() > 0) {
+			for (String key : this.getSensors().keySet()) {
+				Sensor sensor = this.getSensors().get(key);
+				if (sensor != null && sensor.getReadings() != null) {
+					TreeSet<Message> readings = sensor.getReadings();
+					float maxSize = (float)max;
+					if (readings.size() > maxSize) {
+						TreeSet<Message> temp = new TreeSet<Message>();
+
+						float rate = maxSize / readings.size();
+						Random ran = new Random();
+						for (Message message : readings) {
+							count++;
+							if (ran.nextFloat() < rate) {
+								temp.add(message);
+							}
+						}
+						sensor.setReadings(temp);
+					}
+				}
+			}
+		}
+		System.out.printf("Performed %d operations reducing the size of the tree sets\n", count);
 	}
 
 }

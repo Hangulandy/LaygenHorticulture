@@ -6,7 +6,7 @@
 		<tr ng-repeat="sensor in dataCtrl.machine.sensors">
 			<td>{{dataCtrl.get(sensor.name);}}</td>
 			<td>:</td>
-			<td>{{dataCtrl.machine.readings[sensor.name]}}
+			<td> {{dataCtrl.getReading(sensor);}}
 				{{dataCtrl.machine.sensors[sensor.name].units}}</td>
 		</tr>
 	</table>

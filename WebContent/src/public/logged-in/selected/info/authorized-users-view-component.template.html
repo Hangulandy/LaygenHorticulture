@@ -10,16 +10,64 @@
 			<th>{{authUsersCtrl.get('optionsLabel');}}</th>
 		</tr>
 		<tr ng-repeat="user in authUsersCtrl.machine.authorizedUsers">
-			<td>{{user.name}}</td>
-			<td class="not-mobile">{{user.organization}}</td>
-			<td>{{user.email}}</td>
+			<td  class="left">{{user.name}}</td>
+			<td class="not-mobile left">{{user.organization}}</td>
+			<td  class="left">{{user.email}}</td>
 			<td><button ng-if="authUsersCtrl.canRevoke(user);"
 					ng-click="authUsersCtrl.revoke(user);">{{authUsersCtrl.get('revokeLabel');}}</button>
 				<button ng-if="authUsersCtrl.canMakeOwner(user);"
 					ng-click="authUsersCtrl.transfer(user);">{{authUsersCtrl.get('transferLabel');}}</button></td>
 		</tr>
 	</table>
-	
+
+	<div>
+		<h3>{{authUsersCtrl.get('searchUsersHeading');}}</h3>
+
+		<form name="searchUsersForm" novalidate>
+			<input type="email" name="email"
+				placeholder="{{authUsersCtrl.get('emailPlaceholder');}}"
+				ng-model="authUsersCtrl.email" required />
+			<button ng-click="authUsersCtrl.search();"
+				ng-disabled="authUsersCtrl.$invalid">{{authUsersCtrl.get('searchLabel');}}</button>
+			<br> <span
+				ng-if="authUsersCtrl.email.$invalid && authUsersCtrl.email.$touched">{{authUsersCtrl.get('emailInvalidMessage');}}</span>
+		</form>
+	</div>
+
+	<div ng-if="authUsersCtrl.foundUser !== undefined">
+		<h3>{{authUsersCtrl.get('addUserHeading');}}</h3>
+		<table class="transparent">
+			<tr>
+				<td>{{authUsersCtrl.get('nameLabel');}}</td>
+				<td>:</td>
+				<td>{{authUsersCtrl.foundUser.name}}</td>
+			</tr>
+			<tr>
+				<td>{{authUsersCtrl.get('organizationLabel');}}</td>
+				<td>:</td>
+				<td>{{authUsersCtrl.foundUser.organization}}</td>
+			</tr>
+			<tr>
+				<td>{{authUsersCtrl.get('emailLabel');}}</td>
+				<td>:</td>
+				<td>{{authUsersCtrl.foundUser.email}}</td>
+			</tr>
+			<tr>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td>
+					<div
+						ng-if="authUsersCtrl.userIsOwner() && !authUsersCtrl.userIsAuthorized(authUsersCtrl.foundUser)">
+						<button ng-click="authUsersCtrl.addUser()">{{authUsersCtrl.get('addLabel');}}</button>
+						<button ng-click="authUsersCtrl.clearResults()">{{authUsersCtrl.get('reset');}}</button>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
 	<h4>{{authUsersCtrl.get(authUsersCtrl.message);}}</h4>
+
 
 </div>

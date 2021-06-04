@@ -4,16 +4,24 @@
 	angular.module('public')
 		.controller('GeneralInfoViewComponentController', GeneralInfoViewComponentController);
 
-	GeneralInfoViewComponentController.$inject = ['AppDataService'];
-	function GeneralInfoViewComponentController(AppDataService) {
+	GeneralInfoViewComponentController.$inject = ['AppDataService', '$rootScope'];
+	function GeneralInfoViewComponentController(AppDataService, $rootScope) {
 
 		var genInfoCtrl = this;
-
-		genInfoCtrl.machine = AppDataService.getMachine();
+		
+		$rootScope.$on('machinStatusChanged', function(){
+			genInfoCtrl.refresh();
+		})
 
 		genInfoCtrl.get = function(entry) {
 			return AppDataService.get(entry);
 		}
+		
+		genInfoCtrl.refresh = function(){
+				genInfoCtrl.machine = AppDataService.getMachine();
+		}
+		
+		genInfoCtrl.refresh();
 	}
 
 })();

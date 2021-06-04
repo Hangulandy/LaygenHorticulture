@@ -26,7 +26,7 @@
 	--standard-border: 0px; 
 	--block-height: calc(100vh - calc(calc(var(--footer-height) + var(--header-height)) + calc(2 * var(--standard-pad)))); 
 	--mobile-block-height: calc(var(--block-height) - var(--head-height));
-	--info-page-tile-height: 365px;
+	--info-page-tile-height: 380px;
 }
 
 html {
@@ -114,7 +114,7 @@ input[type=time] {
 }
 
 label {
-	padding: var(--standard-pad);
+	padding: 0px;
 }
 
 p {
@@ -140,7 +140,6 @@ table {
 
 td {
 	padding: calc(var(--standard-pad) / 3);
-	text-align: left;
 }
 
 th {
@@ -240,7 +239,9 @@ form.custom-color-adjuster {
 	margin-top: var(--standard-pad);
 	margin-right: var(--standard-pad);
 	float: left;
-	width: var(--chart-container-width); 
+	width: var(--chart-container-width);
+	height: var(--chart-container-width);
+	box-shadow: 0px 0px calc(var(--standard-pad) / 3) black;
 }
 
 .chart-container-large {
@@ -341,7 +342,6 @@ form.custom-color-adjuster {
 }
 
 .left {
-	padding-left: var(--standard-pad);
 	text-align: left;
 }
 

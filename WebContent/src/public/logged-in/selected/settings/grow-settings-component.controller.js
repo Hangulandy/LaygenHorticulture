@@ -48,7 +48,10 @@
 
 		growCtrl.clearChanges = function() {
 			var picker = document.getElementById('plant_date');
-			picker.value = growCtrl.machine.settings.plant_date;
+
+			if (picker != null) {
+				picker.value = growCtrl.machine.settings.plant_date;
+			}
 			growCtrl.plant_date = new Date(growCtrl.machine.settings.plant_date);
 		}
 

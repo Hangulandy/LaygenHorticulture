@@ -270,8 +270,8 @@
 				console.log("Something went terribly wrong", error);
 			});
 		}
-		
-		service.refreshMachineInfo = function(){
+
+		service.refreshMachineInfo = function() {
 			return $http({
 				method: "GET",
 				url: url,
@@ -287,21 +287,21 @@
 				console.log("Something went terribly wrong", error);
 			});
 		}
-		
-		service.submitSettings = function(params){
+
+		service.submitSettings = function(params) {
 			return $http({
 				method: "GET",
 				url: url,
 				params: params
-			}).then(function(result){
+			}).then(function(result) {
 				var data = result.data;
 				service.setMachine(data.object);
 				service.setUser(data.user);
 				return data;
 			})
-			.catch(function(error){
-				console.log("Something went terribly wrong", error);
-			});
+				.catch(function(error) {
+					console.log("Something went terribly wrong", error);
+				});
 		}
 
 		service.getUser = function() {
@@ -319,7 +319,9 @@
 
 		service.setMachine = function(machine) {
 			service.setInStorage("machine", machine);
-			$rootScope.$broadcast('machineStatusChanged');
+			if (machine != undefined) {
+				$rootScope.$broadcast('machineStatusChanged');
+			}
 		}
 
 		service.resetMachine = function() {
@@ -360,6 +362,16 @@
 
 		service.clearMessagesExcept = function(exclude) {
 			$rootScope.$broadcast('clearMessages', { exclude: exclude });
+		}
+		
+		service.isValidDate = function(date){
+			return (new Date(date) instanceof Date) && !isNaN(new Date(date));
+		}
+		
+		service.isValidTime = function(time){
+			
+			var pattern = new RegExp('([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]');			
+			return pattern.test(time);
 		}
 
 	}

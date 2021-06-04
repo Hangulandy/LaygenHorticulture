@@ -19,6 +19,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.laygen.beans.Machine;
 import com.laygen.beans.MyResponse;
+import com.laygen.beans.Sensor;
 import com.laygen.beans.User;
 import com.laygen.database.Dictionary;
 import com.laygen.database.UserDB;
@@ -127,9 +128,14 @@ public class Controller extends HttpServlet {
 					updateAirSettings(request, response, session);
 				}
 
-//				if (action.equalsIgnoreCase("updateCameraSettings")) {
-//					updateCameraSettings(request, response, session);
-//				}
+				if (action.equalsIgnoreCase("updateCameraSettings")) {
+					updateCameraSettings(request, response, session);
+				}
+
+				if (action.equalsIgnoreCase("viewMachineData")) {
+					viewMachineData(request, response, session);
+				}
+
 			}
 
 		} catch (IllegalStateException e) {
@@ -425,25 +431,19 @@ public class Controller extends HttpServlet {
 		User user = getLoggedInUser(session);
 
 		String lightColor = request.getParameter("light_color");
-		String redString = request.getParameter("redValue");
-		String greenString = request.getParameter("greenValue");
-		String blueString = request.getParameter("blueValue");
+		int redValue = getIntFromString(request.getParameter("redValue"));
+		int greenValue = getIntFromString(request.getParameter("greenValue"));
+		int blueValue = getIntFromString(request.getParameter("blueValue"));
 
 		if (user != null) {
 			if (userIsAuth(session)) {
+
+				// TODO - check that the light color parameter is actually a light color for
+				// that machine
 				if (machine != null && userIsAuth(session) && machine.getLightColors() != null
 						&& machine.getLightColors().get(lightColor) != null) {
 					// everything is good so far
-					int redValue = 0;
-					int greenValue = 0;
-					int blueValue = 0;
-					try {
-						redValue = Integer.parseInt(redString);
-						greenValue = Integer.parseInt(greenString);
-						blueValue = Integer.parseInt(blueString);
-					} catch (Exception e) {
-						// do nothing since these will be 0 if they fail to parse
-					}
+
 					int value = redValue * 1000000 + greenValue * 1000 + blueValue;
 					String messageToMachine = String.format("%d#light_%s", value, lightColor);
 					message = machine.sendCommandToMachine(messageToMachine);
@@ -469,10 +469,15 @@ public class Controller extends HttpServlet {
 					// everything is good so far
 					TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
 
-					// newSettings.put("heater_on", request.getParameter("heater_on"));
-					newSettings.put("fan_on", request.getParameter("fan_on"));
-					newSettings.put("fan_auto", request.getParameter("fan_auto"));
-					newSettings.put("fan_humidity", request.getParameter("fan_humidity"));
+					// int heaterOn = getIntFromString(request.getParameter("heater_on"));
+					int fanOn = getIntFromString(request.getParameter("fan_on"));
+					int fanAuto = getIntFromString(request.getParameter("fan_auto"));
+					int fanHumidity = getIntFromString(request.getParameter("fan_humidity"));
+
+					// newSettings.put("heater_on", String.valueOf(heaterOn));
+					newSettings.put("fan_on", String.valueOf(fanOn));
+					newSettings.put("fan_auto", String.valueOf(fanAuto));
+					newSettings.put("fan_humidity", String.valueOf(fanHumidity));
 
 					message = machine.sendMachineSettngs(newSettings);
 				}
@@ -486,27 +491,75 @@ public class Controller extends HttpServlet {
 		sendObjectWithResponse(machine, message, session, response);
 	}
 
-//	private void updateCameraSettings(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
-//		Machine machine = (Machine) session.getAttribute("machine");
-//
-//		if (machine != null && userIsAuth(session) && machine.getSerialNumber() != null) {
-//			TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
-//
-//			String cameraCyclePeriodHours = request.getParameter("camera_cycle_period_hours");
-//			String cameraCyclePeriodMinutes = request.getParameter("camera_cycle_period_minutes");
-//
-//			int totalCameraCycle = getTotalFromHoursMinutes(cameraCyclePeriodHours, cameraCyclePeriodMinutes);
-//
-//			newSettings.put("camera_cycle_on", request.getParameter("camera_cycle_on"));
-//			newSettings.put("camera_cycle_period", String.valueOf(totalCameraCycle));
-//
-//			session.setAttribute("message",
-//					machine.sendMachineSettngs(newSettings, (String) session.getAttribute("lang")));
-//			session.setAttribute("viewComponent", "machineSettings");
-//		} else {
-//			viewMyMachines(session);
-//		}
-//	}
+	private void updateCameraSettings(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = "null";
+		User user = getLoggedInUser(session);
+
+		if (user != null) {
+			if (userIsAuth(session)) {
+				if (machine != null && machine.getSerialNumber() != null) {
+
+					if (message.equalsIgnoreCase("null")) {
+						// everything is good so far
+						TreeMap<String, String> newSettings = new TreeMap<String, String>(Collections.reverseOrder());
+
+						int period = getIntFromString(request.getParameter("camera_cycle_period"));
+						int onOrOff = getIntFromString(request.getParameter("camera_cycle_on"));
+
+						newSettings.put("camera_cycle_on", String.valueOf(onOrOff));
+						newSettings.put("camera_cycle_period", String.valueOf(period));
+
+						message = machine.sendMachineSettngs(newSettings);
+					}
+				} else {
+					message = "unableToUpdate";
+				}
+			} else {
+				message = "userNotAuthorized";
+			}
+		} else {
+			message = "invalidUserMessage";
+		}
+
+		sendObjectWithResponse(machine, message, session, response);
+	}
+
+	private void viewMachineData(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String startDate = (String) request.getParameter("startDate");
+		String startTime = (String) request.getParameter("startTime");
+		String endDate = (String) request.getParameter("endDate");
+		String endTime = (String) request.getParameter("endTime");
+		String message = "invalidUserMessage";
+		User user = getLoggedInUser(session);
+
+		if (user != null) {
+			if (userIsAuth(session)) {
+				if (machine != null && machine.getSerialNumber() != null) {
+					machine.fetchCurrentReadingsFromDB();
+					
+					if (machine.getSensors() != null) {
+						message = "null";
+						Sensor sensor = null;
+						for (String key : machine.getSensors().keySet()) {
+							sensor = machine.getSensors().get(key);
+								machine.fetchSensorReadingsByDate(startDate, startTime, endDate, endTime, sensor);
+						}
+						machine.reduceReadings(1000);
+					} else {
+						message = "noSensors"; 
+					}
+				} else {
+					message = "invalidMachineInformationMessage";
+				}
+			} else {
+				message = "userNotAuthorized";
+			}
+		}
+
+		sendObjectWithResponse(machine, message, session, response);
+	}
 
 	private User getLoggedInUser(HttpSession session) {
 		User user = (User) session.getAttribute("user");

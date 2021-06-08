@@ -136,6 +136,18 @@ public class Controller extends HttpServlet {
 					viewMachineData(request, response, session);
 				}
 
+				if (action.equalsIgnoreCase("viewCameraPage")) {
+					viewCameraPage(request, response, session);
+				}
+
+//				if (action.equalsIgnoreCase("takePicture")) {
+//					takePicture(session);
+//				}
+//
+//				if (action.equalsIgnoreCase("deleteImage")) {
+//					deleteImageFromMachine(request, session);
+//				}
+
 			}
 
 		} catch (IllegalStateException e) {
@@ -538,17 +550,17 @@ public class Controller extends HttpServlet {
 			if (userIsAuth(session)) {
 				if (machine != null && machine.getSerialNumber() != null) {
 					machine.fetchCurrentReadingsFromDB();
-					
+
 					if (machine.getSensors() != null) {
 						message = "null";
 						Sensor sensor = null;
 						for (String key : machine.getSensors().keySet()) {
 							sensor = machine.getSensors().get(key);
-								machine.fetchSensorReadingsByDate(startDate, startTime, endDate, endTime, sensor);
+							machine.fetchSensorReadingsByDate(startDate, startTime, endDate, endTime, sensor);
 						}
 						machine.reduceReadings(1000);
 					} else {
-						message = "noSensors"; 
+						message = "noSensors";
 					}
 				} else {
 					message = "invalidMachineInformationMessage";
@@ -560,6 +572,58 @@ public class Controller extends HttpServlet {
 
 		sendObjectWithResponse(machine, message, session, response);
 	}
+
+	private void viewCameraPage(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = "null";
+		User user = getLoggedInUser(session);
+
+		if (user != null) {
+			if (userIsAuth(session)) {
+				if (machine != null && machine.getSerialNumber() != null) {
+					// everything is good so far
+					machine.fetchImageList();
+					
+				} else {
+					message = "invalidMachineInformationMessage";
+				}
+			} else {
+				message = "userNotAuthorized";
+			}
+		} else {
+			message = "invalidUserMessage";
+		}
+
+		sendObjectWithResponse(machine, message, session, response);
+	}
+	
+	
+
+//	private void takePicture(HttpSession session) {
+//		Machine machine = (Machine) session.getAttribute("machine");
+//		String message = "null";
+//
+//		if (machine != null && userIsAuth(session)) {
+//			message = machine.takePicture();
+//			session.setAttribute("message", message);
+//			session.setAttribute("viewComponent", "cameraPage");
+//		} else {
+//			viewMyMachines(session);
+//		}
+//	}
+//
+//	private void deleteImageFromMachine(HttpServletRequest request, HttpSession session) {
+//		Machine machine = (Machine) session.getAttribute("machine");
+//		String imageId = (String) request.getParameter("imageId");
+//
+//		if (machine != null && userIsAuth(session) && imageId != null) {
+//			String newImageId = machine.deleteImage(imageId);
+//			session.setAttribute("selectedImageId", newImageId);
+//			String message = imageId.equalsIgnoreCase(newImageId) ? "failure" : "success";
+//			session.setAttribute("message", message);
+//		}
+//		session.setAttribute("viewComponent", "cameraPage");
+//	}
 
 	private User getLoggedInUser(HttpSession session) {
 		User user = (User) session.getAttribute("user");

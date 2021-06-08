@@ -72,6 +72,10 @@ button {
 	line-height: 0px;
 }
 
+canvas {
+	height: 600px;
+}
+
 h1 {
 	position: relative;
 	margin: var(--standard-pad) 0px;
@@ -240,13 +244,18 @@ form.custom-color-adjuster {
 	margin-right: var(--standard-pad);
 	float: left;
 	width: var(--chart-container-width);
-	height: var(--chart-container-width);
+	height: 200px;
 	box-shadow: 0px 0px calc(var(--standard-pad) / 3) black;
 }
 
 .chart-container-large {
 	width: 100%;
 	margin: var(--standard-pad);
+} 
+
+.checkboxTiles {
+	margin: var(--standard-pad) var(--standard-pad) 0px 0px;
+	float: left;
 }
 
 .clear {

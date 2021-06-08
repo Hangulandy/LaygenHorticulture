@@ -1,4 +1,3 @@
-<div class="chart-container">
-	<h4>Data Chart</h4>
-	{{chartCtrl.sensor.name}}
+<div ng-show="chartCtrl.selected" class="chart-container">
+	<canvas id="{{chartCtrl.sensor.name}}"></canvas>
 </div>

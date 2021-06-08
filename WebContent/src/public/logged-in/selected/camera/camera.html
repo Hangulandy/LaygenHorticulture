@@ -1,3 +1,8 @@
 <div class="page">
-	<h2>Camera Page</h2>
+	<h2>{{cameraCtrl.get('cameraHeading')}}</h2>
+	<hr>
+	<select ng-model="cameraCtrl.selectedImage"
+		ng-options="k as v for (k, v) in cameraCtrl.machine.images"><option
+			value="" disabled selected>{{cameraCtrl.get('selectAnImageLabel')}}</option></select>
+			<button ng-click="cameraCtrl.selectImage()">{{cameraCtrl.get('select')}}</button>
 </div>

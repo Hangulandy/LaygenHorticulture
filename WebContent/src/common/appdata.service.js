@@ -293,12 +293,32 @@
 				method: "GET",
 				url: url,
 				params: params
-			}).then(function(result) {
-				var data = result.data;
-				service.setMachine(data.object);
-				service.setUser(data.user);
-				return data;
 			})
+				.then(function(result) {
+					var data = result.data;
+					service.setMachine(data.object);
+					service.setUser(data.user);
+					return data;
+				})
+				.catch(function(error) {
+					console.log("Something went terribly wrong", error);
+				});
+		}
+
+		service.getMachineWithImages = function() {
+			return $http({
+				method: "GET",
+				url: url,
+				params: {
+					action: "viewCameraPage"
+				}
+			})
+				.then(function(result) {
+					var data = result.data;
+					service.setMachine(data.object);
+					service.setUser(data.user);
+					return data.object;
+				})
 				.catch(function(error) {
 					console.log("Something went terribly wrong", error);
 				});
@@ -319,9 +339,7 @@
 
 		service.setMachine = function(machine) {
 			service.setInStorage("machine", machine);
-			if (machine != undefined) {
-				$rootScope.$broadcast('machineStatusChanged');
-			}
+			$rootScope.$broadcast('machineStatusChanged');
 		}
 
 		service.resetMachine = function() {
@@ -363,14 +381,14 @@
 		service.clearMessagesExcept = function(exclude) {
 			$rootScope.$broadcast('clearMessages', { exclude: exclude });
 		}
-		
-		service.isValidDate = function(date){
+
+		service.isValidDate = function(date) {
 			return (new Date(date) instanceof Date) && !isNaN(new Date(date));
 		}
-		
-		service.isValidTime = function(time){
-			
-			var pattern = new RegExp('([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]');			
+
+		service.isValidTime = function(time) {
+
+			var pattern = new RegExp('([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]');
 			return pattern.test(time);
 		}
 

@@ -1,20 +1,30 @@
 <div class="page">
-	<h2>{{dataCtrl.get('sensorHeading');}}</h2>
+	<h2>{{dataCtrl.get('sensorHeading')}}</h2>
 	<hr>
 	<form name="dataDateForm" novalidate>
-		<label>{{dataCtrl.get('fromLabel');}}:</label> <input type="date"
+		<label>{{dataCtrl.get('fromLabel')}}:</label> <input type="date"
 			id="startDate" name="startDate" min="dataCtrl.minDate"
 			max="dataCtrl.maxDate" pattern="\d{4}-\d{2}-\d{2}" required /> <input
 			type="time" id="startTime" name="startTime" min="dataCtrl.minTime"
 			max="dataCtrl.maxTime" required /> <br class="mobile-only"> <br
-			class="mobile-only"> <label>{{dataCtrl.get('toLabel');}}:</label>
+			class="mobile-only"> <label>{{dataCtrl.get('toLabel')}}:</label>
 		<input type="date" id="endDate" name="endDate" min="dataCtrl.minDate"
 			max="dataCtrl.maxDate" pattern="\d{4}-\d{2}-\d{2}" required /> <input
 			type="time" id="endTime" name="endTime" min="dataCtrl.minTime"
 			max="dataCtrl.maxTime" required /> <br class="mobile-only"> <br
 			class="mobile-only">
-		<button ng-click="dataCtrl.submit();">{{dataCtrl.get('select');}}</button>
+		<button ng-click="dataCtrl.submit()">{{dataCtrl.get('select')}}</button>
 	</form>
-	<single-chart ng-repeat="sensor in dataCtrl.machine.sensors" sensor="sensor"></single-chart>
+
+	<div ng-repeat="sensor in dataCtrl.machine.sensors"
+		class="checkboxTiles">
+		<label ng-if="dataCtrl.hasData(sensor.name)"><input
+			type="checkbox" ng-model="dataCtrl.sensorIsSelected[sensor.name]"
+			ng-change="dataCtrl.saveSensors()" /> {{dataCtrl.get(sensor.name)}} </label>
+	</div>
+	<br style="clear: both;">
+
+	<single-chart ng-repeat="sensor in dataCtrl.machine.sensors"
+		sensor="sensor" selected="dataCtrl.isSelected(sensor.name)"></single-chart>
 
 </div>

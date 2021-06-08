@@ -8,7 +8,7 @@
 	function routeConfig($stateProvider) {
 
 		$stateProvider
-			.state('common',{
+			.state('common', {
 				abstract: true,
 				templateUrl: 'src/common/common.html',
 				controller: 'CommonController',
@@ -17,7 +17,7 @@
 					dict: ['AppDataService', function(AppDataService) {
 						return AppDataService.getDictionary();
 					}]
-				}				
+				}
 			})
 			.state('common.public', {
 				abstract: true,
@@ -64,7 +64,7 @@
 				controller: 'SelectedController',
 				controllerAs: 'selectedCtrl',
 				resolve: {
-					machine: ['AppDataService', function(AppDataService){
+					machine: ['AppDataService', function(AppDataService) {
 						return AppDataService.getMachine();
 					}]
 				}
@@ -89,7 +89,14 @@
 			})
 			.state('common.public.logged-in.selected.camera', {
 				url: '/logged-in/camera',
-				templateUrl: 'src/public/logged-in/selected/camera/camera.html'
+				templateUrl: 'src/public/logged-in/selected/camera/camera.html',
+				controller: 'CameraController',
+				controllerAs: 'cameraCtrl',
+				resolve: {
+					machine: ['AppDataService', function(AppDataService) {
+						return AppDataService.getMachineWithImages();
+					}]
+				}
 			});
 	}
 })();

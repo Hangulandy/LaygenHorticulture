@@ -76,4 +76,8 @@ public class Sensor implements Comparable<Sensor> {
 			}
 		}
 	}
+
+	public void clearReadings() {
+		this.readings = null;
+	}
 }

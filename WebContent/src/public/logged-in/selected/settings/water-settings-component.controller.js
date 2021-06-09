@@ -4,13 +4,10 @@
 	angular.module('public')
 		.controller('WaterSettingsComponentController', WaterSettingsComponentController);
 
-	WaterSettingsComponentController.$inject = ['AppDataService', '$scope', '$rootScope'];
-	function WaterSettingsComponentController(AppDataService, $scope, $rootScope) {
+	WaterSettingsComponentController.$inject = ['AppDataService', '$scope'];
+	function WaterSettingsComponentController(AppDataService, $scope) {
 		var waterCtrl = this;
 
-		$rootScope.$on('machineStatusChanged', function() {
-			waterCtrl.refresh();
-		})
 
 		$scope.$watch('machine', function() {
 			waterCtrl.refresh();
@@ -83,7 +80,6 @@
 		}
 
 		waterCtrl.refresh = function() {
-			waterCtrl.machine = AppDataService.getMachine();
 			waterCtrl.waterInValveOn = waterCtrl.machine.settings.water_in_valve_on;
 			waterCtrl.waterCycleOn = waterCtrl.machine.settings.water_cycle_on;
 			waterCtrl.waterCycleDuration = parseInt(waterCtrl.machine.settings.water_cycle_duration);

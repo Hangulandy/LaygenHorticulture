@@ -4,18 +4,13 @@
 	angular.module('public')
 		.controller('LightSettingsComponentController', LightSettingsComponentController);
 
-	LightSettingsComponentController.$inject = ['AppDataService', '$scope', '$rootScope'];
-	function LightSettingsComponentController(AppDataService, $scope, $rootScope) {
+	LightSettingsComponentController.$inject = ['AppDataService', '$scope'];
+	function LightSettingsComponentController(AppDataService, $scope) {
 		var lightCtrl = this;
 
 		$scope.$watch('machine', function() {
 			lightCtrl.clearChanges();
 		});
-		
-		$rootScope.$on('machineStatusChanged', function(){
-			lightCtrl.machine = AppDataService.getMachine();
-			lightCtrl.clearChanges();
-		})
 
 		$scope.$on('clearMessages', function() {
 			lightCtrl.message = "null";

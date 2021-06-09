@@ -45,8 +45,10 @@
 
 		var settingsCtrl = this;
 
-		$rootScope.$on('machinemachineStatusChanged', function() {
-			settingsCtrl.getMachine();
+		$rootScope.$on('machineStatusChanged', function() {
+			if (AppDataService.getMachine() != undefined) {
+				settingsCtrl.machine = AppDataService.getMachine();
+			}
 		});
 
 		settingsCtrl.get = function(entry) {

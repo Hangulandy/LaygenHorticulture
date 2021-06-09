@@ -4,14 +4,14 @@
 	angular.module('public')
 		.controller('SettingsQuickViewComponentController', SettingsQuickViewComponentController);
 
-	SettingsQuickViewComponentController.$inject = ['AppDataService', '$rootScope'];
-	function SettingsQuickViewComponentController(AppDataService, $rootScope) {
+	SettingsQuickViewComponentController.$inject = ['AppDataService', '$scope'];
+	function SettingsQuickViewComponentController(AppDataService, $scope) {
 
 		var settingsCtrl = this;
-
-		$rootScope.$on('machineStatusChanged', function() {
+		
+		$scope.$watch('settingsCtrl.machine', function(){
 			settingsCtrl.refresh();
-		});
+		})
 
 		settingsCtrl.getOpenedOrClosed = function(setting) {
 			if (settingsCtrl.machine.settings[setting] == "1") {
@@ -42,7 +42,6 @@
 		}
 
 		settingsCtrl.refresh = function() {
-			settingsCtrl.machine = AppDataService.getMachine();
 			settingsCtrl.waterCyclePeriod = parseInt(settingsCtrl.machine.settings.water_cycle_period);
 
 			var tempTime = settingsCtrl.waterCyclePeriod;
@@ -51,8 +50,6 @@
 			tempTime = tempTime % 3600; // remove whole hours
 			settingsCtrl.currentCycleMinutes = Math.floor(tempTime / 60);
 		}
-
-		settingsCtrl.refresh();
 	}
 
 })();

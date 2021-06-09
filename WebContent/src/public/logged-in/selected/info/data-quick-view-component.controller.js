@@ -4,14 +4,10 @@
 	angular.module('public')
 		.controller('DataQuickViewComponentController', DataQuickViewComponentController);
 
-	DataQuickViewComponentController.$inject = ['AppDataService', '$rootScope'];
-	function DataQuickViewComponentController(AppDataService, $rootScope) {
+	DataQuickViewComponentController.$inject = ['AppDataService'];
+	function DataQuickViewComponentController(AppDataService) {
 
 		var dataCtrl = this;
-
-		$rootScope.$on('machineStatusChanged', function(){
-			dataCtrl.refresh();
-		})
 
 		dataCtrl.get = function(entry) {
 			return AppDataService.get(entry);
@@ -25,12 +21,6 @@
 			}
 			return val; 
 		}
-		
-		dataCtrl.refresh = function(){
-			dataCtrl.machine = AppDataService.getMachine();
-		}
-		
-		dataCtrl.refresh();
 	}
 
 })();

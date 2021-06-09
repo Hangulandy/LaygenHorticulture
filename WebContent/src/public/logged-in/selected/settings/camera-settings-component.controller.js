@@ -4,13 +4,9 @@
 	angular.module('public')
 		.controller('CameraSettingsComponentController', CameraSettingsComponentController);
 
-	CameraSettingsComponentController.$inject = ['AppDataService', '$scope', '$rootScope'];
-	function CameraSettingsComponentController(AppDataService, $scope, $rootScope) {
+	CameraSettingsComponentController.$inject = ['AppDataService', '$scope'];
+	function CameraSettingsComponentController(AppDataService, $scope) {
 		var cameraCtrl = this;
-
-		$rootScope.$on('machineStatusChanged', function() {
-			cameraCtrl.refresh();
-		})
 
 		$scope.$watch('machine', function() {
 			cameraCtrl.refresh();
@@ -66,7 +62,6 @@
 		}
 
 		cameraCtrl.refresh = function() {
-			cameraCtrl.machine = AppDataService.getMachine();
 			cameraCtrl.cameraCycleOn = cameraCtrl.machine.settings.camera_cycle_on;
 			cameraCtrl.cameraCyclePeriod = parseInt(cameraCtrl.machine.settings.camera_cycle_period);
 

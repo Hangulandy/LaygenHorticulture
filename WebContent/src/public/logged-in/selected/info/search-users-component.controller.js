@@ -44,7 +44,6 @@
 			var promise = AppDataService.addUser(user);
 			promise.then(function(result) {
 				searchUsersCtrl.message = result.message;
-				searchUsersCtrl.machine = AppDataService.getMachine();
 				AppDataService.verifyUserAndMachine();
 			});
 		}
@@ -59,7 +58,6 @@
 
 		/* Run init code */
 
-		searchUsersCtrl.machine = AppDataService.getMachine();
 		searchUsersCtrl.resetMessage();
 	}
 

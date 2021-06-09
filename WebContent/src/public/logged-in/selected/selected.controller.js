@@ -14,12 +14,12 @@
 		selectedCtrl.get = function(entry) {
 			return AppDataService.get(entry);
 		}
-		
-		$rootScope.$on('machineStatusUpdated', function(){
-			AppDataService.verifyUserAndMachine();
+
+		$rootScope.$on('machineStatusUpdated', function() {
+			if (AppDataService.getMachine() != undefined) {
+				selectedCtrl.machine = AppDataService.getMachine();	
+			}
 		})
-		
-		AppDataService.verifyUserAndMachine();
 	}
 
 

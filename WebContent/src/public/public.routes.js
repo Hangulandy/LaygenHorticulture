@@ -86,6 +86,7 @@
 				templateUrl: 'src/public/logged-in/selected/data/data.html',
 				controller: 'DataController',
 				controllerAs: 'dataCtrl'
+				// need to get new machine with camera images cleared
 			})
 			.state('common.public.logged-in.selected.camera', {
 				url: '/logged-in/camera',

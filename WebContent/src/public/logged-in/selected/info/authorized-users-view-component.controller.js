@@ -12,10 +12,6 @@
 
 		/* Declare functions */
 
-		$rootScope.$on('machineStatusChanged', function() {
-			authUsersCtrl.machine = AppDataService.getMachine();
-		})
-
 		$rootScope.$on('userRemoved', function() {
 			authUsersCtrl.resetMessage();
 		})
@@ -56,7 +52,6 @@
 			var promise = AppDataService.removeUser(user);
 			promise.then(function(result) {
 				authUsersCtrl.message = result.message;
-				authUsersCtrl.machine = AppDataService.getMachine();
 				AppDataService.verifyUserAndMachine();
 			});
 		}
@@ -66,7 +61,6 @@
 			var promise = AppDataService.transferOwnership(user);
 			promise.then(function(result) {
 				authUsersCtrl.message = result.message;
-				authUsersCtrl.machine = AppDataService.getMachine();
 				AppDataService.verifyUserAndMachine();
 			});
 		}
@@ -98,7 +92,6 @@
 			var promise = AppDataService.addUser(user);
 			promise.then(function(result) {
 				authUsersCtrl.message = result.message;
-				authUsersCtrl.machine = AppDataService.getMachine();
 				AppDataService.verifyUserAndMachine();
 			});
 		}
@@ -109,7 +102,6 @@
 
 		/* Run init code */
 
-		authUsersCtrl.machine = AppDataService.getMachine();
 		authUsersCtrl.resetMessage();
 	}
 

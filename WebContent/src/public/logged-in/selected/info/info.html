@@ -2,9 +2,9 @@
 	<h2>{{infoCtrl.get('machineInfoHeading');}}</h2>
 	<hr>
 	<div>
-		<settings-quick-view></settings-quick-view>
-		<machine-data-quick-view></machine-data-quick-view>
-		<general-info-view></general-info-view>
-		<authorized-users-view></authorized-users-view>
+		<settings-quick-view machine="infoCtrl.machine"></settings-quick-view>
+		<machine-data-quick-view machine="infoCtrl.machine"></machine-data-quick-view>
+		<general-info-view machine="infoCtrl.machine"></general-info-view>
+		<authorized-users-view machine="infoCtrl.machine"></authorized-users-view>
 	</div>
 </div>

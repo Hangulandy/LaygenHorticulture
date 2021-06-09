@@ -4,14 +4,9 @@
 	angular.module('public')
 		.controller('AirSettingsComponentController', AirSettingsComponentController);
 
-	AirSettingsComponentController.$inject = ['AppDataService', '$scope', '$rootScope'];
-	function AirSettingsComponentController(AppDataService, $scope, $rootScope) {
+	AirSettingsComponentController.$inject = ['AppDataService', '$scope'];
+	function AirSettingsComponentController(AppDataService, $scope) {
 		var airCtrl = this;
-
-		$rootScope.$on('machineStatusChanged', function() {
-			airCtrl.machine = AppDataService.getMachine();
-			airCtrl.clearChanges();
-		})
 
 		$scope.$watch('machine', function() {
 			airCtrl.clearChanges();

@@ -1,8 +1,17 @@
 <div class="page">
 	<h2>{{cameraCtrl.get('cameraHeading')}}</h2>
 	<hr>
+	<h4>{{cameraCtrl.get(cameraCtrl.message)}}</h4>
+	<button ng-click="cameraCtrl.takePicture()">{{cameraCtrl.get('capture')}}</button>
+	<button ng-click="cameraCtrl.refreshPage()">{{cameraCtrl.get('refresh')}}</button>
 	<select ng-model="cameraCtrl.selectedImage"
 		ng-options="k as v for (k, v) in cameraCtrl.machine.images"><option
 			value="" disabled selected>{{cameraCtrl.get('selectAnImageLabel')}}</option></select>
-			<button ng-click="cameraCtrl.selectImage()">{{cameraCtrl.get('select')}}</button>
+	<button ng-click="cameraCtrl.selectImage()">{{cameraCtrl.get('select')}}</button>
+	<div ng-if="cameraCtrl.hasImage()">
+		<img class="display-img"
+			src="data:image/jpg;base64,{{cameraCtrl.imageString}}" />
+		<button ng-click="cameraCtrl.deleteImage()">{{cameraCtrl.get('delete')}}</button>
+		<button ng-click="cameraCtrl.downloadImage()">{{cameraCtrl.get('downloadButtonLabel')}}</button>
+	</div>
 </div>

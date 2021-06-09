@@ -33,7 +33,7 @@
 		}
 
 		service.machineValid = function() {
-			if (service.getMachine() !== undefined) {
+			if (service.getMachine() != undefined) {
 				return true;
 			}
 			return false;
@@ -43,12 +43,13 @@
 			// must have a result variable declared because the lambda expression 
 			// will return a value for each value in the loop otherwise
 			var found = false;
-			service.getMachine().authorizedUsers.forEach(authUser => {
-				if (authUser.id == user.id) {
-					found = true;
-				}
-			});
-			console.log();
+			if (user != undefined) {
+				service.getMachine().authorizedUsers.forEach(authUser => {
+					if (authUser.id == user.id) {
+						found = true;
+					}
+				});
+			}
 			return found;
 		}
 
@@ -121,7 +122,6 @@
 		}
 
 		service.login = function(email, password) {
-			service.setUser(undefined);
 			return $http({
 				method: "POST",
 				url: url,
@@ -305,6 +305,31 @@
 				});
 		}
 
+		service.getImageString = function(inputParams) {
+
+			var params = {};
+
+			for (var [key, value] of Object.entries(inputParams)) {
+				if (value == undefined) {
+					value = "";
+				}
+				params[key] = value;
+			}
+			
+			return $http({
+				method: "GET",
+				url: url,
+				params: params
+			})
+				.then(function(result) {
+					var data = result.data;
+					return data;
+				})
+				.catch(function(error) {
+					console.log("Something went terribly wrong", error);
+				});
+		}
+
 		service.getMachineWithImages = function() {
 			return $http({
 				method: "GET",
@@ -322,6 +347,23 @@
 				.catch(function(error) {
 					console.log("Something went terribly wrong", error);
 				});
+		}
+
+		service.standardGet = function(params) {
+			return $http({
+				method: "GET",
+				url: url,
+				params: params
+			})
+				.then(function(result) {
+					var data = result.data;
+					service.setMachine(data.object);
+					service.setUser(data.user);
+					return data;
+				})
+				.catch(function(error) {
+					console.log("Something went terribly wrong", error);
+				})
 		}
 
 		service.getUser = function() {

@@ -12,14 +12,15 @@
 			}
 		});
 
-	DataController.$inject = ['AppDataService', '$rootScope', '$state'];
-	function DataController(AppDataService, $rootScope, $state) {
+	DataController.$inject = ['AppDataService', '$rootScope'];
+	function DataController(AppDataService, $rootScope) {
 
 		var dataCtrl = this;
 
 		$rootScope.$on('machineStatusChanged', function() {
-			$state.reload();
-			dataCtrl.refresh();
+			if (AppDataService.getMachine() != undefined) {
+				dataCtrl.refresh();
+			}
 		});
 
 		dataCtrl.get = function(entry) {
@@ -50,17 +51,16 @@
 
 		dataCtrl.refresh = function() {
 			dataCtrl.machine = AppDataService.getMachine();
-			console.log(dataCtrl.machine);
 			dataCtrl.sensorIsSelected = dataCtrl.getSelectedSensorsFromStorage();
-			
+
 			dataCtrl.sensorIsSelected = dataCtrl.sensorIsSelected === undefined ? {} : dataCtrl.sensorIsSelected;
 
 			for (const [key, value] of Object.entries(dataCtrl.machine.sensors)) {
 				dataCtrl.sensorIsSelected[key] = false;
 			}
-			
+
 			var plantDate = dataCtrl.machine.settings.plant_date;
-			
+
 			dataCtrl.minDate = AppDataService.isValidDate(plantDate) != undefined ? plantDate : "2021-01-01";
 			var startDate = dataCtrl.machine.startDate;
 			startDate = AppDataService.isValidDate(startDate) ? startDate : dataCtrl.minDate;
@@ -93,20 +93,20 @@
 				endTimePicker.value = endTime;
 			}
 		}
-		
-		dataCtrl.saveSensors = function(){
+
+		dataCtrl.saveSensors = function() {
 			AppDataService.setInStorage("sensorIsSelected", dataCtrl.sensorIsSelected);
 		}
-		
-		dataCtrl.getSelectedSensorsFromStorage = function(){
+
+		dataCtrl.getSelectedSensorsFromStorage = function() {
 			AppDataService.getFromStorage("sensorIsSelected");
 		}
 
 		dataCtrl.getSelectedSensors = function() {
 			var output = {};
 			for (const [key, value] of Object.entries(dataCtrl.sensorIsSelected)) {
-				if (dataCtrl.sensorIsSelected[key]){
-					output[key] = dataCtrl.machine.sensors[key]; 
+				if (dataCtrl.sensorIsSelected[key]) {
+					output[key] = dataCtrl.machine.sensors[key];
 				}
 			}
 			return output;
@@ -115,8 +115,8 @@
 		dataCtrl.hasData = function(sensor) {
 			return dataCtrl.machine.sensors[sensor].readings != undefined;
 		}
-		
-		dataCtrl.isSelected = function(sensorName){
+
+		dataCtrl.isSelected = function(sensorName) {
 			return dataCtrl.sensorIsSelected[sensorName];
 		}
 

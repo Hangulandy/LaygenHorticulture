@@ -24,7 +24,6 @@ public class Machine {
 	private TreeMap<String, Sensor> sensors;
 	private TreeMap<String, String> images;
 	private TreeSet<User> authorizedUsers;
-	private String image;
 	private Sensor selectedSensor;
 	private String startDate;
 	private String endDate;
@@ -203,35 +202,23 @@ public class Machine {
 		setImageNames(outputMap);
 	}
 
-	/*
-	 * This is odd-looking because of Base64 encoding
-	 */
-	public String getImage() {
-		if (this.getImageNames().size() > 0) {
-			return image;
-		} else {
-			return null;
+	// Returns the image as a Base64 encoded String
+	public String fetchImage(String imageId) {
+		String string = null;
+
+		byte[] bytes = MachineDB.fetchImageBytesById(imageId);
+
+		if (bytes != null) {
+			string = Base64.getEncoder().encodeToString(bytes);
 		}
+		
+		return string;
 	}
 
-	public void setImage(String image) {
-		this.image = image;
-	}
-
-	public void fetchImage(String imageId) {
-		this.setImage(Base64.getEncoder().encodeToString(MachineDB.fetchImageBytesById(imageId)));
-	}
-
-	public String deleteImage(String imageId) {
+	public void deleteImage(String imageId) {
 		if (imageId != null) {
 			MachineDB.deleteImage(imageId);
-			this.getImageNames().remove(imageId);
-		}
-		if (this.getImageNames().size() > 0) {
-			this.fetchImage(this.getImageNames().firstKey());
-			return this.getImageNames().firstKey();
-		} else {
-			return null;
+			this.fetchImageList();
 		}
 	}
 
@@ -446,7 +433,7 @@ public class Machine {
 				Sensor sensor = this.getSensors().get(key);
 				if (sensor != null && sensor.getReadings() != null) {
 					TreeSet<Message> readings = sensor.getReadings();
-					float maxSize = (float)max;
+					float maxSize = (float) max;
 					if (readings.size() > maxSize) {
 						TreeSet<Message> temp = new TreeSet<Message>();
 
@@ -464,6 +451,17 @@ public class Machine {
 			}
 		}
 		System.out.printf("Performed %d operations reducing the size of the tree sets\n", count);
+	}
+
+	public void clearImages() {
+		this.setImageNames(null);
+	}
+
+	public void clearReadings() {
+		for (String key : this.getSensors().keySet()) {
+			Sensor sensor = this.getSensors().get(key);
+			sensor.clearReadings();
+		}
 	}
 
 }

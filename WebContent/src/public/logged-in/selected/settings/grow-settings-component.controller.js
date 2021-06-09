@@ -4,14 +4,9 @@
 	angular.module('public')
 		.controller('GrowSettingsComponentController', GrowSettingsComponentController);
 
-	GrowSettingsComponentController.$inject = ['AppDataService', '$scope', '$rootScope'];
-	function GrowSettingsComponentController(AppDataService, $scope, $rootScope) {
+	GrowSettingsComponentController.$inject = ['AppDataService', '$scope'];
+	function GrowSettingsComponentController(AppDataService, $scope) {
 		var growCtrl = this;
-
-		$rootScope.$on('machineStatusChanged', function() {
-			growCtrl.machine = AppDataService.getMachine();
-			growCtrl.clearChanges();
-		})
 
 		$scope.$watch('machine', function() {
 			growCtrl.clearChanges();

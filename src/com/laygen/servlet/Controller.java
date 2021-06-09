@@ -1,8 +1,10 @@
 package com.laygen.servlet;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
@@ -23,6 +25,9 @@ import com.laygen.beans.Sensor;
 import com.laygen.beans.User;
 import com.laygen.database.Dictionary;
 import com.laygen.database.UserDB;
+
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.compress.utils.IOUtils;
 
 /**
  * Servlet implementation class Controller
@@ -56,6 +61,11 @@ public class Controller extends HttpServlet {
 			synchronized (lock) {
 
 				Dictionary dict = (Dictionary) session.getAttribute("dict");
+
+				if (!(action.equalsIgnoreCase("viewCameraPage") || action.equalsIgnoreCase("takePicture")
+						|| action.equalsIgnoreCase("deleteImage"))) {
+					clearImages(session);
+				}
 
 				if (dict == null || dict.getEntries() == null) {
 					dict = Dictionary.getInstance();
@@ -140,13 +150,17 @@ public class Controller extends HttpServlet {
 					viewCameraPage(request, response, session);
 				}
 
-//				if (action.equalsIgnoreCase("takePicture")) {
-//					takePicture(session);
-//				}
-//
-//				if (action.equalsIgnoreCase("deleteImage")) {
-//					deleteImageFromMachine(request, session);
-//				}
+				if (action.equalsIgnoreCase("selectImage")) {
+					selectImage(request, response, session);
+				}
+
+				if (action.equalsIgnoreCase("captureImage")) {
+					captureImage(response, session);
+				}
+
+				if (action.equalsIgnoreCase("deleteImage")) {
+					deleteImageFromMachine(request, response, session);
+				}
 
 			}
 
@@ -154,6 +168,14 @@ public class Controller extends HttpServlet {
 			sendSessionExpireMessage(response);
 		}
 
+	}
+
+	private void clearImages(HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		if (machine != null) {
+			machine.clearImages();
+			session.setAttribute("machine", machine);
+		}
 	}
 
 	private void sendSessionExpireMessage(HttpServletResponse response) {
@@ -325,7 +347,7 @@ public class Controller extends HttpServlet {
 	private void refreshMachineInfo(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String message = "null";
-		User user = getLoggedInUser(session);
+		User user = (User) session.getAttribute("user");
 
 		if (user != null) {
 			if (userIsAuth(session)) {
@@ -344,7 +366,7 @@ public class Controller extends HttpServlet {
 	private void updateGrowSettings(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String message = "invalidUserMessage";
-		User user = getLoggedInUser(session);
+		User user = (User) session.getAttribute("user");
 
 		if (user != null) {
 			if (userIsAuth(session)) {
@@ -366,7 +388,7 @@ public class Controller extends HttpServlet {
 	private void updateWaterSettings(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String message = "invalidUserMessage";
-		User user = getLoggedInUser(session);
+		User user = (User) session.getAttribute("user");
 
 		if (user != null) {
 			if (userIsAuth(session)) {
@@ -407,7 +429,7 @@ public class Controller extends HttpServlet {
 	private void updateLightSettings(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String message = "invalidUserMessage";
-		User user = getLoggedInUser(session);
+		User user = (User) session.getAttribute("user");
 
 		if (user != null) {
 			if (userIsAuth(session)) {
@@ -440,7 +462,7 @@ public class Controller extends HttpServlet {
 	private void updateCustomColor(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String message = "invalidUserMessage";
-		User user = getLoggedInUser(session);
+		User user = (User) session.getAttribute("user");
 
 		String lightColor = request.getParameter("light_color");
 		int redValue = getIntFromString(request.getParameter("redValue"));
@@ -473,7 +495,7 @@ public class Controller extends HttpServlet {
 	private void updateAirSettings(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String message = "invalidUserMessage";
-		User user = getLoggedInUser(session);
+		User user = (User) session.getAttribute("user");
 
 		if (user != null) {
 			if (userIsAuth(session)) {
@@ -506,7 +528,7 @@ public class Controller extends HttpServlet {
 	private void updateCameraSettings(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String message = "null";
-		User user = getLoggedInUser(session);
+		User user = (User) session.getAttribute("user");
 
 		if (user != null) {
 			if (userIsAuth(session)) {
@@ -544,7 +566,7 @@ public class Controller extends HttpServlet {
 		String endDate = (String) request.getParameter("endDate");
 		String endTime = (String) request.getParameter("endTime");
 		String message = "invalidUserMessage";
-		User user = getLoggedInUser(session);
+		User user = (User) session.getAttribute("user");
 
 		if (user != null) {
 			if (userIsAuth(session)) {
@@ -576,14 +598,14 @@ public class Controller extends HttpServlet {
 	private void viewCameraPage(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		Machine machine = (Machine) session.getAttribute("machine");
 		String message = "null";
-		User user = getLoggedInUser(session);
+		User user = (User) session.getAttribute("user");
 
 		if (user != null) {
 			if (userIsAuth(session)) {
 				if (machine != null && machine.getSerialNumber() != null) {
 					// everything is good so far
 					machine.fetchImageList();
-					
+
 				} else {
 					message = "invalidMachineInformationMessage";
 				}
@@ -596,41 +618,89 @@ public class Controller extends HttpServlet {
 
 		sendObjectWithResponse(machine, message, session, response);
 	}
-	
-	
 
-//	private void takePicture(HttpSession session) {
-//		Machine machine = (Machine) session.getAttribute("machine");
-//		String message = "null";
-//
-//		if (machine != null && userIsAuth(session)) {
-//			message = machine.takePicture();
-//			session.setAttribute("message", message);
-//			session.setAttribute("viewComponent", "cameraPage");
-//		} else {
-//			viewMyMachines(session);
-//		}
-//	}
-//
-//	private void deleteImageFromMachine(HttpServletRequest request, HttpSession session) {
-//		Machine machine = (Machine) session.getAttribute("machine");
-//		String imageId = (String) request.getParameter("imageId");
-//
-//		if (machine != null && userIsAuth(session) && imageId != null) {
-//			String newImageId = machine.deleteImage(imageId);
-//			session.setAttribute("selectedImageId", newImageId);
-//			String message = imageId.equalsIgnoreCase(newImageId) ? "failure" : "success";
-//			session.setAttribute("message", message);
-//		}
-//		session.setAttribute("viewComponent", "cameraPage");
-//	}
-
-	private User getLoggedInUser(HttpSession session) {
+	private void selectImage(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = "null";
 		User user = (User) session.getAttribute("user");
-		if (user != null && user.isLoggedIn()) {
-			return user;
+		String imageId = request.getParameter("imageId");
+		// byte[] imageBytes = null;
+		String imageString = null;
+
+		if (imageId != null && !imageId.equalsIgnoreCase("")) {
+
+			if (user != null) {
+				if (userIsAuth(session)) {
+					if (machine != null && machine.getSerialNumber() != null) {
+						// everything is good so far
+						imageString = machine.fetchImage(imageId);
+						if (imageString.length() < 10) {
+							message = "cannotFindImageMessage";
+						} else {
+							machine.clearReadings();
+							session.setAttribute("machine", machine);
+						}
+					} else {
+						message = "invalidMachineInformationMessage";
+					}
+				} else {
+					message = "userNotAuthorized";
+				}
+			} else {
+				message = "invalidUserMessage";
+			}
+		} else {
+			message = "cannotFindImageMessage";
 		}
-		return null;
+		sendObjectWithResponse(machine, message, session, response, imageString);
+	}
+
+	private void captureImage(HttpServletResponse response, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = "null";
+		User user = (User) session.getAttribute("user");
+
+		if (user != null) {
+			if (userIsAuth(session)) {
+				if (machine != null && machine.getSerialNumber() != null) {
+					// everything is good so far
+					message = machine.takePicture();
+				} else {
+					message = "invalidMachineInformationMessage";
+				}
+			} else {
+				message = "userNotAuthorized";
+			}
+		} else {
+			message = "invalidUserMessage";
+		}
+
+		sendObjectWithResponse(machine, message, session, response);
+	}
+
+	private void deleteImageFromMachine(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Machine machine = (Machine) session.getAttribute("machine");
+		String message = "null";
+		User user = (User) session.getAttribute("user");
+		String imageId = (String) request.getParameter("imageId");
+
+		if (user != null) {
+			if (userIsAuth(session)) {
+				if (machine != null && machine.getSerialNumber() != null) {
+					// everything is good so far
+					machine.deleteImage(imageId);
+					message = "success";
+				} else {
+					message = "invalidMachineInformationMessage";
+				}
+			} else {
+				message = "userNotAuthorized";
+			}
+		} else {
+			message = "invalidUserMessage";
+		}
+
+		sendObjectWithResponse(machine, message, session, response);
 	}
 
 	private boolean userIsAuth(HttpSession session) {
@@ -643,13 +713,13 @@ public class Controller extends HttpServlet {
 		return outcome;
 	}
 
-	private void sendObjectWithResponse(Object obj, String message, HttpSession session, HttpServletResponse response) {
+	private void sendObjectWithResponse(Object obj, String message, HttpSession session, HttpServletResponse response,
+			String string) {
 
 		User user = (User) session.getAttribute("user");
 
-		if (user == null || !user.isLoggedIn()) {
+		if (user == null) {
 			message = "invalidUserMessage";
-			user = null;
 			obj = null;
 		}
 
@@ -657,8 +727,8 @@ public class Controller extends HttpServlet {
 		resp.setUser(user);
 		resp.setObject(user == null ? null : obj);
 		resp.setMessage(message);
-
-		resp.printIt();
+		resp.setString(string);
+		// resp.printIt();
 
 		try {
 			PrintWriter out = response.getWriter();
@@ -670,6 +740,10 @@ public class Controller extends HttpServlet {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void sendObjectWithResponse(Object obj, String message, HttpSession session, HttpServletResponse response) {
+		sendObjectWithResponse(obj, message, session, response, null);
 	}
 
 	private void sendMapAsResponse(Map map, HttpServletResponse response) {
@@ -685,6 +759,18 @@ public class Controller extends HttpServlet {
 			out.print(jsonData);
 			out.close();
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void sendImageAsResponse(byte[] imageBytes, HttpServletResponse response) {
+		ByteArrayInputStream in = null;
+		try {
+			in = new ByteArrayInputStream(imageBytes);
+			Base64InputStream stream = new Base64InputStream(in);
+			IOUtils.copy(stream, response.getOutputStream());
+			in.close();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

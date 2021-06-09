@@ -19,16 +19,11 @@
 			}
 		})
 
-		chartCtrl.refresh = function() {
-		}
-
 		chartCtrl.populateChart = function() {
 			var id = chartCtrl.sensor.name;
 
 			if (chartCtrl.sensor.readings != undefined) {
 				var labels = chartCtrl.sensor.readings.map(function(reading) {
-					// return parseInt(reading.rowId.split('-')[2]);
-
 					var temp = parseInt(reading.rowId.split('-')[2]);
 					var divisor = 10000000000;
 					var year = Math.floor(temp / divisor);
@@ -110,8 +105,6 @@
 		chartCtrl.hasData = function() {
 			return chartCtrl.sensor.readings != undefined;
 		}
-
-		chartCtrl.refresh();
 	}
 
 

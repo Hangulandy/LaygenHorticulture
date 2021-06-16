@@ -20,6 +20,7 @@
 		$rootScope.$on('machineStatusChanged', function() {
 			if (AppDataService.getMachine() != undefined) {
 				dataCtrl.refresh();
+				console.log("Machine status changed");
 			}
 		});
 
@@ -42,9 +43,9 @@
 				endTime: endTime
 			}
 
-			var promise = AppDataService.submitSettings(params);
+			var promise = AppDataService.standardGet(params);
 			promise.then(function(result) {
-				console.log(result);
+				// What to do here?
 			});
 
 		}

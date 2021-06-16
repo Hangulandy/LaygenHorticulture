@@ -1,13 +1,12 @@
 (function() {
 	"use strict";
 
-	angular.module('common')
-		.controller('CommonController', CommonController);
+	angular.module('common').controller('CommonController', CommonController);
 
-	CommonController.$inject = ['AppDataService', '$rootScope', '$state'];
+	CommonController.$inject = [ 'AppDataService', '$rootScope', '$state' ];
 	function CommonController(AppDataService, $rootScope, $state) {
 		var commonCtrl = this;
-				
+
 		$rootScope.$on('userStatusChanged', function(event) {
 			commonCtrl.refreshUser();
 		});
@@ -51,7 +50,5 @@
 		}
 
 	}
-
-
 
 })();

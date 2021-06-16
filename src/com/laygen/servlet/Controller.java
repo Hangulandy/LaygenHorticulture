@@ -204,7 +204,7 @@ public class Controller extends HttpServlet {
 
 		String message = user.login(email, password);
 
-		session.setAttribute("user", user);
+		session.setAttribute("user", user.isLoggedIn() ? user : null);
 		sendObjectWithResponse(user, message, session, response);
 	}
 
@@ -236,6 +236,8 @@ public class Controller extends HttpServlet {
 
 	private void selectMachine(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		String serialNumber = request.getParameter("selectedMachineId");
+		
+		System.out.println(serialNumber);
 		Machine machine = null;
 		String message = "invalidValueMessage";
 
@@ -250,6 +252,7 @@ public class Controller extends HttpServlet {
 				session.setAttribute("machine", machine);
 				if (!userIsAuth(session)) {
 					message = "userNotAuthorized";
+					machine = null;
 				} else {
 					message = "null";
 				}

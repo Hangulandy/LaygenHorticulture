@@ -128,7 +128,7 @@ public class User implements Comparable<User> {
 			return "emailNotValidMessage";
 		}
 
-		if (getName().trim().length() <2) {
+		if (getName().trim().length() < 2) {
 			return "nameTooShortMessage";
 		}
 
@@ -191,7 +191,11 @@ public class User implements Comparable<User> {
 		this.email = email;
 		this.password = password;
 
-		return UserDB.login(this);
+		String message = UserDB.login(this);
+
+		this.password = null;
+
+		return message;
 	}
 
 	public void refreshAuthorizations() {

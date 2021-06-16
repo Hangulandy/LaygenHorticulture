@@ -77,8 +77,6 @@ public class UserDB {
 			user.setOrganization(userFromDB.getOrganization());
 			user.setLoggedIn(userFromDB.isLoggedIn());
 			user.setPassword(null);
-		} else {
-			user = null;
 		}
 
 		return message;

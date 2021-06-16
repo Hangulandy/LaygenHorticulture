@@ -4,8 +4,8 @@
 	angular.module('public')
 		.controller('LoginController', LoginController);
 
-	LoginController.$inject = ['AppDataService'];
-	function LoginController(AppDataService) {
+	LoginController.$inject = ['AppDataService', '$state'];
+	function LoginController(AppDataService, $state) {
 		var loginCtrl = this;
 
 		loginCtrl.data = {};
@@ -20,7 +20,9 @@
 				var promise = AppDataService.login(loginCtrl.email, loginCtrl.password);
 				promise.then(function(result) {
 					loginCtrl.data = result;
-					AppDataService.verifyUserAndMachine();
+					if (AppDataService.getUser() != undefined){
+						$state.go('common.public.logged-in.not-selected');
+					}
 				});
 			} else {
 				console.log("No data to send to login");

@@ -44,29 +44,29 @@ public class Machine {
 	public void fetchAllFromDB() {
 
 		fetchInfoFromDB();
-		if (this.getInfo() == null) {
-			return;
-		}
+//		if (this.getInfo() == null) {
+//			return;
+//		}
 
 		fetchCurrentReadingsFromDB();
-		if (this.getReadings() == null) {
-			return;
-		}
+//		if (this.getReadings() == null) {
+//			return;
+//		}
 
 		fetchSettingsFromDB(); // includes fetch light colors
-		if (this.getSettings() == null) {
-			return;
-		}
+//		if (this.getSettings() == null) {
+//			return;
+//		}
 
 		fetchSensorsFromDB();
-		if (this.getSensors() == null) {
-			return;
-		}
+//		if (this.getSensors() == null) {
+//			return;
+//		}
 
 		fetchAuthorizedUsersFromDB();
-		if (this.getAuthorizedUsers() == null) {
-			return;
-		}
+//		if (this.getAuthorizedUsers() == null) {
+//			return;
+//		}
 	}
 
 	public void fetchInfoFromDB() {

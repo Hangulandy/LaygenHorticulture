@@ -33,7 +33,7 @@
 			promise.then(function() {
 				var machine = AppDataService.getMachine();
 				// Redirect to either the machine info view page or the machine list page
-				if (machine !== undefined) {
+				if (machine != undefined) {
 					$state.go('common.public.logged-in.selected.info');
 				} else {
 					$state.go('common.public.logged-in.not-selected');

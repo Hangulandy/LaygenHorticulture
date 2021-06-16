@@ -16,6 +16,7 @@
 		$scope.$watch('chartCtrl.selected', function() {
 			if (chartCtrl.selected) {
 				chartCtrl.populateChart();
+				console.log(chartCtrl.sensor);
 			}
 		})
 
@@ -49,6 +50,8 @@
 					return reading.value;
 				});
 			}
+			
+			console.log(labels, data);
 
 			var ctx = document.getElementById(id).getContext('2d');
 			var config = {
